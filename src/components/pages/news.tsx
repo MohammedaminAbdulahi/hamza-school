@@ -9,6 +9,11 @@ import {
   Pin,
   Bell,
   Tag,
+  Share2,
+  Facebook,
+  Twitter,
+  Linkedin,
+  Link2,
 } from 'lucide-react'
 import { PageHero } from '@/components/site/page-hero'
 import { SectionHeader } from '@/components/site/section-header'
@@ -20,6 +25,12 @@ import { NEWS, EVENTS } from '@/lib/data/school'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
 import {
   Pagination,
   PaginationContent,
@@ -236,14 +247,87 @@ export function NewsPage() {
                       <span className="text-xs font-medium text-muted-foreground">
                         By {article.author}
                       </span>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="h-8 gap-1 px-2 text-primary hover:bg-primary/10"
-                      >
-                        Read
-                        <ArrowRight className="size-3.5" />
-                      </Button>
+                      <div className="flex items-center gap-1">
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="size-8 text-muted-foreground hover:text-primary"
+                              aria-label="Share article"
+                            >
+                              <Share2 className="size-3.5" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end" className="w-44">
+                            <DropdownMenuItem
+                              onClick={() =>
+                                window.open(
+                                  `https://facebook.com/sharer/sharer.php?u=${encodeURIComponent(
+                                    window.location.href
+                                  )}`,
+                                  '_blank',
+                                  'noopener,noreferrer'
+                                )
+                              }
+                            >
+                              <Facebook className="size-4" />
+                              Share on Facebook
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                              onClick={() =>
+                                window.open(
+                                  `https://twitter.com/intent/tweet?text=${encodeURIComponent(
+                                    article.title
+                                  )}&url=${encodeURIComponent(window.location.href)}`,
+                                  '_blank',
+                                  'noopener,noreferrer'
+                                )
+                              }
+                            >
+                              <Twitter className="size-4" />
+                              Share on Twitter
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                              onClick={() =>
+                                window.open(
+                                  `https://linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(
+                                    window.location.href
+                                  )}`,
+                                  '_blank',
+                                  'noopener,noreferrer'
+                                )
+                              }
+                            >
+                              <Linkedin className="size-4" />
+                              Share on LinkedIn
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                              onClick={() => {
+                                if (navigator.share) {
+                                  navigator.share({ title: article.title, text: article.excerpt })
+                                } else if (navigator.clipboard) {
+                                  navigator.clipboard.writeText(window.location.href)
+                                  import('sonner').then(({ toast }) =>
+                                    toast.success('Link copied to clipboard!')
+                                  )
+                                }
+                              }}
+                            >
+                              <Link2 className="size-4" />
+                              Copy link
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="h-8 gap-1 px-2 text-primary hover:bg-primary/10"
+                        >
+                          Read
+                          <ArrowRight className="size-3.5" />
+                        </Button>
+                      </div>
                     </div>
                   </CardContent>
                 </Card>
