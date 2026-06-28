@@ -1,0 +1,351 @@
+'use client'
+
+import * as React from 'react'
+import { Images, Maximize2, X, ArrowRight, Camera } from 'lucide-react'
+import { PageHero } from '@/components/site/page-hero'
+import { SectionHeader } from '@/components/site/section-header'
+import { Reveal } from '@/components/site/reveal'
+import { SmartImage } from '@/components/site/smart-image'
+import { useNav } from '@/lib/nav-store'
+import { GALLERY, GALLERY_CATEGORIES } from '@/lib/data/school'
+import { Card, CardContent } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
+import { Badge } from '@/components/ui/badge'
+import {
+  Dialog,
+  DialogContent,
+  DialogTitle,
+  DialogDescription,
+} from '@/components/ui/dialog'
+import { cn } from '@/lib/utils'
+
+interface GalleryItem {
+  title: string
+  category: string
+  image: string
+}
+
+// Varying row spans for a masonry-like layout
+const SPAN_PATTERNS = [
+  'row-span-2',
+  'row-span-1',
+  'row-span-1',
+  'row-span-2',
+  'row-span-1',
+  'row-span-2',
+  'row-span-1',
+  'row-span-1',
+  'row-span-2',
+  'row-span-1',
+  'row-span-2',
+  'row-span-1',
+]
+
+function getCategoryBadgeClass(category: string) {
+  switch (category) {
+    case 'Campus':
+      return 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300'
+    case 'Events':
+      return 'bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300'
+    case 'Sports':
+      return 'bg-teal-100 text-teal-700 dark:bg-teal-900/40 dark:text-teal-300'
+    case 'Arts':
+      return 'bg-rose-100 text-rose-700 dark:bg-rose-900/40 dark:text-rose-300'
+    case 'Culture':
+      return 'bg-orange-100 text-orange-700 dark:bg-orange-900/40 dark:text-orange-300'
+    case 'Graduation':
+      return 'bg-amber-200 text-amber-800 dark:bg-amber-900/50 dark:text-amber-200'
+    default:
+      return 'bg-muted text-muted-foreground'
+  }
+}
+
+export function GalleryPage() {
+  const goPage = useNav((s) => s.goPage)
+  const [activeCategory, setActiveCategory] = React.useState('All')
+  const [lightboxIndex, setLightboxIndex] = React.useState<number | null>(
+    null
+  )
+
+  const filtered: GalleryItem[] = React.useMemo(() => {
+    return activeCategory === 'All'
+      ? GALLERY
+      : GALLERY.filter((g) => g.category === activeCategory)
+  }, [activeCategory])
+
+  const openLightbox = (index: number) => setLightboxIndex(index)
+  const closeLightbox = () => setLightboxIndex(null)
+
+  const showPrev = () =>
+    setLightboxIndex((i) =>
+      i === null ? i : (i - 1 + filtered.length) % filtered.length
+    )
+  const showNext = () =>
+    setLightboxIndex((i) => (i === null ? i : (i + 1) % filtered.length))
+
+  // Keyboard navigation in lightbox
+  React.useEffect(() => {
+    if (lightboxIndex === null) return
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') closeLightbox()
+      if (e.key === 'ArrowLeft') showPrev()
+      if (e.key === 'ArrowRight') showNext()
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [lightboxIndex, filtered.length])
+
+  const current =
+    lightboxIndex !== null ? filtered[lightboxIndex] : null
+
+  return (
+    <div className="flex flex-col">
+      <PageHero
+        eyebrow="Gallery"
+        title="Moments That Make Us Hamza"
+        description="A vibrant look at life on campus — classrooms, championships, creativity, and community. Click any image to view it up close."
+        seed="gallery-hero"
+        icon="Images"
+        breadcrumb="Gallery"
+      />
+
+      {/* ===== GALLERY ===== */}
+      <section className="py-20 sm:py-24">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <Reveal>
+            <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
+              <SectionHeader
+                align="left"
+                eyebrow="Photo Gallery"
+                title="Explore Our Campus in Pictures"
+                description="Filter by category to find the moments that matter most to you."
+              />
+              <Badge
+                variant="secondary"
+                className="inline-flex h-9 items-center gap-2 rounded-full bg-primary/10 px-4 text-sm font-semibold text-primary"
+              >
+                <Images className="size-4" />
+                {filtered.length} of {GALLERY.length} images
+              </Badge>
+            </div>
+          </Reveal>
+
+          {/* Filter buttons */}
+          <Reveal delay={0.05}>
+            <div className="mt-8 flex flex-wrap gap-2">
+              {GALLERY_CATEGORIES.map((cat) => {
+                const count =
+                  cat === 'All'
+                    ? GALLERY.length
+                    : GALLERY.filter((g) => g.category === cat).length
+                return (
+                  <Button
+                    key={cat}
+                    size="sm"
+                    variant={
+                      activeCategory === cat ? 'default' : 'outline'
+                    }
+                    onClick={() => setActiveCategory(cat)}
+                    className={cn(
+                      'h-9 rounded-full px-4',
+                      activeCategory === cat
+                        ? 'bg-primary text-primary-foreground shadow-md shadow-primary/30'
+                        : 'hover:border-primary hover:text-primary'
+                    )}
+                  >
+                    {cat}
+                    <span
+                      className={cn(
+                        'ml-1.5 rounded-full px-1.5 text-xs',
+                        activeCategory === cat
+                          ? 'bg-primary-foreground/20'
+                          : 'bg-muted text-muted-foreground'
+                      )}
+                    >
+                      {count}
+                    </span>
+                  </Button>
+                )
+              })}
+            </div>
+          </Reveal>
+
+          {/* Masonry grid */}
+          <div className="mt-10 grid auto-rows-[180px] grid-cols-2 gap-4 sm:grid-cols-3 sm:auto-rows-[200px] lg:grid-cols-4">
+            {filtered.map((item, i) => {
+              const span =
+                SPAN_PATTERNS[i % SPAN_PATTERNS.length]
+              return (
+                <Reveal
+                  key={`${item.title}-${i}`}
+                  delay={(i % 4) * 0.06}
+                  className={cn(
+                    'group relative cursor-pointer overflow-hidden rounded-2xl',
+                    span
+                  )}
+                >
+                  <button
+                    onClick={() => openLightbox(i)}
+                    className="block size-full"
+                    aria-label={`View ${item.title} larger`}
+                  >
+                    <SmartImage
+                      seed={item.image}
+                      alt={item.title}
+                      label={item.title}
+                      rounded="rounded-2xl"
+                      className="size-full transition-transform duration-500 group-hover:scale-105"
+                    />
+                    {/* Overlay */}
+                    <div className="absolute inset-0 flex flex-col justify-between bg-gradient-to-t from-black/60 via-transparent to-transparent p-4 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
+                      <div className="flex justify-end">
+                        <span
+                          className={cn(
+                            'inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-semibold backdrop-blur-md',
+                            getCategoryBadgeClass(item.category)
+                          )}
+                        >
+                          {item.category}
+                        </span>
+                      </div>
+                      <div className="flex items-center justify-between text-white">
+                        <span className="text-sm font-semibold drop-shadow">
+                          {item.title}
+                        </span>
+                        <span className="flex size-8 items-center justify-center rounded-full bg-white/20 backdrop-blur-md">
+                          <Maximize2 className="size-4" />
+                        </span>
+                      </div>
+                    </div>
+                  </button>
+                </Reveal>
+              )
+            })}
+          </div>
+
+          {filtered.length === 0 && (
+            <div className="mt-16 flex flex-col items-center justify-center gap-3 text-center">
+              <Camera className="size-12 text-muted-foreground/50" />
+              <p className="text-base font-medium">
+                No photos in this category yet.
+              </p>
+              <Button
+                variant="outline"
+                onClick={() => setActiveCategory('All')}
+              >
+                View all photos
+              </Button>
+            </div>
+          )}
+        </div>
+      </section>
+
+      {/* ===== CTA ===== */}
+      <section className="relative overflow-hidden bg-primary py-16 text-primary-foreground sm:py-20">
+        <div className="absolute inset-0 opacity-10 [background-image:radial-gradient(circle_at_1px_1px,white_1px,transparent_0)] [background-size:32px_32px]" />
+        <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <Reveal>
+            <div className="flex flex-col items-center gap-8 text-center lg:flex-row lg:justify-between lg:text-left">
+              <div className="max-w-2xl">
+                <Badge className="bg-amber-400 text-amber-950 hover:bg-amber-400">
+                  See It Live
+                </Badge>
+                <h2 className="mt-4 text-balance text-3xl font-bold tracking-tight sm:text-4xl">
+                  Pictures don't do it justice
+                </h2>
+                <p className="mt-4 text-base text-primary-foreground/85 sm:text-lg">
+                  Visit our campus to experience the energy, warmth, and
+                  wonder of Hamza School in person.
+                </p>
+              </div>
+              <div className="flex flex-col gap-3 sm:flex-row">
+                <Button
+                  size="lg"
+                  onClick={() => goPage('contact')}
+                  className="h-12 bg-amber-400 px-7 text-base text-amber-950 shadow-xl hover:bg-amber-300"
+                >
+                  Book a Campus Tour
+                  <ArrowRight className="size-4" />
+                </Button>
+                <Button
+                  size="lg"
+                  variant="outline"
+                  onClick={() => goPage('admissions')}
+                  className="h-12 border-white/40 bg-white/10 px-7 text-base text-white backdrop-blur-md hover:bg-white/20 hover:text-white"
+                >
+                  Apply Now
+                </Button>
+              </div>
+            </div>
+          </Reveal>
+        </div>
+      </section>
+
+      {/* ===== LIGHTBOX ===== */}
+      <Dialog
+        open={lightboxIndex !== null}
+        onOpenChange={(open) => {
+          if (!open) closeLightbox()
+        }}
+      >
+        <DialogContent
+          showCloseButton={false}
+          className="max-w-4xl border-0 bg-transparent p-0 shadow-none [&>button]:hidden"
+        >
+          {current && (
+            <div className="overflow-hidden rounded-2xl bg-card">
+              <div className="relative">
+                <SmartImage
+                  seed={current.image}
+                  alt={current.title}
+                  label={current.title}
+                  rounded="rounded-none"
+                  className="aspect-[16/10] w-full"
+                />
+                <button
+                  onClick={closeLightbox}
+                  aria-label="Close"
+                  className="absolute right-3 top-3 flex size-9 items-center justify-center rounded-full bg-black/40 text-white backdrop-blur-md transition-colors hover:bg-black/60"
+                >
+                  <X className="size-5" />
+                </button>
+                <button
+                  onClick={showPrev}
+                  aria-label="Previous"
+                  className="absolute left-3 top-1/2 flex size-10 -translate-y-1/2 items-center justify-center rounded-full bg-black/40 text-white backdrop-blur-md transition-colors hover:bg-black/60"
+                >
+                  <ArrowRight className="size-5 rotate-180" />
+                </button>
+                <button
+                  onClick={showNext}
+                  aria-label="Next"
+                  className="absolute right-3 top-1/2 flex size-10 -translate-y-1/2 items-center justify-center rounded-full bg-black/40 text-white backdrop-blur-md transition-colors hover:bg-black/60"
+                >
+                  <ArrowRight className="size-5" />
+                </button>
+              </div>
+              <div className="flex items-center justify-between gap-4 p-5">
+                <div>
+                  <DialogTitle className="text-lg font-semibold">
+                    {current.title}
+                  </DialogTitle>
+                  <DialogDescription className="text-sm text-muted-foreground">
+                    Photo {lightboxIndex! + 1} of {filtered.length}
+                  </DialogDescription>
+                </div>
+                <Badge
+                  className={cn(
+                    'shrink-0',
+                    getCategoryBadgeClass(current.category)
+                  )}
+                >
+                  {current.category}
+                </Badge>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
+    </div>
+  )
+}
