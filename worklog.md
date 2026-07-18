@@ -268,3 +268,29 @@ Agent-browser verification:
 Stage Summary:
 - All original requirements now fully implemented including 404 & 500 error pages and social sharing
 - Website is production-ready and fully verified
+
+---
+Task ID: 6
+Agent: Main (Z.ai Code)
+Task: Add real PostgreSQL-ready backend (Express + SQLite) — convert News page to real database
+
+Work Log:
+- Created mini-services/api/ — Express backend on port 4000
+  - index.ts: Express server with routes for /api/news (GET, GET/:id, POST), /api/events, /api/school, /api/health
+  - db.ts: Database init using bun:sqlite (SQLite). Creates tables (news_articles, events, school_info) and seeds them with the same data from school.ts. Includes comments showing how to switch to PostgreSQL (pg Pool) when deploying.
+  - package.json: express, cors, better-sqlite3 deps (using bun:sqlite at runtime)
+- Started API as persistent Python daemon (survives shell exit)
+- Created src/lib/api.ts — frontend API client with typed methods (getNews, getNewsArticle, createNews, getEvents, getSchoolInfo). All requests auto-append XTransformPort=4000 for gateway routing.
+- Updated src/components/pages/news.tsx:
+  - Replaced `import { NEWS }` with `import { api, type NewsArticle }`
+  - Added useState/useEffect to fetch news from real API on mount
+  - Added loading spinner, error state with retry button, empty state
+  - The news grid now renders real database data instead of mock data
+- Verified: API returns 6 articles via gateway, frontend compiles clean, lint passes
+
+Stage Summary:
+- News page now loads from a REAL database (SQLite locally, PostgreSQL-ready for deploy)
+- To switch to PostgreSQL: replace db.ts with pg Pool, change db.prepare().all() to await pool.query()
+- Pattern established: same approach can be repeated for Events, Gallery, Login, etc.
+- Files created: mini-services/api/index.ts, mini-services/api/db.ts, src/lib/api.ts
+- Files modified: src/components/pages/news.tsx

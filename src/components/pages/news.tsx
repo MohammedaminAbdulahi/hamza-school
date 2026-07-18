@@ -21,7 +21,8 @@ import { Reveal } from '@/components/site/reveal'
 import { SmartImage } from '@/components/site/smart-image'
 import { DynamicIcon } from '@/components/site/dynamic-icon'
 import { useNav } from '@/lib/nav-store'
-import { NEWS, EVENTS } from '@/lib/data/school'
+import { EVENTS } from '@/lib/data/school'
+import { api, type NewsArticle } from '@/lib/api'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -137,13 +138,32 @@ export function NewsPage() {
   const [activeCategory, setActiveCategory] = React.useState('All')
   const [page, setPage] = React.useState(1)
 
+  // ─── Fetch news from the real database (Express API) ───
+  const [news, setNews] = React.useState<NewsArticle[]>([])
+  const [loading, setLoading] = React.useState(true)
+  const [error, setError] = React.useState<string | null>(null)
+
+  React.useEffect(() => {
+    setLoading(true)
+    api.getNews()
+      .then((data) => {
+        setNews(data)
+        setError(null)
+      })
+      .catch((err) => {
+        console.error('Failed to load news:', err)
+        setError('Could not load news. Please try again later.')
+      })
+      .finally(() => setLoading(false))
+  }, [])
+
   const filtered = React.useMemo(() => {
     const list =
       activeCategory === 'All'
-        ? NEWS
-        : NEWS.filter((n) => n.category === activeCategory)
+        ? news
+        : news.filter((n) => n.category === activeCategory)
     return list
-  }, [activeCategory])
+  }, [activeCategory, news])
 
   React.useEffect(() => {
     setPage(1)
@@ -210,6 +230,25 @@ export function NewsPage() {
           </Reveal>
 
           {/* News grid */}
+          {loading ? (
+            <div className="mt-10 flex min-h-[300px] items-center justify-center">
+              <div className="size-10 animate-spin rounded-full border-2 border-primary/20 border-t-primary" />
+            </div>
+          ) : error ? (
+            <div className="mt-10 flex min-h-[300px] flex-col items-center justify-center gap-3 text-center">
+              <p className="text-muted-foreground">{error}</p>
+              <Button variant="outline" size="sm" onClick={() => {
+                setLoading(true)
+                api.getNews().then(setNews).catch(() => setError('Could not load news.')).finally(() => setLoading(false))
+              }}>
+                Try again
+              </Button>
+            </div>
+          ) : pageItems.length === 0 ? (
+            <div className="mt-10 flex min-h-[300px] items-center justify-center text-muted-foreground">
+              No articles found in this category.
+            </div>
+          ) : (
           <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {pageItems.map((article, i) => (
               <Reveal key={article.title} delay={i * 0.08}>
@@ -334,6 +373,7 @@ export function NewsPage() {
               </Reveal>
             ))}
           </div>
+          )}
 
           {/* Pagination */}
           {totalPages > 1 && (
