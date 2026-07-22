@@ -6,11 +6,6 @@ import {
   Search,
   Sun,
   Moon,
-  ChevronDown,
-  GraduationCap,
-  Users,
-  ShieldCheck,
-  UserCog,
   Phone,
 } from 'lucide-react'
 import { useTheme } from 'next-themes'
@@ -22,16 +17,8 @@ import {
   SheetTitle,
   SheetTrigger,
 } from '@/components/ui/sheet'
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu'
 import { Logo } from './logo'
-import { useNav, type PageId, type PortalRole } from '@/lib/nav-store'
+import { useNav, type PageId } from '@/lib/nav-store'
 import { cn } from '@/lib/utils'
 import { SCHOOL } from '@/lib/data/school'
 
@@ -39,26 +26,13 @@ const PAGES: { id: PageId; label: string }[] = [
   { id: 'home', label: 'Home' },
   { id: 'about', label: 'About Us' },
   { id: 'academics', label: 'Academics' },
-  { id: 'admissions', label: 'Admissions' },
   { id: 'news', label: 'News & Events' },
   { id: 'gallery', label: 'Gallery' },
   { id: 'contact', label: 'Contact' },
 ]
 
-const PORTALS: {
-  role: PortalRole
-  label: string
-  desc: string
-  icon: React.ElementType
-}[] = [
-  { role: 'student', label: 'Student Portal', desc: 'Grades, assignments & schedule', icon: GraduationCap },
-  { role: 'parent', label: 'Parent Portal', desc: 'Track your child’s progress', icon: Users },
-  { role: 'teacher', label: 'Teacher Portal', desc: 'Manage classes & grading', icon: UserCog },
-  { role: 'admin', label: 'Admin Panel', desc: 'School administration', icon: ShieldCheck },
-]
-
 export function Navbar() {
-  const { view, goPage, openPortalLogin, mobileNavOpen, setMobileNavOpen, setSearchOpen } = useNav()
+  const { view, goPage, mobileNavOpen, setMobileNavOpen, setSearchOpen } = useNav()
   const { theme, setTheme } = useTheme()
   const [mounted, setMounted] = React.useState(false)
   const [scrolled, setScrolled] = React.useState(false)
@@ -71,8 +45,6 @@ export function Navbar() {
     window.addEventListener('scroll', onScroll, { passive: true })
     return () => window.removeEventListener('scroll', onScroll)
   }, [])
-
-  const activePage = view.kind === 'page' ? view.page : null
 
   return (
     <header
@@ -109,11 +81,11 @@ export function Navbar() {
               onClick={() => goPage(p.id)}
               className={cn(
                 'relative rounded-lg px-3 py-2 text-sm font-medium transition-colors hover:text-primary',
-                activePage === p.id ? 'text-primary' : 'text-foreground/80'
+                view === p.id ? 'text-primary' : 'text-foreground/80'
               )}
             >
               {p.label}
-              {activePage === p.id && (
+              {view === p.id && (
                 <span className="absolute inset-x-3 -bottom-px h-0.5 rounded-full bg-primary" />
               )}
             </button>
@@ -145,42 +117,11 @@ export function Navbar() {
             )}
           </Button>
 
-          {/* Portals dropdown */}
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="hidden gap-1.5 md:inline-flex">
-                Portals
-                <ChevronDown className="size-4" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-64">
-              <DropdownMenuLabel className="text-muted-foreground">
-                Secure access
-              </DropdownMenuLabel>
-              <DropdownMenuSeparator />
-              {PORTALS.map((portal) => (
-                <DropdownMenuItem
-                  key={portal.role}
-                  onClick={() => openPortalLogin(portal.role)}
-                  className="flex items-start gap-3 py-2.5"
-                >
-                  <span className="mt-0.5 flex size-9 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
-                    <portal.icon className="size-4.5" />
-                  </span>
-                  <span className="flex flex-col">
-                    <span className="text-sm font-semibold">{portal.label}</span>
-                    <span className="text-xs text-muted-foreground">{portal.desc}</span>
-                  </span>
-                </DropdownMenuItem>
-              ))}
-            </DropdownMenuContent>
-          </DropdownMenu>
-
           <Button
-            onClick={() => goPage('admissions')}
+            onClick={() => goPage('contact')}
             className="hidden bg-primary shadow-md shadow-primary/20 hover:bg-primary/90 sm:inline-flex"
           >
-            Apply Now
+            Contact Us
           </Button>
 
           {/* Mobile menu */}
@@ -203,7 +144,7 @@ export function Navbar() {
                     onClick={() => goPage(p.id)}
                     className={cn(
                       'rounded-lg px-3 py-2.5 text-left text-sm font-medium transition-colors hover:bg-accent',
-                      activePage === p.id
+                      view === p.id
                         ? 'bg-primary/10 text-primary'
                         : 'text-foreground'
                     )}
@@ -212,26 +153,11 @@ export function Navbar() {
                   </button>
                 ))}
               </div>
-              <div className="mt-6 border-t pt-4">
-                <p className="px-3 pb-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                  Portals
-                </p>
-                {PORTALS.map((portal) => (
-                  <button
-                    key={portal.role}
-                    onClick={() => openPortalLogin(portal.role)}
-                    className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left text-sm font-medium transition-colors hover:bg-accent"
-                  >
-                    <portal.icon className="size-4.5 text-primary" />
-                    {portal.label}
-                  </button>
-                ))}
-              </div>
               <Button
-                onClick={() => goPage('admissions')}
+                onClick={() => goPage('contact')}
                 className="mt-6 w-full bg-primary shadow-md shadow-primary/20"
               >
-                Apply Now
+                Contact Us
               </Button>
               <div className="mt-6 space-y-1 border-t pt-4 text-sm text-muted-foreground">
                 <p className="flex items-center gap-2">

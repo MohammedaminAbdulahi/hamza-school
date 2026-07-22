@@ -53,7 +53,7 @@ function formatDate(iso: string) {
 }
 
 export function HomePage() {
-  const { goPage, openPortalLogin } = useNav()
+  const { goPage } = useNav()
 
   return (
     <div className="flex flex-col">
@@ -116,10 +116,10 @@ export function HomePage() {
             >
               <Button
                 size="lg"
-                onClick={() => goPage('admissions')}
+                onClick={() => goPage('contact')}
                 className="h-12 bg-amber-500 px-7 text-base text-amber-950 shadow-xl shadow-amber-500/30 hover:bg-amber-400"
               >
-                Enroll Your Child
+                Get in Touch
                 <ArrowRight className="size-4.5" />
               </Button>
               <Button
@@ -558,22 +558,22 @@ export function HomePage() {
           <Reveal>
             <span className="inline-flex items-center gap-2 rounded-full bg-white/15 px-4 py-1.5 text-sm font-medium text-white backdrop-blur">
               <Sparkles className="size-4 text-amber-300" />
-              Admissions Open for 2025–2026
+              Visit Us This Term
             </span>
             <h2 className="mt-5 text-balance text-3xl font-bold tracking-tight text-white sm:text-4xl lg:text-5xl">
-              Begin Your Child’s Hamza Journey Today
+              Come See the Hamza Difference
             </h2>
             <p className="mx-auto mt-5 max-w-2xl text-balance text-lg text-white/85">
-              Limited seats remain across all grade levels. Schedule a tour, meet our
-              educators, and discover why families choose Hamza.
+              We'd love to meet you and your child. Book a visit, meet our teachers,
+              and feel the warmth of our community for yourself.
             </p>
             <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
               <Button
                 size="lg"
-                onClick={() => goPage('admissions')}
+                onClick={() => goPage('contact')}
                 className="h-12 bg-white px-7 text-base text-primary shadow-xl hover:bg-white/90"
               >
-                Apply Now
+                Contact Us
                 <ArrowRight className="size-4.5" />
               </Button>
               <Button

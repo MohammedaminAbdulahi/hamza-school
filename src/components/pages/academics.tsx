@@ -626,7 +626,7 @@ export function AcademicsPage() {
                   <div className="flex items-center gap-2">
                     <GraduationCap className="size-7" />
                     <span className="text-xs font-semibold uppercase tracking-wider">
-                      Admissions Open for 2025–2026
+                      Visit Us This Term
                     </span>
                   </div>
                   <h2 className="mt-3 text-2xl font-bold tracking-tight sm:text-3xl">
@@ -641,7 +641,7 @@ export function AcademicsPage() {
                   <Button
                     size="lg"
                     className="bg-white text-amber-700 hover:bg-white/90"
-                    onClick={() => goPage('admissions')}
+                    onClick={() => goPage('contact')}
                   >
                     Start Application
                     <ArrowRight className="size-4" />

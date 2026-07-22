@@ -27,11 +27,9 @@ const SEARCH_INDEX: SearchItem[] = [
     page: p.id,
     keywords: [p.label.toLowerCase(), p.id],
   })),
-  { title: 'Admissions Process', description: 'How to apply to Hamza School', page: 'admissions', keywords: ['apply', 'enroll', 'requirements', 'tuition'] },
-  { title: 'STEM & Robotics Lab', description: 'Our innovation programs', page: 'academics', keywords: ['science', 'robotics', 'stem', 'technology', 'lab'] },
+  { title: 'Biology Lab', description: 'Our hands-on science program', page: 'academics', keywords: ['science', 'biology', 'lab', 'experiment'] },
   { title: 'School Calendar', description: 'Upcoming events and dates', page: 'news', keywords: ['calendar', 'events', 'dates', 'schedule'] },
-  { title: 'School Facilities', description: 'Campus, labs, library & sports', page: 'about', keywords: ['campus', 'facilities', 'library', 'sports', 'lab'] },
-  { title: 'Tuition & Fees', description: 'Annual tuition by grade level', page: 'admissions', keywords: ['tuition', 'fees', 'cost', 'price', 'scholarship'] },
+  { title: 'School Facilities', description: 'Campus, labs, library & spaces', page: 'about', keywords: ['campus', 'facilities', 'library', 'lab'] },
   { title: 'Clubs & Activities', description: 'Student clubs and societies', page: 'academics', keywords: ['clubs', 'activities', 'extracurricular'] },
   { title: 'Contact Us', description: 'Phone, email, address & map', page: 'contact', keywords: ['contact', 'phone', 'email', 'address', 'map'] },
 ]

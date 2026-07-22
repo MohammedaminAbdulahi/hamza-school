@@ -485,7 +485,7 @@ export function ContactPage() {
               <div className="flex flex-col gap-3 sm:flex-row">
                 <Button
                   size="lg"
-                  onClick={() => goPage('admissions')}
+                  onClick={() => goPage('contact')}
                   className="h-12 bg-amber-400 px-7 text-base text-amber-950 shadow-xl hover:bg-amber-300"
                 >
                   Start Application

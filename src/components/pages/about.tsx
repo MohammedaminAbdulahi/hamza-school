@@ -471,9 +471,9 @@ export function AboutPage() {
                     size="lg"
                     variant="secondary"
                     className="bg-amber-400 text-amber-950 hover:bg-amber-300"
-                    onClick={() => goPage('admissions')}
+                    onClick={() => goPage('contact')}
                   >
-                    Apply Now
+                    Contact Us
                     <ArrowRight className="size-4" />
                   </Button>
                   <Button

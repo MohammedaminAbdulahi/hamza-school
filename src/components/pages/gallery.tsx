@@ -270,10 +270,10 @@ export function GalleryPage() {
                 <Button
                   size="lg"
                   variant="outline"
-                  onClick={() => goPage('admissions')}
+                  onClick={() => goPage('contact')}
                   className="h-12 border-white/40 bg-white/10 px-7 text-base text-white backdrop-blur-md hover:bg-white/20 hover:text-white"
                 >
-                  Apply Now
+                  Contact Us
                 </Button>
               </div>
             </div>

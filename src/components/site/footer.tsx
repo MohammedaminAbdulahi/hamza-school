@@ -23,7 +23,6 @@ import { toast } from 'sonner'
 const QUICK_LINKS: { label: string; page: PageId }[] = [
   { label: 'About Us', page: 'about' },
   { label: 'Academics', page: 'academics' },
-  { label: 'Admissions', page: 'admissions' },
   { label: 'News & Events', page: 'news' },
   { label: 'Gallery', page: 'gallery' },
   { label: 'Contact', page: 'contact' },
@@ -50,7 +49,7 @@ export function Footer() {
           <div className="text-center md:text-left">
             <h3 className="text-2xl font-bold">Stay Connected with Hamza School</h3>
             <p className="mt-1 text-primary-foreground/80">
-              Subscribe for news, events, and admissions updates.
+              Subscribe for news, events, and school updates.
             </p>
           </div>
           <form
@@ -124,24 +123,30 @@ export function Footer() {
         </div>
 
         <div>
-          <h4 className="mb-4 text-sm font-bold uppercase tracking-wider">Portals</h4>
+          <h4 className="mb-4 text-sm font-bold uppercase tracking-wider">Visit Us</h4>
           <ul className="space-y-2.5 text-sm">
-            {(['student', 'parent', 'teacher', 'admin'] as const).map((r) => (
-              <li key={r}>
-                <button
-                  onClick={() => useNav.getState().openPortalLogin(r)}
-                  className="capitalize text-muted-foreground transition-colors hover:text-primary"
-                >
-                  {r} Portal
-                </button>
-              </li>
-            ))}
             <li>
               <button
-                onClick={() => goPage('admissions')}
+                onClick={() => goPage('contact')}
                 className="text-muted-foreground transition-colors hover:text-primary"
               >
-                Apply for Admission
+                Book a Visit
+              </button>
+            </li>
+            <li>
+              <button
+                onClick={() => goPage('news')}
+                className="text-muted-foreground transition-colors hover:text-primary"
+              >
+                Latest News
+              </button>
+            </li>
+            <li>
+              <button
+                onClick={() => goPage('gallery')}
+                className="text-muted-foreground transition-colors hover:text-primary"
+              >
+                School Gallery
               </button>
             </li>
           </ul>

@@ -16,18 +16,17 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Hamza School | Inspiring Excellence, Building Tomorrow's Leaders",
+  title: "Hamza School | Learning Without Limits — Addis Ababa, Ethiopia",
   description:
-    "Hamza School is a premier institution committed to academic excellence, character development, and inspiring tomorrow's leaders. Explore our programs, admissions, and vibrant campus life.",
+    "Hamza School is a warm, family-like school in Addis Ababa serving Grades 1–8. Caring teachers, a real biology lab, and a love for learning that lasts a lifetime.",
   keywords: [
     "Hamza School",
-    "school",
-    "education",
-    "admissions",
-    "academics",
-    "STEM",
-    "student portal",
-    "premium school",
+    "school Addis Ababa",
+    "Ethiopia school",
+    "primary school",
+    "junior secondary",
+    "Grades 1 to 8",
+    "private school Ethiopia",
   ],
   authors: [{ name: "Hamza School" }],
   icons: {
