@@ -21,7 +21,7 @@ import { Reveal } from '@/components/site/reveal'
 import { SmartImage } from '@/components/site/smart-image'
 import { DynamicIcon } from '@/components/site/dynamic-icon'
 import { useNav } from '@/lib/nav-store'
-import { EVENTS } from '@/lib/data/school'
+import { NEWS, EVENTS } from '@/lib/data/school'
 import { api, type NewsArticle } from '@/lib/api'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -139,20 +139,19 @@ export function NewsPage() {
   const [page, setPage] = React.useState(1)
 
   // ─── Fetch news from the real database (Express API) ───
+  // Falls back to mock data if the API is unavailable (e.g. on Vercel)
   const [news, setNews] = React.useState<NewsArticle[]>([])
   const [loading, setLoading] = React.useState(true)
-  const [error, setError] = React.useState<string | null>(null)
 
   React.useEffect(() => {
     setLoading(true)
     api.getNews()
       .then((data) => {
-        setNews(data)
-        setError(null)
+        setNews(data as NewsArticle[])
       })
-      .catch((err) => {
-        console.error('Failed to load news:', err)
-        setError('Could not load news. Please try again later.')
+      .catch(() => {
+        // API not available — fall back to local data so the page still works
+        setNews(NEWS as unknown as NewsArticle[])
       })
       .finally(() => setLoading(false))
   }, [])
@@ -233,16 +232,6 @@ export function NewsPage() {
           {loading ? (
             <div className="mt-10 flex min-h-[300px] items-center justify-center">
               <div className="size-10 animate-spin rounded-full border-2 border-primary/20 border-t-primary" />
-            </div>
-          ) : error ? (
-            <div className="mt-10 flex min-h-[300px] flex-col items-center justify-center gap-3 text-center">
-              <p className="text-muted-foreground">{error}</p>
-              <Button variant="outline" size="sm" onClick={() => {
-                setLoading(true)
-                api.getNews().then(setNews).catch(() => setError('Could not load news.')).finally(() => setLoading(false))
-              }}>
-                Try again
-              </Button>
             </div>
           ) : pageItems.length === 0 ? (
             <div className="mt-10 flex min-h-[300px] items-center justify-center text-muted-foreground">
