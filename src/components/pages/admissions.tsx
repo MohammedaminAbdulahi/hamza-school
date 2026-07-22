@@ -53,8 +53,6 @@ import {
 } from '@/components/ui/accordion'
 
 const GRADES = [
-  'Pre-K',
-  'Kindergarten',
   'Grade 1',
   'Grade 2',
   'Grade 3',
@@ -63,10 +61,6 @@ const GRADES = [
   'Grade 6',
   'Grade 7',
   'Grade 8',
-  'Grade 9',
-  'Grade 10',
-  'Grade 11',
-  'Grade 12',
 ]
 
 const DOWNLOAD_FORMS = [
@@ -174,7 +168,7 @@ export function AdmissionsPage() {
       <PageHero
         eyebrow="Admissions"
         title="Begin Your Hamza Journey"
-        description="From first inquiry to first day of school — we make the admissions process warm, transparent, and supportive for every family."
+        description="From your first hello to your child's first day of school — we make the admissions process warm, transparent, and supportive for every family in Addis Ababa."
         seed="admissions-hero"
         icon="GraduationCap"
         breadcrumb="Admissions"
@@ -189,7 +183,7 @@ export function AdmissionsPage() {
                 align="left"
                 eyebrow="What You'll Need"
                 title="Admission Requirements"
-                description="A simple checklist of documents and information to prepare before submitting your application."
+                description="A simple checklist of documents and information to prepare before submitting your application for Grades 1–8."
               />
               <Card className="mt-8 border-primary/10 shadow-sm">
                 <CardContent className="p-6 sm:p-8">
@@ -222,7 +216,7 @@ export function AdmissionsPage() {
                   className="aspect-[4/3] w-full"
                 />
                 <div className="absolute -bottom-6 -left-6 hidden rounded-2xl border bg-card p-5 shadow-xl sm:block">
-                  <p className="text-3xl font-bold text-primary">$75</p>
+                  <p className="text-3xl font-bold text-primary">500 ETB</p>
                   <p className="text-sm text-muted-foreground">
                     Application Fee
                   </p>
@@ -283,7 +277,7 @@ export function AdmissionsPage() {
             <SectionHeader
               eyebrow="Tuition & Fees"
               title="Transparent Tuition Information"
-              description="An investment in your child's future. Annual tuition by grade level, with flexible payment plans available."
+              description="An investment in your child's future. Termly tuition by grade level, with sibling discounts and flexible payment plans available."
             />
           </Reveal>
           <Reveal delay={0.1}>
@@ -295,7 +289,7 @@ export function AdmissionsPage() {
                       Grade Level
                     </TableHead>
                     <TableHead className="text-sm font-semibold uppercase tracking-wider text-primary">
-                      Annual Tuition
+                      Termly Tuition
                     </TableHead>
                     <TableHead className="pr-6 text-sm font-semibold uppercase tracking-wider text-primary">
                       Notes
@@ -327,13 +321,13 @@ export function AdmissionsPage() {
               </div>
               <div>
                 <h3 className="text-base font-semibold text-amber-950 dark:text-amber-100">
-                  Financial Aid &amp; Scholarships Available
+                  Sibling Discounts &amp; Flexible Payment Plans
                 </h3>
                 <p className="mt-1 text-sm text-amber-900/80 dark:text-amber-100/70">
-                  Over 22% of Hamza students receive need-based aid or merit
-                  scholarships. Sibling discounts and flexible monthly payment
-                  plans are also offered. Contact our accounts office to learn
-                  more.
+                  Families enrolling two or more children receive a 10% sibling
+                  discount on tuition for the second and subsequent children.
+                  Termly and monthly payment plans are also available — speak with
+                  our accounts office to find a plan that works for your family.
                 </p>
               </div>
             </div>
@@ -350,7 +344,7 @@ export function AdmissionsPage() {
                 align="left"
                 eyebrow="Apply Online"
                 title="Start Your Application"
-                description="Complete the form below and our admissions team will reach out within 2 business days to schedule your campus tour."
+                description="Complete the form below and our admissions team will reach out within 2 business days to schedule your campus visit."
               />
               <div className="mt-8 space-y-4">
                 {[
@@ -396,7 +390,7 @@ export function AdmissionsPage() {
                         </Label>
                         <Input
                           id="studentName"
-                          placeholder="e.g. Aisha Rahman"
+                          placeholder="e.g. Amanuel Tesfaye"
                           value={form.studentName}
                           onChange={update('studentName')}
                           required
@@ -443,7 +437,7 @@ export function AdmissionsPage() {
                         </Label>
                         <Input
                           id="parentName"
-                          placeholder="e.g. Sarah Mitchell"
+                          placeholder="e.g. Mr. Tesfaye Bekele"
                           value={form.parentName}
                           onChange={update('parentName')}
                           required
@@ -454,7 +448,7 @@ export function AdmissionsPage() {
                         <Input
                           id="phone"
                           type="tel"
-                          placeholder="+1 (555) 000-0000"
+                          placeholder="e.g. +251 91 234 5678"
                           value={form.phone}
                           onChange={update('phone')}
                         />
@@ -478,7 +472,7 @@ export function AdmissionsPage() {
                       <Textarea
                         id="address"
                         rows={2}
-                        placeholder="Street, City, State, ZIP"
+                        placeholder="Sub-city, woreda, house number, Addis Ababa"
                         value={form.address}
                         onChange={update('address')}
                       />

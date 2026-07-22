@@ -294,3 +294,76 @@ Stage Summary:
 - Pattern established: same approach can be repeated for Events, Gallery, Login, etc.
 - Files created: mini-services/api/index.ts, mini-services/api/db.ts, src/lib/api.ts
 - Files modified: src/components/pages/news.tsx
+
+---
+Task ID: 7
+Agent: full-stack-developer
+Task: Personalize About, Academics, Admissions pages for Ethiopian context
+
+Work Log:
+- Read worklog.md (Tasks 1–6) to understand foundation, shared components, data, and the home page personalization tone
+- Read the current about.tsx, academics.tsx, admissions.tsx, and school.ts to identify stale American/foreign content (Pre-K, high school, IB, AP, $, robotics, physics/chemistry labs, foreign names, etc.)
+- Updated `src/lib/data/school.ts` (the data file these pages import from) to fix stale entries that contradicted the Grade 1–8 / Addis Ababa scope:
+  * HISTORY → realistic Ethiopian milestones (2015 founded on Bole Road with 60 students → 2016 full primary cohort → 2018 first Grade 8 graduates & national exam success → 2020 biology lab opened → 2023 grew to 850 students → 2025 digital learning tools)
+  * ACHIEVEMENTS → Grade 8 national exam top 5%, Addis Ababa science fair champions, regional reading competition, Bole Sub-City community service recognition
+  * DEPARTMENTS → Ethiopian department heads (Hiwot Tadesse, Dawit Kebede, Selamawit Girma, Bereket Mengistu, Eden Asefa, Yonas Bekele) with realistic subject counts
+  * CLUBS → Science, Reading, Art, Sports, Drama, Environment, Music, Civics & Ethics clubs (removed robotics, coding, astronomy, debate/MUN, photography)
+  * SPORTS → Soccer, Basketball, Volleyball, Athletics & Running (removed swimming, tennis — not realistic for the school)
+  * ADMISSION_REQUIREMENTS → Ethiopian: kebele ID, two report cards, passport photo, medical form, 500 ETB fee
+  * TUITION → ETB termly tuition for Grades 1–8 only (Lower Primary 24,000 ETB/term; Upper Primary 28,000 ETB/term; Junior Secondary 32,000 ETB/term) — removed Pre-K and Grades 9–12 rows
+  * FAQS → realistic Ethiopian context: 8AM–4PM school hours, 20–25 class sizes, minibus routes across Bole/Yeka/Kirkos/Arada/Lemi Kura sub-cities, English+Amharic core with optional French from Grade 5, Grade 6 & 8 national exam prep, 10% sibling discount
+  * LEADERSHIP bio for Eden Asefa → "early-grade literacy and numeracy" (was "early years pedagogy")
+  * TEACHERS subject for Abel Tesfaye → "Mathematics & Science" (was "Mathematics & Physics" — no physics lab)
+- Updated `src/components/pages/about.tsx` (text content only — same component structure/design preserved):
+  * QUICK_STATS → 10+, 850+, 48+, 96% (matching the home page STATS values) instead of 27+/1840+/142+/98%
+  * PageHero title/description → "A community where every child is seen, valued, and inspired" + "family-like learning home in Addis Ababa"
+  * History timeline SectionHeader → "A story of small beginnings, steady growth" + "From a single rented building on Bole Road to a warm 850-student campus"
+  * Mission text → warm and personal: "create a warm, family-like school in Addis Ababa where every child is seen, valued, and inspired to learn"
+  * Vision text → "leave Grade 8 not only ready for secondary school, but ready for life" (replaced "college-ready, life-ready")
+  * Principal "Leading since" badge → 2015 (was 2014)
+  * Facilities SectionHeader → "Small, warm spaces built for discovery" + "intentionally modest" (was "World-class facilities")
+  * Accreditations SectionHeader → "Licensed & trusted by Ethiopian authorities" + Ministry of Education / Addis Ababa Education Bureau language (was "highest international standards")
+  * Accreditations grid → lg:grid-cols-3 (was lg:grid-cols-4) since ACCREDITATIONS now has 3 items
+  * CTA → "families across Addis Ababa choose Hamza" (was "Riverside")
+- Updated `src/components/pages/academics.tsx` (text content + LABS/LANGUAGES/STEM→SCIENCE structure):
+  * Removed unused icon imports (Cpu, FlaskConical, Atom, TestTube); added Leaf, Sun, Sprout for the science & discovery feature
+  * GRADE_LEVELS → 3 rows: Lower Primary (1–4), Upper Primary (5–6), Junior Secondary (7–8) — removed Pre-K/Kindergarten and High School rows
+  * PageHero description → "From first letters and numbers in Grade 1 to the Grade 8 national examination"
+  * Curriculum overview SectionHeader → "Three stages, one caring journey" (was "Four stages")
+  * Programs grid → lg:grid-cols-3 (was lg:grid-cols-4) since PROGRAMS now has 3 stages
+  * Grade Levels SectionHeader → "A clear path from Grade 1 to Grade 8" (was "Pre-K to graduation")
+  * Subjects SectionHeader → "Eleven subject areas" (was "Twelve") + "aligned with the Ethiopian national curriculum"
+  * STEM_FEATURES renamed to SCIENCE_FEATURES + reframed around biology lab, nature observation, environment club, science fair (removed robotics, AI, coding, capstone)
+  * STEM section → "Science & Discovery" with "Where curiosity meets the natural world" + biology/nature/garden focus (replaced "STEM Education" / "Where curiosity becomes invention" / robotics+coding+data science)
+  * SmartImage for that section → Microscope / "Biology Lab & Discovery" (was Cpu / "Innovation Lab")
+  * LANGUAGES → 3 cards: English (primary instruction), Amharic (daily core), French (optional from Grade 5) — removed Mandarin and Spanish
+  * Language SectionHeader → "English, Amharic, and a window to the world" (was "World Languages / Multilingual learners, global citizens")
+  * Languages grid → lg:grid-cols-3 (was lg:grid-cols-4) for 3 cards
+  * Library section → reframed as "Our School Reading Corner" with 3,000+ storybooks, Amharic & English collections, weekly library period (was "Learning Resource Center / 12,000-square-foot / 40,000 volumes / 3D printers / 12 academic databases")
+  * LABS → only Biology Laboratory (removed Physics & Chemistry labs); grid changed to max-w-2xl single column for proper display of one lab
+  * Laboratories SectionHeader → "Hands-on science in our biology lab" (was "Three specialist laboratories")
+  * ARTS_FEATURES → Music & Singing (Ethiopian songs), Visual Arts (locally available materials), Drama & Storytelling (Ethiopian folktales) — removed "600-seat auditorium", "ceramics", "broadcast studio"
+  * Arts SmartImage alt/label → "Music, Art & Drama" (was "Performing & Visual Arts")
+  * CTA → "classrooms, biology lab, and reading corner" (was "classrooms, labs, and studios")
+- Updated `src/components/pages/admissions.tsx` (text content + form placeholders):
+  * GRADES → Grade 1 through Grade 8 only (removed Pre-K, Kindergarten, Grades 9–12)
+  * PageHero description → "for every family in Addis Ababa"
+  * Admission Requirements description → "for Grades 1–8"
+  * Application Fee badge → "500 ETB" (was "$75")
+  * Tuition SectionHeader → "Termly tuition by grade level, with sibling discounts and flexible payment plans"
+  * Tuition table header → "Termly Tuition" (was "Annual Tuition")
+  * Tuition callout → "Sibling Discounts & Flexible Payment Plans" with 10% sibling discount language (was "Financial Aid & Scholarships Available" with "22% need-based aid or merit scholarships")
+  * Apply Online description → "campus visit" (was "campus tour")
+  * Form placeholders: studentName → "e.g. Amanuel Tesfaye" (was "Aisha Rahman"); parentName → "e.g. Mr. Tesfaye Bekele" (was "Sarah Mitchell"); phone → "e.g. +251 91 234 5678" (was "+1 (555) 000-0000"); address → "Sub-city, woreda, house number, Addis Ababa" (was "Street, City, State, ZIP")
+- Ran `bun run lint` → 0 errors (clean)
+- Ran `bunx tsc --noEmit` → 0 errors in my files (about.tsx, academics.tsx, admissions.tsx, school.ts); pre-existing errors in contact.tsx, footer.tsx, examples/, mini-services/, skills/ are not in scope
+- Checked dev.log → server running cleanly on port 3000, no compile errors
+- Verified no stale references remain in my files via grep: no "high school", "Pre-K", "Kindergarten", "Early Years", "Cognia", "IB", "Advanced Placement", "Mandarin", "Robotics", "physics lab", "chemistry lab", "Riverside", "$", "financial aid", "merit scholarship", foreign department head names, etc. (The remaining matches in school.ts are NEWS/EVENTS/GALLERY arrays used by other pages — news now loads from the API per Task 6, EVENTS/GALLERY are out of my scope)
+
+Stage Summary:
+- All THREE target pages (About, Academics, Admissions) now consistently reflect the same warm, personal, Ethiopian Grade 1–8 identity established by the home page
+- Same warm family-like tone ("every child is seen, valued, and inspired"), Addis Ababa location, Grades 1–8 ONLY (no Pre-K/Kindergarten/high school), biology lab as the ONLY lab, reading corner (not LRC), Ethiopian Ministry of Education accreditation, ETB tuition, realistic Addis Ababa context throughout
+- The data file (school.ts) was also updated so all the imported arrays (HISTORY, ACHIEVEMENTS, DEPARTMENTS, CLUBS, SPORTS, ADMISSION_REQUIREMENTS, TUITION, FAQS) match the new scope — no more stale American/foreign data leak through
+- All existing components, design, animations, accessibility (ARIA progressbars, semantic HTML, accordion, table responsive), and CTAs preserved — only TEXT CONTENT was updated
+- Lint clean, TypeScript clean for my files, dev server running without errors
+- Files modified: src/lib/data/school.ts, src/components/pages/about.tsx, src/components/pages/academics.tsx, src/components/pages/admissions.tsx

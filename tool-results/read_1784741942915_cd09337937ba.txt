@@ -1,0 +1,694 @@
+     1→'use client'
+     2→
+     3→import * as React from 'react'
+     4→import {
+     5→  ArrowRight,
+     6→  BookOpen,
+     7→  Cpu,
+     8→  Library,
+     9→  Languages as LanguagesIcon,
+    10→  Palette,
+    11→  Music,
+    12→  GraduationCap,
+    13→  FlaskConical,
+    14→  Microscope,
+    15→  Atom,
+    16→  TestTube,
+    17→} from 'lucide-react'
+    18→import { PageHero } from '@/components/site/page-hero'
+    19→import { SectionHeader } from '@/components/site/section-header'
+    20→import { Reveal } from '@/components/site/reveal'
+    21→import { SmartImage } from '@/components/site/smart-image'
+    22→import { DynamicIcon } from '@/components/site/dynamic-icon'
+    23→import { useNav } from '@/lib/nav-store'
+    24→import {
+    25→  PROGRAMS,
+    26→  DEPARTMENTS,
+    27→  SUBJECTS,
+    28→  CLUBS,
+    29→  SPORTS,
+    30→} from '@/lib/data/school'
+    31→import {
+    32→  Card,
+    33→  CardContent,
+    34→  CardDescription,
+    35→  CardHeader,
+    36→  CardTitle,
+    37→} from '@/components/ui/card'
+    38→import { Button } from '@/components/ui/button'
+    39→import { Badge } from '@/components/ui/badge'
+    40→import {
+    41→  Table,
+    42→  TableBody,
+    43→  TableCell,
+    44→  TableHead,
+    45→  TableHeader,
+    46→  TableRow,
+    47→} from '@/components/ui/table'
+    48→import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+    49→
+    50→const GRADE_LEVELS = [
+    51→  {
+    52→    band: 'Early Years',
+    53→    grades: 'Pre-K – K',
+    54→    ages: 'Ages 3–5',
+    55→    milestones: 'Foundational literacy, numeracy & social-emotional learning',
+    56→  },
+    57→  {
+    58→    band: 'Primary School',
+    59→    grades: 'Grades 1–5',
+    60→    ages: 'Ages 6–10',
+    61→    milestones: 'Core academics, creativity, and collaborative projects',
+    62→  },
+    63→  {
+    64→    band: 'Middle School',
+    65→    grades: 'Grades 6–8',
+    66→    ages: 'Ages 11–13',
+    67→    milestones: 'Interdisciplinary study, critical thinking & independence',
+    68→  },
+    69→  {
+    70→    band: 'High School',
+    71→    grades: 'Grades 9–12',
+    72→    ages: 'Ages 14–18',
+    73→    milestones: 'AP courses, college counseling & capstone projects',
+    74→  },
+    75→]
+    76→
+    77→const STEM_FEATURES = [
+    78→  {
+    79→    icon: Cpu,
+    80→    title: 'Robotics & AI Lab',
+    81→    description:
+    82→      'Collaborative robots, 3D printers, and machine-learning workstations where students design, build, and program autonomous systems.',
+    83→  },
+    84→  {
+    85→    icon: BookOpen,
+    86→    title: 'Coding Curriculum',
+    87→    description:
+    88→      'A spiraled K–12 curriculum spanning Scratch, Python, JavaScript, and AP Computer Science — culminating in student-led software projects.',
+    89→  },
+    90→  {
+    91→    icon: FlaskConical,
+    92→    title: 'Science Laboratories',
+    93→    description:
+    94→      'Six specialist labs for physics, chemistry, and biology with university-grade equipment and inquiry-based experimental design.',
+    95→  },
+    96→  {
+    97→    icon: Microscope,
+    98→    title: 'Research & Innovation',
+    99→    description:
+   100→      'Annual science fairs, mentorships with university researchers, and a senior capstone program that produces publishable student work.',
+   101→  },
+   102→]
+   103→
+   104→const LANGUAGES = [
+   105→  {
+   106→    name: 'English',
+   107→    icon: BookOpen,
+   108→    level: 'Fluent / Native Track',
+   109→    description:
+   110→      'Core literacy from Early Years, with AP English Literature and academic writing in High School.',
+   111→    proficiency: 95,
+   112→  },
+   113→  {
+   114→    name: 'Mandarin',
+   115→    icon: LanguagesIcon,
+   116→    level: 'Dual-Language Immersion',
+   117→    description:
+   118→      'Immersive English–Mandarin track in Primary; full HSK-aligned progression through High School.',
+   119→    proficiency: 80,
+   120→  },
+   121→  {
+   122→    name: 'French',
+   123→    icon: LanguagesIcon,
+   124→    level: 'Intermediate – Advanced',
+   125→    description:
+   126→      'DELF-aligned instruction from Grade 6, with exchange opportunities in Lyon and Dakar.',
+   127→    proficiency: 70,
+   128→  },
+   129→  {
+   130→    name: 'Spanish',
+   131→    icon: LanguagesIcon,
+   132→    level: 'Beginner – Advanced',
+   133→    description:
+   134→      'Conversational to AP Spanish; cultural immersion trips to Mexico City and Madrid.',
+   135→    proficiency: 65,
+   136→  },
+   137→]
+   138→
+   139→const LABS = [
+   140→  {
+   141→    name: 'Physics Laboratory',
+   142→    iconName: 'Atom',
+   143→    description:
+   144→      'Digital data-logging stations, optical benches, and a wind tunnel for mechanics and waves experiments.',
+   145→    equipment: ['Wind tunnel', 'Oscilloscopes', 'Air track', 'Optical benches'],
+   146→  },
+   147→  {
+   148→    name: 'Chemistry Laboratory',
+   149→    iconName: 'TestTube',
+   150→    description:
+   151→      'Eight fume hoods, an analytical balance room, and chromatography stations for organic and inorganic chemistry.',
+   152→    equipment: ['Fume hoods ×8', 'Spectrophotometer', 'Rotary evaporator', 'pH meters'],
+   153→  },
+   154→  {
+   155→    name: 'Biology Laboratory',
+   156→    iconName: 'Microscope',
+   157→    description:
+   158→      'Compound and stereo microscopes, a controlled-growth chamber, and a DNA electrophoresis station.',
+   159→    equipment: ['Microscopes ×20', 'PCR machine', 'Growth chamber', 'Electrophoresis'],
+   160→  },
+   161→]
+   162→
+   163→const ARTS_FEATURES = [
+   164→  {
+   165→    icon: Music,
+   166→    title: 'Performing Arts',
+   167→    description:
+   168→      'Orchestra, choir, jazz band, and drama society stage six major productions each year in our 600-seat auditorium.',
+   169→  },
+   170→  {
+   171→    icon: Palette,
+   172→    title: 'Visual Arts',
+   173→    description:
+   174→      'Studios for drawing, painting, ceramics, and digital design — with an annual gallery exhibition of student work.',
+   175→  },
+   176→  {
+   177→    icon: BookOpen,
+   178→    title: 'Media & Film',
+   179→    description:
+   180→      'A broadcast studio and editing suite where students produce documentaries, podcasts, and short films.',
+   181→  },
+   182→]
+   183→
+   184→export function AcademicsPage() {
+   185→  const goPage = useNav((s) => s.goPage)
+   186→
+   187→  return (
+   188→    <div className="flex flex-col">
+   189→      <PageHero
+   190→        eyebrow="Academics"
+   191→        title="A curriculum that grows with every student"
+   192→        description="From play-based Early Years to Advanced Placement and capstone research, our academic program balances rigor, curiosity, and care."
+   193→        seed="academics-hero"
+   194→        icon="BookOpen"
+   195→        breadcrumb="Academics"
+   196→      />
+   197→
+   198→      {/* Curriculum Overview */}
+   199→      <section className="py-20 sm:py-24">
+   200→        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+   201→          <Reveal>
+   202→            <SectionHeader
+   203→              eyebrow="Curriculum Overview"
+   204→              title="Four stages, one continuous journey"
+   205→              description="Our spiraled K–12 curriculum builds conceptual understanding year over year — weaving together inquiry, mastery, and real-world application."
+   206→            />
+   207→          </Reveal>
+   208→          <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+   209→            {PROGRAMS.map((program, i) => (
+   210→              <Reveal key={program.title} delay={i * 0.06}>
+   211→                <Card className="group h-full overflow-hidden py-0 transition-all hover:-translate-y-1 hover:shadow-lg">
+   212→                  <SmartImage
+   213→                    seed={`academics-program-${program.title}`}
+   214→                    alt={program.title}
+   215→                    icon={program.icon}
+   216→                    label={program.level}
+   217→                    className="aspect-[16/10] w-full rounded-none"
+   218→                  />
+   219→                  <CardHeader>
+   220→                    <CardTitle className="text-base">{program.title}</CardTitle>
+   221→                    <CardDescription className="text-xs font-medium uppercase tracking-wider text-primary">
+   222→                      {program.level}
+   223→                    </CardDescription>
+   224→                  </CardHeader>
+   225→                  <CardContent>
+   226→                    <p className="text-sm text-muted-foreground">{program.description}</p>
+   227→                  </CardContent>
+   228→                </Card>
+   229→              </Reveal>
+   230→            ))}
+   231→          </div>
+   232→        </div>
+   233→      </section>
+   234→
+   235→      {/* Grade Levels — Table */}
+   236→      <section className="bg-muted/30 py-20 sm:py-24">
+   237→        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+   238→          <Reveal>
+   239→            <SectionHeader
+   240→              eyebrow="Grade Levels"
+   241→              title="A clear path from Pre-K to graduation"
+   242→              description="Each grade band is thoughtfully designed to match developmental milestones, academic goals, and the changing needs of growing learners."
+   243→            />
+   244→          </Reveal>
+   245→          <Reveal delay={0.1}>
+   246→            <Card className="mt-12 overflow-hidden py-0">
+   247→              <Table>
+   248→                <TableHeader>
+   249→                  <TableRow className="bg-primary/5 hover:bg-primary/5">
+   250→                    <TableHead className="px-6 py-4 text-sm font-semibold">Stage</TableHead>
+   251→                    <TableHead className="px-6 py-4 text-sm font-semibold">Grades</TableHead>
+   252→                    <TableHead className="px-6 py-4 text-sm font-semibold">Ages</TableHead>
+   253→                    <TableHead className="px-6 py-4 text-sm font-semibold">Key Milestones</TableHead>
+   254→                  </TableRow>
+   255→                </TableHeader>
+   256→                <TableBody>
+   257→                  {GRADE_LEVELS.map((row) => (
+   258→                    <TableRow key={row.band}>
+   259→                      <TableCell className="px-6 py-4 font-semibold text-primary">
+   260→                        {row.band}
+   261→                      </TableCell>
+   262→                      <TableCell className="px-6 py-4">{row.grades}</TableCell>
+   263→                      <TableCell className="px-6 py-4">{row.ages}</TableCell>
+   264→                      <TableCell className="px-6 py-4 text-muted-foreground">
+   265→                        {row.milestones}
+   266→                      </TableCell>
+   267→                    </TableRow>
+   268→                  ))}
+   269→                </TableBody>
+   270→              </Table>
+   271→            </Card>
+   272→          </Reveal>
+   273→        </div>
+   274→      </section>
+   275→
+   276→      {/* Departments */}
+   277→      <section className="py-20 sm:py-24">
+   278→        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+   279→          <Reveal>
+   280→            <SectionHeader
+   281→              eyebrow="Departments"
+   282→              title="Specialist departments, shared standards"
+   283→              description="Six departments collaborate across grade levels to ensure continuity, depth, and a coherent learning experience for every student."
+   284→            />
+   285→          </Reveal>
+   286→          <div className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+   287→            {DEPARTMENTS.map((dept, i) => (
+   288→              <Reveal key={dept.name} delay={i * 0.06}>
+   289→                <Card className="group h-full transition-all hover:-translate-y-1 hover:shadow-lg">
+   290→                  <CardHeader>
+   291→                    <div className="flex items-center justify-between">
+   292→                      <div className="flex size-12 items-center justify-center rounded-xl bg-primary/10 text-primary transition-colors group-hover:bg-primary group-hover:text-primary-foreground">
+   293→                        <DynamicIcon name={dept.icon} className="size-6" />
+   294→                      </div>
+   295→                      <Badge variant="secondary">{dept.subjects} subjects</Badge>
+   296→                    </div>
+   297→                    <CardTitle className="mt-3 text-lg">{dept.name}</CardTitle>
+   298→                    <CardDescription>
+   299→                      Department Head: <span className="font-medium text-foreground">{dept.head}</span>
+   300→                    </CardDescription>
+   301→                  </CardHeader>
+   302→                </Card>
+   303→              </Reveal>
+   304→            ))}
+   305→          </div>
+   306→        </div>
+   307→      </section>
+   308→
+   309→      {/* Subjects */}
+   310→      <section className="bg-muted/30 py-20 sm:py-24">
+   311→        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+   312→          <Reveal>
+   313→            <SectionHeader
+   314→              eyebrow="Subjects Offered"
+   315→              title="A broad and balanced academic menu"
+   316→              description="Twelve subject areas spanning the sciences, humanities, arts, and languages — complemented by electives that grow each year."
+   317→            />
+   318→          </Reveal>
+   319→          <Reveal delay={0.1}>
+   320→            <Card className="mt-12">
+   321→              <CardContent className="pt-6">
+   322→                <div className="flex flex-wrap gap-3">
+   323→                  {SUBJECTS.map((subject) => (
+   324→                    <Badge
+   325→                      key={subject}
+   326→                      variant="outline"
+   327→                      className="border-primary/30 bg-primary/5 px-4 py-2 text-sm font-medium text-foreground hover:bg-primary/10"
+   328→                    >
+   329→                      {subject}
+   330→                    </Badge>
+   331→                  ))}
+   332→                </div>
+   333→              </CardContent>
+   334→            </Card>
+   335→          </Reveal>
+   336→        </div>
+   337→      </section>
+   338→
+   339→      {/* STEM Education */}
+   340→      <section className="py-20 sm:py-24">
+   341→        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+   342→          <Reveal>
+   343→            <div className="relative overflow-hidden rounded-3xl border bg-gradient-to-br from-emerald-600 via-emerald-700 to-teal-800 p-8 text-primary-foreground sm:p-12">
+   344→              <div className="absolute -right-16 -top-16 size-72 rounded-full bg-amber-400/20 blur-3xl" />
+   345→              <div className="absolute -bottom-20 -left-10 size-80 rounded-full bg-white/10 blur-3xl" />
+   346→              <div className="relative grid items-center gap-10 lg:grid-cols-2">
+   347→                <div>
+   348→                  <span className="inline-flex items-center gap-2 rounded-full bg-white/15 px-3 py-1 text-xs font-semibold uppercase tracking-wider">
+   349→                    <span className="size-1.5 rounded-full bg-amber-300" />
+   350→                    STEM Education
+   351→                  </span>
+   352→                  <h2 className="mt-4 text-balance text-3xl font-bold tracking-tight sm:text-4xl">
+   353→                    Where curiosity becomes invention
+   354→                  </h2>
+   355→                  <p className="mt-4 text-base text-primary-foreground/85 sm:text-lg">
+   356→                    From a kindergartener's first circuit to a senior's published
+   357→                    research, our STEM pathway immerses students in robotics, coding,
+   358→                    data science, and authentic laboratory inquiry.
+   359→                  </p>
+   360→                  <div className="mt-8 grid gap-5 sm:grid-cols-2">
+   361→                    {STEM_FEATURES.map((feature) => (
+   362→                      <div key={feature.title} className="flex gap-3">
+   363→                        <div className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-white/15">
+   364→                          <feature.icon className="size-5" />
+   365→                        </div>
+   366→                        <div>
+   367→                          <div className="text-sm font-semibold">{feature.title}</div>
+   368→                          <p className="mt-1 text-xs leading-relaxed text-primary-foreground/80">
+   369→                            {feature.description}
+   370→                          </p>
+   371→                        </div>
+   372→                      </div>
+   373→                    ))}
+   374→                  </div>
+   375→                </div>
+   376→                <div className="relative">
+   377→                  <SmartImage
+   378→                    seed="academics-stem"
+   379→                    alt="Students conducting experiments in the STEM and robotics lab"
+   380→                    icon="Cpu"
+   381→                    label="Innovation Lab"
+   382→                    className="aspect-[4/3] w-full border border-white/20"
+   383→                  />
+   384→                </div>
+   385→              </div>
+   386→            </div>
+   387→          </Reveal>
+   388→        </div>
+   389→      </section>
+   390→
+   391→      {/* Language Programs */}
+   392→      <section className="bg-muted/30 py-20 sm:py-24">
+   393→        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+   394→          <Reveal>
+   395→            <SectionHeader
+   396→              eyebrow="World Languages"
+   397→              title="Multilingual learners, global citizens"
+   398→              description="Our language programs develop communicative competence, cultural fluency, and the confidence to connect across borders."
+   399→            />
+   400→          </Reveal>
+   401→          <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+   402→            {LANGUAGES.map((lang, i) => (
+   403→              <Reveal key={lang.name} delay={i * 0.06}>
+   404→                <Card className="group h-full transition-all hover:-translate-y-1 hover:shadow-lg">
+   405→                  <CardHeader>
+   406→                    <div className="flex size-12 items-center justify-center rounded-xl bg-amber-500/10 text-amber-600 dark:text-amber-400 transition-colors group-hover:bg-amber-500 group-hover:text-white">
+   407→                      <lang.icon className="size-6" />
+   408→                    </div>
+   409→                    <CardTitle className="mt-3 text-lg">{lang.name}</CardTitle>
+   410→                    <CardDescription className="text-xs font-semibold uppercase tracking-wider text-primary">
+   411→                      {lang.level}
+   412→                    </CardDescription>
+   413→                  </CardHeader>
+   414→                  <CardContent>
+   415→                    <p className="text-sm text-muted-foreground">{lang.description}</p>
+   416→                    <div className="mt-4">
+   417→                      <div className="mb-1 flex items-center justify-between text-xs text-muted-foreground">
+   418→                        <span>Proficiency target</span>
+   419→                        <span className="font-semibold text-foreground">{lang.proficiency}%</span>
+   420→                      </div>
+   421→                      <div className="h-2 w-full overflow-hidden rounded-full bg-muted">
+   422→                        <div
+   423→                          className="h-full rounded-full bg-gradient-to-r from-amber-500 to-emerald-600"
+   424→                          style={{ width: `${lang.proficiency}%` }}
+   425→                          role="progressbar"
+   426→                          aria-valuenow={lang.proficiency}
+   427→                          aria-valuemin={0}
+   428→                          aria-valuemax={100}
+   429→                        />
+   430→                      </div>
+   431→                    </div>
+   432→                  </CardContent>
+   433→                </Card>
+   434→              </Reveal>
+   435→            ))}
+   436→          </div>
+   437→        </div>
+   438→      </section>
+   439→
+   440→      {/* Library + Laboratories — two columns */}
+   441→      <section className="py-20 sm:py-24">
+   442→        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+   443→          {/* Library feature */}
+   444→          <Reveal>
+   445→            <Card className="overflow-hidden border-primary/20 py-0">
+   446→              <div className="grid lg:grid-cols-2">
+   447→                <div className="relative">
+   448→                  <SmartImage
+   449→                    seed="academics-library"
+   450→                    alt="Hamza Learning Resource Center with reading atriums and digital archives"
+   451→                    icon="Library"
+   452→                    label="Learning Resource Center"
+   453→                    className="h-full min-h-64 w-full rounded-none"
+   454→                  />
+   455→                </div>
+   456→                <div className="p-8 sm:p-10">
+   457→                  <span className="inline-flex items-center gap-2 rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-primary">
+   458→                    <span className="size-1.5 rounded-full bg-primary" />
+   459→                    The Library
+   460→                  </span>
+   461→                  <h2 className="mt-4 text-balance text-2xl font-bold tracking-tight sm:text-3xl">
+   462→                    The Hamza Learning Resource Center
+   463→                  </h2>
+   464→                  <p className="mt-4 text-base text-muted-foreground">
+   465→                    A 12,000-square-foot hub of inquiry housing over <strong className="text-foreground">40,000 volumes</strong>,
+   466→                    digital archives, peer-tutoring suites, and silent study atriums.
+   467→                    Staffed by two full-time librarians and a digital-learning specialist,
+   468→                    the LRC is the academic heart of our campus.
+   469→                  </p>
+   470→                  <ul className="mt-6 grid gap-3 sm:grid-cols-2">
+   471→                    {[
+   472→                      '40,000+ print volumes',
+   473→                      '12 academic databases',
+   474→                      'Quiet study atriums',
+   475→                      'Peer-tutoring suites',
+   476→                      'Maker corner with 3D printers',
+   477→                      'Daily after-school hours',
+   478→                    ].map((item) => (
+   479→                      <li key={item} className="flex items-center gap-2 text-sm">
+   480→                        <span className="flex size-5 items-center justify-center rounded-full bg-primary/10 text-primary">
+   481→                          <BookOpen className="size-3" />
+   482→                        </span>
+   483→                        {item}
+   484→                      </li>
+   485→                    ))}
+   486→                  </ul>
+   487→                </div>
+   488→              </div>
+   489→            </Card>
+   490→          </Reveal>
+   491→
+   492→          {/* Laboratories */}
+   493→          <Reveal className="mt-16">
+   494→            <SectionHeader
+   495→              eyebrow="Laboratories"
+   496→              title="Science in practice"
+   497→              description="Three specialist laboratories give students hands-on experience with the methods and tools of real scientific inquiry."
+   498→            />
+   499→          </Reveal>
+   500→          <div className="mt-12 grid gap-6 md:grid-cols-3">
+   501→            {LABS.map((lab, i) => (
+   502→              <Reveal key={lab.name} delay={i * 0.08}>
+   503→                <Card className="group h-full overflow-hidden py-0 transition-all hover:-translate-y-1 hover:shadow-lg">
+   504→                  <SmartImage
+   505→                    seed={`academics-lab-${lab.name}`}
+   506→                    alt={lab.name}
+   507→                    icon={lab.iconName}
+   508→                    label={lab.name}
+   509→                    className="aspect-[16/10] w-full rounded-none"
+   510→                  />
+   511→                  <CardHeader>
+   512→                    <div className="flex items-center gap-2">
+   513→                      <DynamicIcon name={lab.iconName} className="size-5 text-primary" />
+   514→                      <CardTitle className="text-base">{lab.name}</CardTitle>
+   515→                    </div>
+   516→                  </CardHeader>
+   517→                  <CardContent>
+   518→                    <p className="text-sm text-muted-foreground">{lab.description}</p>
+   519→                    <div className="mt-4 flex flex-wrap gap-2">
+   520→                      {lab.equipment.map((eq) => (
+   521→                        <Badge key={eq} variant="secondary" className="text-xs">
+   522→                          {eq}
+   523→                        </Badge>
+   524→                      ))}
+   525→                    </div>
+   526→                  </CardContent>
+   527→                </Card>
+   528→              </Reveal>
+   529→            ))}
+   530→          </div>
+   531→        </div>
+   532→      </section>
+   533→
+   534→      {/* Extracurricular — Tabs */}
+   535→      <section className="bg-muted/30 py-20 sm:py-24">
+   536→        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+   537→          <Reveal>
+   538→            <SectionHeader
+   539→              eyebrow="Beyond the Classroom"
+   540→              title="Clubs, sports & the arts"
+   541→              description="A vibrant co-curricular program develops leadership, teamwork, and lifelong passions — every student finds their stage."
+   542→            />
+   543→          </Reveal>
+   544→          <Reveal delay={0.1}>
+   545→            <Tabs defaultValue="clubs" className="mt-12">
+   546→              <TabsList className="h-auto w-full justify-center bg-background p-1 sm:w-auto">
+   547→                <TabsTrigger value="clubs" className="flex-1 gap-1.5 px-6 py-2 sm:flex-none">
+   548→                  <DynamicIcon name="Users" className="size-4" />
+   549→                  Clubs
+   550→                </TabsTrigger>
+   551→                <TabsTrigger value="sports" className="flex-1 gap-1.5 px-6 py-2 sm:flex-none">
+   552→                  <DynamicIcon name="Dumbbell" className="size-4" />
+   553→                  Sports
+   554→                </TabsTrigger>
+   555→                <TabsTrigger value="arts" className="flex-1 gap-1.5 px-6 py-2 sm:flex-none">
+   556→                  <DynamicIcon name="Palette" className="size-4" />
+   557→                  Arts &amp; Music
+   558→                </TabsTrigger>
+   559→              </TabsList>
+   560→
+   561→              {/* Clubs */}
+   562→              <TabsContent value="clubs" className="mt-8">
+   563→                <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+   564→                  {CLUBS.map((club, i) => (
+   565→                    <Reveal key={club.name} delay={i * 0.04}>
+   566→                      <Card className="group h-full transition-all hover:-translate-y-1 hover:shadow-lg">
+   567→                        <CardContent className="pt-6">
+   568→                          <div className="flex items-center justify-between">
+   569→                            <div className="flex size-11 items-center justify-center rounded-xl bg-primary/10 text-primary transition-colors group-hover:bg-primary group-hover:text-primary-foreground">
+   570→                              <DynamicIcon name={club.icon} className="size-5" />
+   571→                            </div>
+   572→                            <Badge variant="secondary">{club.members} members</Badge>
+   573→                          </div>
+   574→                          <div className="mt-4 font-semibold">{club.name}</div>
+   575→                        </CardContent>
+   576→                      </Card>
+   577→                    </Reveal>
+   578→                  ))}
+   579→                </div>
+   580→              </TabsContent>
+   581→
+   582→              {/* Sports */}
+   583→              <TabsContent value="sports" className="mt-8">
+   584→                <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+   585→                  {SPORTS.map((sport, i) => (
+   586→                    <Reveal key={sport.name} delay={i * 0.05}>
+   587→                      <Card className="group h-full transition-all hover:-translate-y-1 hover:shadow-lg">
+   588→                        <CardContent className="flex items-center gap-4 pt-6">
+   589→                          <div className="flex size-12 items-center justify-center rounded-xl bg-amber-500/10 text-amber-600 transition-colors group-hover:bg-amber-500 group-hover:text-white dark:text-amber-400">
+   590→                            <DynamicIcon name={sport.icon} className="size-6" />
+   591→                          </div>
+   592→                          <div className="flex-1">
+   593→                            <div className="font-semibold">{sport.name}</div>
+   594→                            <div className="text-sm text-muted-foreground">
+   595→                              Season: <span className="font-medium text-foreground">{sport.season}</span>
+   596→                            </div>
+   597→                          </div>
+   598→                        </CardContent>
+   599→                      </Card>
+   600→                    </Reveal>
+   601→                  ))}
+   602→                </div>
+   603→              </TabsContent>
+   604→
+   605→              {/* Arts & Music */}
+   606→              <TabsContent value="arts" className="mt-8">
+   607→                <div className="grid gap-8 lg:grid-cols-12">
+   608→                  <Reveal className="lg:col-span-5">
+   609→                    <div className="relative h-full min-h-64">
+   610→                      <SmartImage
+   611→                        seed="academics-arts"
+   612→                        alt="Students performing in the Hamza auditorium and exhibiting visual art"
+   613→                        icon="Music"
+   614→                        label="Performing & Visual Arts"
+   615→                        className="h-full w-full"
+   616→                      />
+   617→                    </div>
+   618→                  </Reveal>
+   619→                  <Reveal className="lg:col-span-7" delay={0.1}>
+   620→                    <div className="grid gap-5 sm:grid-cols-1">
+   621→                      {ARTS_FEATURES.map((feat, i) => (
+   622→                        <Card key={feat.title} className="transition-all hover:shadow-md">
+   623→                          <CardContent className="flex gap-4 pt-6">
+   624→                            <div className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
+   625→                              <feat.icon className="size-5" />
+   626→                            </div>
+   627→                            <div>
+   628→                              <div className="font-semibold">{feat.title}</div>
+   629→                              <p className="mt-1 text-sm text-muted-foreground">
+   630→                                {feat.description}
+   631→                              </p>
+   632→                            </div>
+   633→                          </CardContent>
+   634→                        </Card>
+   635→                      ))}
+   636→                    </div>
+   637→                  </Reveal>
+   638→                </div>
+   639→              </TabsContent>
+   640→            </Tabs>
+   641→          </Reveal>
+   642→        </div>
+   643→      </section>
+   644→
+   645→      {/* CTA */}
+   646→      <section className="pb-24 pt-4">
+   647→        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+   648→          <Reveal>
+   649→            <div className="relative overflow-hidden rounded-3xl border bg-gradient-to-br from-amber-500 via-orange-500 to-amber-600 p-8 text-white sm:p-12">
+   650→              <div className="absolute -right-16 -top-16 size-64 rounded-full bg-white/20 blur-3xl" />
+   651→              <div className="absolute -bottom-20 -left-10 size-72 rounded-full bg-emerald-600/20 blur-3xl" />
+   652→              <div className="relative flex flex-col items-start gap-6 lg:flex-row lg:items-center lg:justify-between">
+   653→                <div className="max-w-2xl">
+   654→                  <div className="flex items-center gap-2">
+   655→                    <GraduationCap className="size-7" />
+   656→                    <span className="text-xs font-semibold uppercase tracking-wider">
+   657→                      Admissions Open for 2025–2026
+   658→                    </span>
+   659→                  </div>
+   660→                  <h2 className="mt-3 text-2xl font-bold tracking-tight sm:text-3xl">
+   661→                    Begin your child's academic journey with us
+   662→                  </h2>
+   663→                  <p className="mt-3 text-base text-white/85 sm:text-lg">
+   664→                    Explore our programs in person. Schedule a personalized tour and see
+   665→                    our classrooms, labs, and studios in action.
+   666→                  </p>
+   667→                </div>
+   668→                <div className="flex flex-col gap-3 sm:flex-row">
+   669→                  <Button
+   670→                    size="lg"
+   671→                    className="bg-white text-amber-700 hover:bg-white/90"
+   672→                    onClick={() => goPage('admissions')}
+   673→                  >
+   674→                    Start Application
+   675→                    <ArrowRight className="size-4" />
+   676→                  </Button>
+   677→                  <Button
+   678→                    size="lg"
+   679→                    variant="outline"
+   680→                    className="border-white/40 bg-transparent text-white hover:bg-white/10 hover:text-white"
+   681→                    onClick={() => goPage('contact')}
+   682→                  >
+   683→                    Book a Tour
+   684→                  </Button>
+   685→                </div>
+   686→              </div>
+   687→            </div>
+   688→          </Reveal>
+   689→        </div>
+   690→      </section>
+   691→    </div>
+   692→  )
+   693→}
+   694→

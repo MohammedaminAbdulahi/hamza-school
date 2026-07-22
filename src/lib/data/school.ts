@@ -94,31 +94,31 @@ export const PROGRAMS = [
 
 export const ACHIEVEMENTS = [
   {
-    title: 'National Science Olympiad Champions',
+    title: 'Grade 8 National Exam — Top 5% Nationwide',
     year: '2024',
     description:
-      'Our Robotics team secured first place nationally, beating 320 competing schools.',
+      'Our Grade 8 class achieved a 96% pass rate, with several students placing in the top 5% nationally.',
     icon: 'Trophy',
   },
   {
-    title: '98% University Acceptance Rate',
+    title: 'Addis Ababa Science Fair Champions',
     year: '2024',
     description:
-      'Graduates were accepted into 45+ prestigious universities across 12 countries.',
+      'Our science club won first place at the sub-city science fair with their project on local water quality.',
     icon: 'GraduationCap',
   },
   {
-    title: 'State Debate Championship',
+    title: 'Regional Reading Competition Winners',
     year: '2023',
     description:
-      'The debate club claimed the state title for the third consecutive year.',
+      'Three of our students took top honors in the Addis Ababa regional reading and Amharic literacy contest.',
     icon: 'Medal',
   },
   {
-    title: 'Community Service Award',
+    title: 'Community Service Recognition',
     year: '2023',
     description:
-      'Recognized for over 12,000 hours of student-led community service.',
+      'Recognized by the Bole Sub-City administration for student-led neighborhood clean-up and tree planting.',
     icon: 'HeartHandshake',
   },
 ]
@@ -273,7 +273,7 @@ export const LEADERSHIP = [
   { name: 'Mr. Bereket Mengistu', role: 'Head of Student Affairs', bio: 'Student wellbeing and character development.', initials: 'BM' },
   { name: 'Mrs. Selamawit Girma', role: 'Admissions Coordinator', bio: '10 years guiding families through enrollment.', initials: 'SG' },
   { name: 'Mr. Dawit Kebede', role: 'Science Department Lead', bio: 'Runs our biology lab and science club.', initials: 'DK' },
-  { name: 'Ms. Eden Asefa', role: 'Lower Primary Coordinator', bio: 'Specialist in early years pedagogy.', initials: 'EA' },
+  { name: 'Ms. Eden Asefa', role: 'Lower Primary Coordinator', bio: 'Specialist in early-grade literacy and numeracy.', initials: 'EA' },
 ]
 
 export const TEACHERS = [
@@ -284,7 +284,7 @@ export const TEACHERS = [
   { name: 'Ms. Eden Asefa', subject: 'Lower Primary', years: 7, initials: 'EA' },
   { name: 'Mr. Yonas Bekele', subject: 'Civics & Ethics', years: 8, initials: 'YB' },
   { name: 'Mrs. Meron Alemu', subject: 'English Literature', years: 13, initials: 'MA' },
-  { name: 'Mr. Abel Tesfaye', subject: 'Mathematics & Physics', years: 10, initials: 'AT' },
+  { name: 'Mr. Abel Tesfaye', subject: 'Mathematics & Science', years: 10, initials: 'AT' },
 ]
 
 export const FACILITIES = [
@@ -309,41 +309,39 @@ export const SUBJECTS = [
 ]
 
 export const DEPARTMENTS = [
-  { name: 'Mathematics & Computing', head: 'Ms. Emily Carter', subjects: 6, icon: 'Calculator' },
-  { name: 'Sciences', head: 'Dr. Maria Santos', subjects: 8, icon: 'FlaskConical' },
-  { name: 'Humanities', head: 'Mr. Luis Gomez', subjects: 7, icon: 'Landmark' },
-  { name: 'Languages', head: 'Mrs. Priya Nair', subjects: 5, icon: 'Languages' },
-  { name: 'Arts & Music', head: 'Ms. Yuki Tanaka', subjects: 4, icon: 'Palette' },
-  { name: 'Physical Education', head: 'Mr. Omar Farouk', subjects: 3, icon: 'Dumbbell' },
+  { name: 'Mathematics', head: 'Mrs. Hiwot Tadesse', subjects: 2, icon: 'Calculator' },
+  { name: 'Sciences', head: 'Mr. Dawit Kebede', subjects: 2, icon: 'FlaskConical' },
+  { name: 'Languages', head: 'Mrs. Selamawit Girma', subjects: 3, icon: 'Languages' },
+  { name: 'Social Studies', head: 'Mr. Bereket Mengistu', subjects: 4, icon: 'Landmark' },
+  { name: 'Arts & Music', head: 'Ms. Eden Asefa', subjects: 2, icon: 'Palette' },
+  { name: 'Physical Education', head: 'Mr. Yonas Bekele', subjects: 1, icon: 'Dumbbell' },
 ]
 
 export const CLUBS = [
-  { name: 'Robotics & Engineering', members: 64, icon: 'Bot' },
-  { name: 'Debate & Model UN', members: 48, icon: 'MessageSquare' },
-  { name: 'Coding Club', members: 72, icon: 'Code' },
-  { name: 'Drama Society', members: 40, icon: 'Drama' },
-  { name: 'Eco & Sustainability', members: 55, icon: 'Leaf' },
-  { name: 'Astronomy Club', members: 33, icon: 'Star' },
-  { name: 'Choir & Orchestra', members: 80, icon: 'Music' },
-  { name: 'Photography', members: 29, icon: 'Camera' },
+  { name: 'Science Club', members: 48, icon: 'FlaskConical' },
+  { name: 'Reading Club', members: 65, icon: 'BookOpen' },
+  { name: 'Art Club', members: 42, icon: 'Palette' },
+  { name: 'Sports Club', members: 80, icon: 'Dumbbell' },
+  { name: 'Drama Club', members: 35, icon: 'Drama' },
+  { name: 'Environment Club', members: 50, icon: 'Leaf' },
+  { name: 'Music Club', members: 38, icon: 'Music' },
+  { name: 'Civics & Ethics Club', members: 44, icon: 'HeartHandshake' },
 ]
 
 export const SPORTS = [
-  { name: 'Basketball', season: 'Winter', icon: 'Basketball' },
-  { name: 'Soccer', season: 'Fall', icon: 'Volleyball' },
-  { name: 'Swimming', season: 'Year-round', icon: 'Waves' },
-  { name: 'Track & Field', season: 'Spring', icon: 'PersonStanding' },
-  { name: 'Tennis', season: 'Spring', icon: 'Circle' },
-  { name: 'Volleyball', season: 'Fall', icon: 'Volleyball' },
+  { name: 'Soccer', season: 'Dry season', icon: 'Volleyball' },
+  { name: 'Basketball', season: 'Year-round', icon: 'Basketball' },
+  { name: 'Volleyball', season: 'Dry season', icon: 'Volleyball' },
+  { name: 'Athletics & Running', season: 'Year-round', icon: 'PersonStanding' },
 ]
 
 export const HISTORY = [
-  { year: '1998', title: 'Hamza School Founded', description: 'Opened with 120 students and 12 teachers in a single historic building.' },
-  { year: '2005', title: 'STEM Wing Expansion', description: 'Added dedicated science and technology laboratories to meet growing demand.' },
-  { year: '2012', title: 'IB Authorization', description: 'Became an authorized International Baccalaureate World School.' },
-  { year: '2017', title: 'Performing Arts Centre', description: 'Opened a 600-seat auditorium and music suites.' },
-  { year: '2021', title: 'Robotics & AI Lab', description: 'Launched a flagship innovation lab with industry partners.' },
-  { year: '2025', title: 'Dual-Language Program', description: 'Introduced an immersive English-Mandarin primary track.' },
+  { year: '2015', title: 'Hamza School Founded', description: 'Mr. Abdulsemed Hamza opens Hamza School in Addis Ababa with 60 students, four teachers, and a small rented building along Bole Road.' },
+  { year: '2016', title: 'First Full Primary Cohort', description: 'Grades 1–6 are fully established with caring, locally-trained teachers and a focus on literacy and numeracy.' },
+  { year: '2018', title: 'First Grade 8 Graduates', description: 'Our inaugural Grade 8 class sits the national examination — every student passes, and several place in the top 10% nationwide.' },
+  { year: '2020', title: 'Biology Laboratory Opens', description: 'Our first dedicated science lab is built, giving Grades 7–8 hands-on access to microscopes, specimens, and real experiments.' },
+  { year: '2023', title: 'Growing to 850 Students', description: 'With new classrooms and a steady reputation for warmth and rigor, enrollment reaches 850+ students across Grades 1–8.' },
+  { year: '2025', title: 'Digital Learning Tools', description: 'Tablets and educational software are introduced in every classroom, alongside a refreshed reading corner and parent lounge.' },
 ]
 
 export const ADMISSION_STEPS = [
@@ -355,30 +353,29 @@ export const ADMISSION_STEPS = [
 ]
 
 export const ADMISSION_REQUIREMENTS = [
-  'Completed online application form',
-  'Birth certificate or passport copy',
-  'Two most recent report cards / transcripts',
-  'Teacher recommendation letter',
-  'Immunization records',
-  'Application fee of $75 (non-refundable)',
+  'Completed application form (online or paper)',
+  'Birth certificate or kebele ID copy',
+  'Two most recent report cards from previous school',
+  'One passport-size photograph',
+  'Completed medical & emergency contact form',
+  'Non-refundable application fee of 500 ETB',
 ]
 
 export const TUITION = [
-  { grade: 'Pre-K – Kindergarten', annual: '$14,500', note: 'Half-day option available' },
-  { grade: 'Grades 1 – 5', annual: '$18,900', note: 'Includes technology fee' },
-  { grade: 'Grades 6 – 8', annual: '$21,400', note: 'Includes lab fees' },
-  { grade: 'Grades 9 – 12', annual: '$24,800', note: 'AP exam fees included' },
+  { grade: 'Lower Primary (Grades 1–4)', annual: '24,000 ETB / term', note: 'Three terms per academic year' },
+  { grade: 'Upper Primary (Grades 5–6)', annual: '28,000 ETB / term', note: 'Includes Grade 6 exam prep materials' },
+  { grade: 'Junior Secondary (Grades 7–8)', annual: '32,000 ETB / term', note: 'Includes biology lab and exam prep' },
 ]
 
 export const FAQS = [
-  { q: 'What is the typical class size at Hamza School?', a: 'Our average class size is 16 students, with a 1:12 teacher-to-student ratio across all grade levels.' },
-  { q: 'Do you offer financial aid or scholarships?', a: 'Yes. We offer need-based financial aid and merit scholarships. Over 22% of our students receive some form of assistance.' },
-  { q: 'What languages are taught?', a: 'All students study English. We also offer Mandarin, French, and Spanish, with a dual-language English-Mandarin track in Primary.' },
-  { q: 'Is there a uniform policy?', a: 'Yes, students wear a smart uniform that fosters community and equality. Details are provided upon enrollment.' },
-  { q: 'What are your school hours?', a: 'Classes run from 8:00 AM to 3:15 PM, with co-curricular activities until 5:00 PM. Office hours are 7:30 AM to 4:30 PM.' },
-  { q: 'Do you provide transportation?', a: 'Yes, we offer bus service across 12 routes within a 20-mile radius for an additional fee.' },
-  { q: 'How does the admissions assessment work?', a: 'Younger children participate in a play-based observation, while older students complete grade-appropriate assessments in math and English, plus an interview.' },
-  { q: 'Can my child visit for a day?', a: 'Absolutely. We offer shadow days where prospective students attend classes with a peer host. Contact admissions to arrange.' },
+  { q: 'What grade levels does Hamza School offer?', a: 'We offer Grades 1 to 8, organized into three stages: Lower Primary (1–4), Upper Primary (5–6), and Junior Secondary (7–8). We do not currently offer Pre-K, Kindergarten, or high school.' },
+  { q: 'What are the school hours?', a: 'Classes run Monday to Friday from 8:00 AM to 4:00 PM. The school office is open from 7:30 AM to 4:30 PM. After-school clubs run until 5:00 PM on selected days.' },
+  { q: 'What is the typical class size?', a: 'Our classes are intentionally small — 20 to 25 students per class — so every child receives personal attention from their teachers.' },
+  { q: 'Is there a school uniform?', a: 'Yes. All students wear a simple, affordable school uniform that fosters equality and belonging. Uniforms can be purchased from the school office at cost.' },
+  { q: 'Do you provide transportation?', a: 'Yes. We operate minibus routes across Bole, Yeka, Kirkos, Arada, and Lemi Kura sub-cities. Route and pickup details are confirmed at enrollment for a termly fee.' },
+  { q: 'What language of instruction do you use?', a: 'English is the primary language of instruction, with Amharic taught daily as a core subject. French is offered as an optional language from Grade 5.' },
+  { q: 'How do you prepare students for national exams?', a: 'Our Grade 6 and Grade 8 students receive focused national examination preparation, including past papers, mock exams, and small-group revision — all built into the regular school day.' },
+  { q: 'Do you offer sibling discounts?', a: 'Yes. Families enrolling two or more children receive a 10% sibling discount on tuition for the second and subsequent children. Flexible termly payment plans are also available.' },
 ]
 
 export const GALLERY = [

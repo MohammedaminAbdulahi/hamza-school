@@ -38,10 +38,10 @@ import {
 } from '@/components/ui/accordion'
 
 const QUICK_STATS = [
-  { value: 27, suffix: '+', label: 'Years of Excellence' },
-  { value: 1840, suffix: '+', label: 'Students Enrolled' },
-  { value: 142, suffix: '+', label: 'Expert Educators' },
-  { value: 98, suffix: '%', label: 'University Acceptance' },
+  { value: 10, suffix: '+', label: 'Years of Excellence' },
+  { value: 850, suffix: '+', label: 'Students Enrolled' },
+  { value: 48, suffix: '+', label: 'Caring Educators' },
+  { value: 96, suffix: '%', label: 'National Exam Pass Rate' },
 ]
 
 export function AboutPage() {
@@ -51,8 +51,8 @@ export function AboutPage() {
     <div className="flex flex-col">
       <PageHero
         eyebrow="About Us"
-        title="A community where curiosity becomes character"
-        description={`Since ${SCHOOL.established}, ${SCHOOL.name} has nurtured bold thinkers, kind hearts, and principled leaders. Discover the people, places, and principles that make us who we are.`}
+        title="A community where every child is seen, valued, and inspired"
+        description={`Since ${SCHOOL.established}, ${SCHOOL.name} has been a family-like learning home in Addis Ababa — where children grow in confidence, character, and curiosity. Meet the people, places, and principles that make us who we are.`}
         seed="about-hero"
         icon="School"
         breadcrumb="About Us"
@@ -82,8 +82,8 @@ export function AboutPage() {
           <Reveal>
             <SectionHeader
               eyebrow="Our Journey"
-              title="A legacy built one milestone at a time"
-              description="From a single historic building to a vibrant 1,800-student campus, every chapter of our story reflects a commitment to growth, innovation, and care."
+              title="A story of small beginnings, steady growth"
+              description="From a single rented building on Bole Road to a warm 850-student campus, every chapter of our story reflects a commitment to children, community, and care."
             />
           </Reveal>
           <div className="mx-auto mt-14 max-w-3xl">
@@ -145,11 +145,11 @@ export function AboutPage() {
                 </CardHeader>
                 <CardContent>
                   <p className="text-sm leading-relaxed text-muted-foreground">
-                    To inspire and empower every student to think critically, act
-                    compassionately, and lead with integrity. We cultivate a joyful,
-                    inquiry-driven learning community where each child is known,
-                    challenged, and supported to reach their fullest potential —
-                    academically, socially, and morally.
+                    To create a warm, family-like school in Addis Ababa where every
+                    child is seen, valued, and inspired to learn. We build strong
+                    foundations in literacy, numeracy, and character — and we help
+                    each child discover the joy of asking questions, the courage to
+                    try, and the pride of steady progress.
                   </p>
                 </CardContent>
               </Card>
@@ -175,11 +175,11 @@ export function AboutPage() {
                 </CardHeader>
                 <CardContent>
                   <p className="text-sm leading-relaxed text-muted-foreground">
-                    To be a beacon of educational excellence — a school where curiosity
-                    becomes wisdom, where diversity becomes strength, and where every
-                    graduate leaves prepared to shape a more just, innovative, and
-                    compassionate world. We envision graduates who are not only
-                    college-ready, but life-ready.
+                    To be a school in Addis Ababa where children leave Grade 8 not
+                    only ready for secondary school, but ready for life — confident
+                    in who they are, kind to those around them, and curious about the
+                    world. We dream of graduates who carry the Hamza spirit of
+                    integrity, hard work, and care wherever they go next.
                   </p>
                 </CardContent>
               </Card>
@@ -236,7 +236,7 @@ export function AboutPage() {
                     <Award className="size-5 text-amber-500" />
                     <div>
                       <div className="text-xs text-muted-foreground">Leading since</div>
-                      <div className="text-sm font-semibold">2014</div>
+                      <div className="text-sm font-semibold">2015</div>
                     </div>
                   </div>
                 </div>
@@ -341,8 +341,8 @@ export function AboutPage() {
           <Reveal>
             <SectionHeader
               eyebrow="Our Campus"
-              title="Spaces designed for discovery"
-              description="World-class facilities that turn curiosity into creation, from cutting-edge labs to serene gardens."
+              title="Small, warm spaces built for discovery"
+              description="Our campus is intentionally modest — focused on the spaces that truly help children learn, play, and feel at home."
             />
           </Reveal>
           <div className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
@@ -380,11 +380,11 @@ export function AboutPage() {
           <Reveal>
             <SectionHeader
               eyebrow="Recognition"
-              title="Accreditations & affiliations"
-              description="Our programs meet the highest international standards, independently verified by leading educational bodies."
+              title="Licensed & trusted by Ethiopian authorities"
+              description="Our school is fully registered with the Ethiopian Ministry of Education and recognized by the Addis Ababa Education Bureau — meeting national standards for primary and junior secondary education."
             />
           </Reveal>
-          <div className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
             {ACCREDITATIONS.map((item, i) => (
               <Reveal key={item} delay={i * 0.06}>
                 <Card className="h-full">
@@ -463,7 +463,7 @@ export function AboutPage() {
                   </h2>
                   <p className="mt-3 text-base text-primary-foreground/80 sm:text-lg">
                     Schedule a campus visit, meet our educators, and discover why families
-                    across Riverside choose {SCHOOL.name} for their children's future.
+                    across Addis Ababa choose {SCHOOL.name} for their children's education.
                   </p>
                 </div>
                 <div className="flex flex-col gap-3 sm:flex-row">
