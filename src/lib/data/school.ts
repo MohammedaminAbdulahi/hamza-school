@@ -2,28 +2,28 @@
 
 export const SCHOOL = {
   name: 'Hamza School',
-  tagline: "Inspiring Excellence, Building Tomorrow's Leaders.",
-  established: 1998,
-  email: 'info@hamzaschool.edu',
-  admissionsEmail: 'admissions@hamzaschool.edu',
-  phone: '+1 (555) 248-1990',
-  altPhone: '+1 (555) 248-1991',
-  address: '1200 Cedar Grove Avenue, Riverside, CA 92501',
-  hours: 'Mon – Fri: 7:30 AM – 4:30 PM',
+  tagline: 'Learning Without Limits — Where Every Child Thrives.',
+  established: 2015,
+  email: 'hello@hamzaschool.et',
+  admissionsEmail: 'join@hamzaschool.et',
+  phone: '+251 91 234 5678',
+  altPhone: '+251 11 234 5679',
+  address: 'Bole Road, Addis Ababa, Ethiopia',
+  hours: 'Mon – Fri: 8:00 AM – 4:00 PM (EAT)',
   social: {
     facebook: 'https://facebook.com',
     twitter: 'https://twitter.com',
     instagram: 'https://instagram.com',
     youtube: 'https://youtube.com',
-    linkedin: 'https://linkedin.com',
+    telegram: 'https://telegram.org',
   },
 }
 
 export const STATS = [
-  { label: 'Years of Excellence', value: 27, suffix: '+' },
-  { label: 'Students Enrolled', value: 1840, suffix: '+' },
-  { label: 'Expert Educators', value: 142, suffix: '+' },
-  { label: 'University Acceptance', value: 98, suffix: '%' },
+  { label: 'Years of Excellence', value: 10, suffix: '+' },
+  { label: 'Active Students', value: 850, suffix: '+' },
+  { label: 'Expert Educators', value: 48, suffix: '+' },
+  { label: 'National Exam Pass Rate', value: 96, suffix: '%' },
 ]
 
 export const WHY_CHOOSE = [
@@ -68,35 +68,27 @@ export const WHY_CHOOSE = [
 export const PROGRAMS = [
   {
     icon: 'BookOpen',
-    title: 'Early Years (Pre-K – K)',
-    level: 'Ages 3–5',
+    title: 'Lower Primary (1–4)',
+    level: 'Grades 1–4',
     description:
-      'Play-based, inquiry-driven learning that builds foundational literacy, numeracy, and social-emotional skills.',
+      'Building strong foundations in literacy, numeracy, and curiosity — with hands-on learning and plenty of joy.',
     color: 'emerald',
   },
   {
     icon: 'Pencil',
-    title: 'Primary School (1–5)',
-    level: 'Grades 1–5',
+    title: 'Upper Primary (5–6)',
+    level: 'Grades 5–6',
     description:
-      'A vibrant curriculum blending core academics with creativity, curiosity, and collaborative projects.',
+      'Deepening knowledge and independence, with focused prep for the Grade 6 national examination.',
     color: 'amber',
   },
   {
     icon: 'Lightbulb',
-    title: 'Middle School (6–8)',
-    level: 'Grades 6–8',
+    title: 'Junior Secondary (7–8)',
+    level: 'Grades 7–8',
     description:
-      'An interdisciplinary approach that develops critical thinking, independence, and a love of learning.',
+      'Critical thinking, scientific inquiry in our biology lab, and rigorous readiness for the Grade 8 exam.',
     color: 'teal',
-  },
-  {
-    icon: 'GraduationCap',
-    title: 'High School (9–12)',
-    level: 'Grades 9–12',
-    description:
-      'Advanced Placement courses, college counseling, and capstone projects that launch future leaders.',
-    color: 'rose',
   },
 ]
 
@@ -229,41 +221,41 @@ export const NEWS = [
 
 export const TESTIMONIALS = [
   {
-    name: 'Sarah Mitchell',
+    name: 'Hanan Tesfaye',
     role: 'Parent of two students',
     quote:
-      'Hamza School has been transformative for our family. The teachers truly know each child and nurture their unique gifts. My son found his passion for robotics here.',
+      'Hamza School feels like family. My daughter actually looks forward to her classes — the teachers truly see her. Her Grade 6 exam results amazed us all.',
     rating: 5,
   },
   {
-    name: 'James Okonkwo',
-    role: 'Class of 2020 Alumnus, MIT',
+    name: 'Yonas Bekele',
+    role: 'Class of 2021 Alumnus',
     quote:
-      'The rigor and mentorship at Hamza prepared me for MIT and beyond. I still call my Hamza teachers for advice. This place builds character, not just transcripts.',
+      'The biology lab at Hamza opened my eyes to science. I’m now studying medicine at Addis Ababa University. I still visit my old teachers every holiday.',
     rating: 5,
   },
   {
-    name: 'Dr. Lena Haddad',
-    role: 'Parent & Education Researcher',
+    name: 'Dr. Meron Girma',
+    role: 'Parent & Education Consultant',
     quote:
-      'As an educator myself, I am consistently impressed by Hamza’s inquiry-based pedagogy and the genuine warmth of the community. It is rare and remarkable.',
+      'As someone who works in education, I can say Hamza gets it right — warm community, real learning, and genuine care for every child. Rare in Addis.',
     rating: 5,
   },
   {
-    name: 'Aisha Rahman',
-    role: 'Class of 2023, Stanford',
+    name: 'Selam Alemu',
+    role: 'Class of 2023, now at Horizon Academy',
     quote:
-      'From the debate stage to the science lab, Hamza gave me the confidence to lead. The college counseling team helped me find the perfect fit.',
+      'The national exam prep here is serious, but the teachers make it fun. I scored in the top 5% nationwide. Hamza believed in me before I believed in myself.',
     rating: 5,
   },
 ]
 
 export const PRINCIPAL = {
-  name: 'Dr. Jonathan Pierce',
-  title: 'Principal, Hamza School',
+  name: 'Mr. Abdulsemed Hamza',
+  title: 'Founder & Principal, Hamza School',
   message:
-    'For over two decades, Hamza School has been a beacon of excellence where curiosity is kindled, character is forged, and every child is empowered to lead a life of purpose. We believe education is not merely the transmission of knowledge, but the cultivation of wisdom, empathy, and resilience. Walk through our halls and you will feel the energy of young minds at work—questioning, creating, and dreaming. I warmly invite you to join our community and witness the Hamza difference firsthand.',
-  signature: 'Dr. Jonathan Pierce',
+    'When I started Hamza School in 2015, I had one dream — to build a place where every child feels seen, valued, and challenged to grow. Ten years later, that dream lives in every classroom. We don’t just prepare students for national exams. We prepare them for life. We believe in learning that sticks, teachers who care, and a community that lifts each other up. I warmly invite you to visit us, walk our halls, and feel the Hamza difference for yourself.',
+  signature: 'Abdulsemed Hamza',
 }
 
 export const CORE_VALUES = [
@@ -276,46 +268,44 @@ export const CORE_VALUES = [
 ]
 
 export const LEADERSHIP = [
-  { name: 'Dr. Jonathan Pierce', role: 'Principal', bio: 'Ed.D., Harvard; 22 years in education leadership.', initials: 'JP' },
-  { name: 'Ms. Fatima Al-Rashid', role: 'Vice Principal, Academics', bio: 'M.Ed., Stanford; curriculum design specialist.', initials: 'FA' },
-  { name: 'Mr. David Chen', role: 'Vice Principal, Student Affairs', bio: 'M.A. Psychology; student wellbeing advocate.', initials: 'DC' },
-  { name: 'Mrs. Helen Brooks', role: 'Director of Admissions', bio: '15 years guiding families through enrollment.', initials: 'HB' },
-  { name: 'Mr. Omar Farouk', role: 'Director of Athletics', bio: 'Former national coach; champions scholar-athletes.', initials: 'OF' },
-  { name: 'Dr. Maria Santos', role: 'Director of STEM', bio: 'Ph.D. Physics; leads our innovation programs.', initials: 'MS' },
+  { name: 'Mr. Abdulsemed Hamza', role: 'Founder & Principal', bio: 'B.Ed, Addis Ababa University; 15 years in education.', initials: 'AH' },
+  { name: 'Mrs. Hiwot Tadesse', role: 'Vice Principal, Academics', bio: 'M.Ed; leads our national exam preparation.', initials: 'HT' },
+  { name: 'Mr. Bereket Mengistu', role: 'Head of Student Affairs', bio: 'Student wellbeing and character development.', initials: 'BM' },
+  { name: 'Mrs. Selamawit Girma', role: 'Admissions Coordinator', bio: '10 years guiding families through enrollment.', initials: 'SG' },
+  { name: 'Mr. Dawit Kebede', role: 'Science Department Lead', bio: 'Runs our biology lab and science club.', initials: 'DK' },
+  { name: 'Ms. Eden Asefa', role: 'Lower Primary Coordinator', bio: 'Specialist in early years pedagogy.', initials: 'EA' },
 ]
 
 export const TEACHERS = [
-  { name: 'Ms. Emily Carter', subject: 'Mathematics', years: 12, initials: 'EC' },
-  { name: 'Mr. Robert Hayes', subject: 'Physics & Robotics', years: 9, initials: 'RH' },
-  { name: 'Mrs. Priya Nair', subject: 'English Literature', years: 14, initials: 'PN' },
-  { name: 'Mr. Luis Gomez', subject: 'History & Civics', years: 11, initials: 'LG' },
-  { name: 'Ms. Yuki Tanaka', subject: 'Visual Arts', years: 7, initials: 'YT' },
-  { name: 'Mr. Ahmed Saleh', subject: 'Computer Science', years: 8, initials: 'AS' },
-  { name: 'Mrs. Grace Adeyemi', subject: 'Biology', years: 13, initials: 'GA' },
-  { name: 'Mr. Thomas Wright', subject: 'Music & Band', years: 10, initials: 'TW' },
+  { name: 'Mrs. Hiwot Tadesse', subject: 'Mathematics', years: 12, initials: 'HT' },
+  { name: 'Mr. Dawit Kebede', subject: 'Biology & Science', years: 9, initials: 'DK' },
+  { name: 'Mrs. Selamawit Girma', subject: 'English & Amharic', years: 14, initials: 'SG' },
+  { name: 'Mr. Bereket Mengistu', subject: 'Social Studies', years: 11, initials: 'BM' },
+  { name: 'Ms. Eden Asefa', subject: 'Lower Primary', years: 7, initials: 'EA' },
+  { name: 'Mr. Yonas Bekele', subject: 'Civics & Ethics', years: 8, initials: 'YB' },
+  { name: 'Mrs. Meron Alemu', subject: 'English Literature', years: 13, initials: 'MA' },
+  { name: 'Mr. Abel Tesfaye', subject: 'Mathematics & Physics', years: 10, initials: 'AT' },
 ]
 
 export const FACILITIES = [
-  { icon: 'FlaskConical', name: 'Science Laboratories', description: 'Six specialist labs for physics, chemistry, and biology.' },
-  { icon: 'Cpu', name: 'Robotics & AI Lab', description: 'Collaborative robots, 3D printers, and ML workstations.' },
-  { icon: 'Library', name: 'Learning Resource Center', description: '40,000+ volumes, digital archives, and study atriums.' },
-  { icon: 'Dumbbell', name: 'Sports Complex', description: 'Olympic pool, indoor courts, and a 400m track.' },
-  { icon: 'Music', name: 'Performing Arts Centre', description: 'A 600-seat auditorium and dedicated music suites.' },
-  { icon: 'Trees', name: 'Eco Garden & Greenhouse', description: 'Living classroom for sustainability and botany.' },
+  { icon: 'FlaskConical', name: 'Biology Laboratory', description: 'Our flagship science lab — microscopes, specimens, and hands-on experiments for Grades 7–8.' },
+  { icon: 'Library', name: 'Reading Corner', description: 'A cozy library with storybooks, reference texts, and study spaces.' },
+  { icon: 'Users', name: 'Small Classrooms', description: 'Class sizes of 20–25, so every child gets personal attention.' },
+  { icon: 'Sun', name: 'Outdoor Play Area', description: 'Safe, sunny space for breaks, games, and physical activity.' },
+  { icon: 'Coffee', name: 'Parent Lounge', description: 'A welcoming space for parent meetings and community events.' },
+  { icon: 'Wifi', name: 'Digital Learning Tools', description: 'Tablets and educational software that enhance classroom learning.' },
 ]
 
 export const ACCREDITATIONS = [
-  'AdvancED / Cognia Accredited',
-  'International Baccalaureate (IB) World School',
-  'Council of International Schools (CIS) Member',
-  'National Association of Independent Schools (NAIS)',
+  'Licensed by the Ethiopian Ministry of Education',
+  'Addis Ababa Education Bureau Registered',
+  'Member, Ethiopian Private Schools Association',
 ]
 
 export const SUBJECTS = [
-  'Mathematics', 'English Language & Literature', 'Sciences (Physics, Chemistry, Biology)',
-  'Computer Science & Coding', 'History & Global Studies', 'Geography',
-  'Mandarin, French & Spanish', 'Visual & Digital Arts', 'Music & Performance',
-  'Physical Education & Health', 'Economics & Business', 'Philosophy & Ethics',
+  'Mathematics', 'English Language', 'Amharic', 'Biology & General Science',
+  'Social Studies', 'Civics & Ethical Education', 'Geography', 'History',
+  'Physical Education', 'Art & Music', 'Digital Literacy',
 ]
 
 export const DEPARTMENTS = [

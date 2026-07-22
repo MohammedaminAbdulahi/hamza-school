@@ -58,18 +58,24 @@ export function HomePage() {
   return (
     <div className="flex flex-col">
       {/* ===== HERO ===== */}
-      <section className="relative flex min-h-[88vh] items-center overflow-hidden">
-        <div className="absolute inset-0 -z-10">
-          <SmartImage
-            seed="hamza-campus-hero"
-            alt="Hamza School campus"
-            icon="GraduationCap"
-            label="Hamza School"
-            rounded="rounded-none"
-            className="h-full w-full"
-          />
-          <div className="hero-overlay absolute inset-0" />
-        </div>
+      <section className="relative flex min-h-[90vh] items-center overflow-hidden">
+        {/* Warm layered background — soft gradient with subtle pattern */}
+        <div className="absolute inset-0 -z-10 bg-gradient-to-br from-emerald-900 via-emerald-800 to-teal-900" />
+        <div className="absolute inset-0 -z-10 opacity-30 [background-image:radial-gradient(circle_at_20%_30%,rgba(245,158,11,0.3),transparent_40%),radial-gradient(circle_at_80%_70%,rgba(16,185,129,0.4),transparent_45%)]" />
+        {/* Subtle grain */}
+        <div className="absolute inset-0 -z-10 opacity-[0.07] [background-image:url('data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22120%22 height=%22120%22><filter id=%22n%22><feTurbulence baseFrequency=%220.9%22/></filter><rect width=%22100%25%22 height=%22100%25%22 filter=%22url(%23n)%22/></svg>')]" />
+        {/* Floating decorative shapes */}
+        <motion.div
+          animate={{ y: [0, -18, 0] }}
+          transition={{ repeat: Infinity, duration: 8, ease: 'easeInOut' }}
+          className="absolute right-[8%] top-[18%] hidden size-32 rounded-full bg-amber-400/20 blur-2xl lg:block"
+        />
+        <motion.div
+          animate={{ y: [0, 16, 0] }}
+          transition={{ repeat: Infinity, duration: 10, ease: 'easeInOut' }}
+          className="absolute bottom-[15%] left-[10%] hidden size-40 rounded-full bg-emerald-400/20 blur-2xl lg:block"
+        />
+
         <div className="mx-auto w-full max-w-7xl px-4 py-20 sm:px-6 lg:px-8">
           <div className="max-w-2xl">
             <motion.span
@@ -79,7 +85,7 @@ export function HomePage() {
               className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-1.5 text-sm font-medium text-white backdrop-blur-md"
             >
               <Sparkles className="size-4 text-amber-300" />
-              Welcome to Hamza School · Est. {SCHOOL.established}
+              Welcome to Hamza School · Addis Ababa, Ethiopia
             </motion.span>
             <motion.h1
               initial={{ opacity: 0, y: 24 }}
@@ -87,9 +93,9 @@ export function HomePage() {
               transition={{ duration: 0.6, delay: 0.1 }}
               className="mt-5 text-balance text-4xl font-bold leading-[1.05] tracking-tight text-white sm:text-5xl lg:text-6xl"
             >
-              Inspiring Excellence,{' '}
+              Where every child is{' '}
               <span className="bg-gradient-to-r from-amber-300 to-amber-500 bg-clip-text text-transparent">
-                Building Tomorrow’s Leaders
+                seen, valued, and inspired
               </span>
             </motion.h1>
             <motion.p
@@ -98,9 +104,9 @@ export function HomePage() {
               transition={{ duration: 0.6, delay: 0.2 }}
               className="mt-6 max-w-xl text-balance text-lg text-white/85 sm:text-xl"
             >
-              A premier learning community where curious minds become courageous
-              leaders. Discover an education that nurtures intellect, character, and
-              purpose.
+              A warm, family-like school in the heart of Addis Ababa. We nurture
+              curious minds from Grade 1 to 8 — with caring teachers, a real biology
+              lab, and a love for learning that lasts a lifetime.
             </motion.p>
             <motion.div
               initial={{ opacity: 0, y: 24 }}
@@ -111,9 +117,9 @@ export function HomePage() {
               <Button
                 size="lg"
                 onClick={() => goPage('admissions')}
-                className="h-12 bg-primary px-7 text-base shadow-xl shadow-primary/30 hover:bg-primary/90"
+                className="h-12 bg-amber-500 px-7 text-base text-amber-950 shadow-xl shadow-amber-500/30 hover:bg-amber-400"
               >
-                Apply Now
+                Enroll Your Child
                 <ArrowRight className="size-4.5" />
               </Button>
               <Button
@@ -122,7 +128,7 @@ export function HomePage() {
                 onClick={() => goPage('about')}
                 className="h-12 border-white/30 bg-white/10 px-7 text-base text-white backdrop-blur-md hover:bg-white/20 hover:text-white"
               >
-                Learn More
+                Learn About Us
               </Button>
             </motion.div>
             <motion.div
@@ -131,7 +137,7 @@ export function HomePage() {
               transition={{ duration: 0.6, delay: 0.5 }}
               className="mt-10 flex flex-wrap items-center gap-x-8 gap-y-3 text-sm text-white/80"
             >
-              {['IB World School', 'Cognia Accredited', '1:12 Ratio', '98% University Rate'].map(
+              {['Licensed by MoE', 'Grades 1–8', 'Small Class Sizes', '96% National Exam Pass'].map(
                 (item) => (
                   <span key={item} className="flex items-center gap-2">
                     <CheckCircle2 className="size-4 text-amber-300" />
@@ -168,33 +174,32 @@ export function HomePage() {
                 seed="hamza-welcome-intro"
                 alt="Students learning at Hamza School"
                 icon="BookOpen"
-                label="A Community of Learners"
+                label="Our Community"
                 className="aspect-[4/3] w-full"
               />
               <div className="absolute -bottom-6 -right-6 hidden rounded-2xl border bg-card p-5 shadow-xl sm:block">
-                <p className="text-3xl font-bold text-primary">27+</p>
-                <p className="text-sm text-muted-foreground">Years of Excellence</p>
+                <p className="text-3xl font-bold text-primary">10+</p>
+                <p className="text-sm text-muted-foreground">Years of Caring</p>
               </div>
             </div>
           </Reveal>
           <Reveal delay={0.15}>
             <span className="inline-flex items-center gap-2 rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-primary">
               <span className="size-1.5 rounded-full bg-primary" />
-              About Hamza School
+              Our Story
             </span>
             <h2 className="mt-4 text-balance text-3xl font-bold tracking-tight sm:text-4xl">
-              A place where every child is known, valued, and inspired
+              A small school with a big heart
             </h2>
             <p className="mt-5 text-base text-muted-foreground sm:text-lg">
-              Founded in {SCHOOL.established}, Hamza School has grown from 120 students
-              into a vibrant community of over 1,800 learners. We blend a rigorous,
-              inquiry-based curriculum with a deep commitment to character, creativity,
-              and global citizenship.
+              Founded in {SCHOOL.established} by Mr. Abdulsemed Hamza, our school began
+              with one simple belief — that every child deserves to be seen. Today, we
+              serve over 850 students from Grade 1 to 8, with small classes, caring
+              teachers, and a real focus on learning that lasts.
             </p>
             <p className="mt-4 text-base text-muted-foreground">
-              Our world-class educators, state-of-the-art facilities, and nurturing
-              culture empower students to think critically, act compassionately, and lead
-              with purpose.
+              From our biology lab to our reading corner, from national exam prep to
+              playtime in the sun — everything we do is built around your child.
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
               <Button onClick={() => goPage('about')} className="bg-primary">
