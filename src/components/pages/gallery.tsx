@@ -170,52 +170,42 @@ export function GalleryPage() {
             </div>
           </Reveal>
 
-          {/* Masonry grid */}
-          <div className="mt-10 grid auto-rows-[180px] grid-cols-2 gap-4 sm:grid-cols-3 sm:auto-rows-[200px] lg:grid-cols-4">
+          {/* Clean grid — big images, easy to see */}
+          <div className="mt-10 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
             {filtered.map((item, i) => {
-              const span =
-                SPAN_PATTERNS[i % SPAN_PATTERNS.length]
               return (
                 <Reveal
                   key={`${item.title}-${i}`}
-                  delay={(i % 4) * 0.06}
-                  className={cn(
-                    'group relative cursor-pointer overflow-hidden rounded-2xl',
-                    span
-                  )}
+                  delay={(i % 3) * 0.07}
+                  className="group relative cursor-pointer overflow-hidden rounded-2xl border bg-card transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-primary/10"
                 >
                   <button
                     onClick={() => openLightbox(i)}
-                    className="block size-full"
+                    className="block w-full text-left"
                     aria-label={`View ${item.title} larger`}
                   >
-                    <SmartImage
-                      seed={item.image}
-                      alt={item.title}
-                      label={item.title}
-                      rounded="rounded-2xl"
-                      className="size-full transition-transform duration-500 group-hover:scale-105"
-                    />
-                    {/* Overlay */}
-                    <div className="absolute inset-0 flex flex-col justify-between bg-gradient-to-t from-black/60 via-transparent to-transparent p-4 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
-                      <div className="flex justify-end">
-                        <span
-                          className={cn(
-                            'inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-semibold backdrop-blur-md',
-                            getCategoryBadgeClass(item.category)
-                          )}
-                        >
-                          {item.category}
-                        </span>
-                      </div>
-                      <div className="flex items-center justify-between text-white">
-                        <span className="text-sm font-semibold drop-shadow">
-                          {item.title}
-                        </span>
-                        <span className="flex size-8 items-center justify-center rounded-full bg-white/20 backdrop-blur-md">
-                          <Maximize2 className="size-4" />
-                        </span>
-                      </div>
+                    <div className="relative aspect-[4/3] overflow-hidden">
+                      <SmartImage
+                        seed={item.image}
+                        alt={item.title}
+                        icon="Image"
+                        rounded="rounded-none"
+                        className="size-full transition-transform duration-500 group-hover:scale-105"
+                      />
+                      <span
+                        className={cn(
+                          'absolute left-3 top-3 inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-semibold backdrop-blur-md',
+                          getCategoryBadgeClass(item.category)
+                        )}
+                      >
+                        {item.category}
+                      </span>
+                    </div>
+                    <div className="flex items-center justify-between p-4">
+                      <span className="text-sm font-semibold">{item.title}</span>
+                      <span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary transition-colors group-hover:bg-primary group-hover:text-primary-foreground">
+                        <Maximize2 className="size-4" />
+                      </span>
                     </div>
                   </button>
                 </Reveal>

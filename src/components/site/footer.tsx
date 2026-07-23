@@ -6,12 +6,11 @@ import {
   Twitter,
   Instagram,
   Youtube,
-  Linkedin,
+  Send,
   Mail,
   Phone,
   MapPin,
   Clock,
-  Send,
 } from 'lucide-react'
 import { Logo } from './logo'
 import { Input } from '@/components/ui/input'
@@ -90,7 +89,7 @@ export function Footer() {
               { icon: Twitter, href: SCHOOL.social.twitter, label: 'Twitter' },
               { icon: Instagram, href: SCHOOL.social.instagram, label: 'Instagram' },
               { icon: Youtube, href: SCHOOL.social.youtube, label: 'YouTube' },
-              { icon: Linkedin, href: SCHOOL.social.linkedin, label: 'LinkedIn' },
+              { icon: Send, href: SCHOOL.social.telegram, label: 'Telegram' },
             ].map((s) => (
               <a
                 key={s.label}

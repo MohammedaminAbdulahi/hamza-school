@@ -12,7 +12,6 @@ import {
   Twitter,
   Instagram,
   Youtube,
-  Linkedin,
   ArrowRight,
   MessageSquare,
   Building2,
@@ -83,7 +82,7 @@ const SOCIAL_LINKS = [
   { name: 'Twitter', icon: Twitter, url: SCHOOL.social.twitter, color: 'hover:bg-sky-500 hover:border-sky-500' },
   { name: 'Instagram', icon: Instagram, url: SCHOOL.social.instagram, color: 'hover:bg-rose-500 hover:border-rose-500' },
   { name: 'YouTube', icon: Youtube, url: SCHOOL.social.youtube, color: 'hover:bg-red-600 hover:border-red-600' },
-  { name: 'LinkedIn', icon: Linkedin, url: SCHOOL.social.linkedin, color: 'hover:bg-emerald-700 hover:border-emerald-700' },
+  { name: 'Telegram', icon: Send, url: SCHOOL.social.telegram, color: 'hover:bg-emerald-700 hover:border-emerald-700' },
 ]
 
 const DEPARTMENTS = [
