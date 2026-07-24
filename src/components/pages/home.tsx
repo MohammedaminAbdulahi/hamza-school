@@ -28,7 +28,6 @@ import { SectionHeader } from '@/components/site/section-header'
 import { AnimatedCounter } from '@/components/site/animated-counter'
 import { DynamicIcon } from '@/components/site/dynamic-icon'
 import { SmartImage } from '@/components/site/smart-image'
-import { HeroScene } from '@/components/site/hero-scene'
 import { useNav } from '@/lib/nav-store'
 import {
   STATS,
@@ -46,39 +45,64 @@ export function HomePage() {
 
   return (
     <div className="flex flex-col">
-      {/* ===== HERO — split layout (text left, visual right) ===== */}
-      <section className="relative overflow-hidden bg-gradient-to-b from-cream to-background">
-        {/* Subtle pattern */}
-        <div className="pattern-islamic absolute inset-0" />
-        <div className="relative mx-auto grid max-w-7xl items-center gap-12 px-5 py-16 sm:px-6 lg:grid-cols-2 lg:gap-16 lg:py-24 lg:px-8">
-          {/* Left: text */}
-          <motion.div
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.6 }}
-            className="order-2 lg:order-1"
-          >
-            <span className="inline-flex items-center gap-2 rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-primary">
-              <span className="size-1.5 rounded-full bg-primary" />
-              Welcome to Hamza School
-            </span>
+      {/* ===== HERO — full background photo with text overlay (matching design) ===== */}
+      <section className="relative flex min-h-[90vh] items-center overflow-hidden">
+        {/* Background photo — the desk scene with books, notebook, plant */}
+        <div className="absolute inset-0 -z-10">
+          <img
+            src="/hero-desk.jpeg"
+            alt="A warm study desk with books labeled Knowledge, Faith, Character, Excellence, an open notebook with a Hadith quote, and a potted plant"
+            className="h-full w-full object-cover"
+          />
+          {/* Dark overlay so text is readable */}
+          <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/65 to-black/35" />
+        </div>
 
-            <h1 className="mt-5 text-balance font-serif text-4xl font-bold leading-[1.08] tracking-tight text-foreground sm:text-5xl lg:text-6xl">
+        <div className="relative mx-auto w-full max-w-7xl px-5 py-20 sm:px-6 lg:px-8">
+          <div className="max-w-2xl">
+            <motion.span
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5 }}
+              className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-1.5 text-sm font-medium text-white backdrop-blur-md"
+            >
+              <Sparkles className="size-4 text-amber-300" />
+              Welcome to Hamza School · Addis Ababa
+            </motion.span>
+
+            <motion.h1
+              initial={{ opacity: 0, y: 24 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.1 }}
+              className="mt-6 text-balance font-serif text-4xl font-bold leading-[1.08] tracking-tight text-white sm:text-5xl lg:text-6xl"
+            >
               Nurturing Faith,{' '}
-              <span className="text-primary">Inspiring Futures.</span>
-            </h1>
+              <span className="bg-gradient-to-r from-amber-200 to-amber-400 bg-clip-text text-transparent">
+                Inspiring Futures.
+              </span>
+            </motion.h1>
 
-            <p className="mt-6 max-w-lg text-balance text-base text-muted-foreground sm:text-lg">
+            <motion.p
+              initial={{ opacity: 0, y: 24 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.2 }}
+              className="mt-6 max-w-lg text-balance text-base text-white/85 sm:text-lg"
+            >
               A warm, faith-based school in the heart of Addis Ababa. We blend
               quality education with strong values — helping every child grow in
               knowledge, character, and faith from Grade 1 to 8.
-            </p>
+            </motion.p>
 
-            <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+            <motion.div
+              initial={{ opacity: 0, y: 24 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.3 }}
+              className="mt-8 flex flex-col gap-3 sm:flex-row"
+            >
               <Button
                 size="lg"
                 onClick={() => goPage('contact')}
-                className="h-12 bg-primary px-7 text-base shadow-lg shadow-primary/20 hover:bg-primary/90"
+                className="h-12 bg-primary px-7 text-base shadow-xl shadow-primary/30 hover:bg-primary/90"
               >
                 Enroll Now
                 <ArrowRight className="size-4.5" />
@@ -87,43 +111,43 @@ export function HomePage() {
                 size="lg"
                 variant="outline"
                 onClick={() => goPage('about')}
-                className="h-12 border-primary/30 px-7 text-base text-primary hover:bg-primary/5"
+                className="h-12 border-white/30 bg-white/10 px-7 text-base text-white backdrop-blur-md hover:bg-white/20 hover:text-white"
               >
                 Discover More
               </Button>
-            </div>
+            </motion.div>
 
             {/* Admissions banner */}
-            <div className="mt-7 flex items-center gap-3 rounded-xl border border-amber-500/30 bg-amber-50 p-3.5 dark:bg-amber-950/20">
-              <Calendar className="size-5 shrink-0 text-amber-600" />
-              <p className="text-sm font-medium text-amber-900 dark:text-amber-200">
+            <motion.div
+              initial={{ opacity: 0, y: 24 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.4 }}
+              className="mt-7 flex items-center gap-3 rounded-xl border border-amber-400/40 bg-amber-500/15 p-3.5 backdrop-blur-md"
+            >
+              <Calendar className="size-5 shrink-0 text-amber-300" />
+              <p className="text-sm font-medium text-amber-50">
                 Admissions Open for 2025/2026 —{' '}
                 <button onClick={() => goPage('contact')} className="font-bold underline underline-offset-2">
                   enroll your child today
                 </button>
               </p>
-            </div>
+            </motion.div>
 
             {/* Trust badges */}
-            <div className="mt-7 flex flex-wrap gap-x-5 gap-y-2 text-xs text-muted-foreground">
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.6, delay: 0.5 }}
+              className="mt-7 flex flex-wrap gap-x-5 gap-y-2 text-xs text-white/75"
+            >
               {['Licensed by MoE', 'Grades 1–8', 'Small Classes', 'Faith-Based'].map((item) => (
                 <span key={item} className="flex items-center gap-1.5">
-                  <CheckCircle2 className="size-3.5 text-primary" />
+                  <CheckCircle2 className="size-3.5 text-amber-300" />
                   {item}
                 </span>
               ))}
-            </div>
-          </motion.div>
-
-          {/* Right: visual — desk scene with books, notebook, plant */}
-          <motion.div
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.6, delay: 0.15 }}
-            className="order-1 lg:order-2"
-          >
-            <HeroScene />
-          </motion.div>
+            </motion.div>
+          </div>
         </div>
       </section>
 
