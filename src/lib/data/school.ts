@@ -2,7 +2,7 @@
 
 export const SCHOOL = {
   name: 'Hamza School',
-  tagline: 'Learning Without Limits — Where Every Child Thrives.',
+  tagline: 'Nurturing Faith, Inspiring Futures.',
   established: 2015,
   email: 'hello@hamzaschool.et',
   admissionsEmail: 'join@hamzaschool.et',
@@ -28,42 +28,35 @@ export const STATS = [
 
 export const WHY_CHOOSE = [
   {
-    icon: 'Award',
-    title: 'Academic Excellence',
-    description:
-      'A rigorous, inquiry-based curriculum delivered by passionate educators, producing consistent top-tier results.',
+    icon: 'BookOpen',
+    title: 'Quality Education',
+    description: 'Strong academic programs designed for success — from early literacy to national exam readiness.',
   },
   {
     icon: 'HeartHandshake',
-    title: 'Character First',
-    description:
-      'We shape principled, compassionate leaders through values-driven education and service learning.',
-  },
-  {
-    icon: 'FlaskConical',
-    title: 'STEM Innovation',
-    description:
-      'State-of-the-art laboratories and maker spaces empower students to design, build, and innovate.',
+    title: 'Faith & Values',
+    description: 'Building strong moral character rooted in Islamic values — honesty, kindness, and responsibility.',
   },
   {
     icon: 'Users',
-    title: 'Small Class Sizes',
-    description:
-      'A 1:12 teacher-to-student ratio ensures every child is known, supported, and challenged.',
+    title: 'Caring Community',
+    description: 'A supportive, family-like environment where every child belongs and is known by name.',
   },
   {
-    icon: 'Globe',
-    title: 'Global Perspective',
-    description:
-      'International exchange programs and multilingual learning prepare students for a connected world.',
-  },
-  {
-    icon: 'Sparkles',
-    title: 'Holistic Development',
-    description:
-      'From arts to athletics, our co-curricular programs nurture the whole child—mind, body, and spirit.',
+    icon: 'Trophy',
+    title: 'Future Leaders',
+    description: 'Preparing students to lead with integrity and make a positive impact in their communities.',
   },
 ]
+
+export const MISSION = {
+  eyebrow: 'Our Mission',
+  title: 'Guiding Hearts. Growing Minds.',
+  description:
+    'At Hamza School, we believe every child deserves an education that balances academic excellence with strong faith and character. We guide our students to become curious learners, compassionate humans, and confident leaders — grounded in values that last a lifetime.',
+  quote: 'Seeking knowledge is an obligation upon every Muslim.',
+  quoteSource: 'Prophet Muhammad ﷺ',
+}
 
 export const PROGRAMS = [
   {

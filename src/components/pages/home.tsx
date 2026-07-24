@@ -9,9 +9,8 @@ import {
   MapPin,
   Star,
   Quote,
-  Sparkles,
   CheckCircle2,
-  Heart,
+  Sparkles,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
@@ -37,6 +36,7 @@ import {
   EVENTS,
   TESTIMONIALS,
   PRINCIPAL,
+  MISSION,
   SCHOOL,
 } from '@/lib/data/school'
 
@@ -45,148 +45,183 @@ export function HomePage() {
 
   return (
     <div className="flex flex-col">
-      {/* ===== HERO — clean, spacious, warm ===== */}
-      <section className="relative flex min-h-[92vh] items-center overflow-hidden">
-        {/* Soft layered background */}
-        <div className="absolute inset-0 -z-10 bg-gradient-to-br from-primary/90 via-primary to-teal-700" />
-        <div className="absolute inset-0 -z-10 opacity-30 [background-image:radial-gradient(circle_at_15%_25%,rgba(245,200,120,0.35),transparent_40%),radial-gradient(circle_at_85%_75%,rgba(255,255,255,0.15),transparent_45%)]" />
-        {/* Floating decorative shapes */}
-        <motion.div
-          animate={{ y: [0, -18, 0] }}
-          transition={{ repeat: Infinity, duration: 9, ease: 'easeInOut' }}
-          className="absolute right-[6%] top-[16%] hidden size-40 rounded-full bg-amber-300/20 blur-3xl lg:block"
-        />
-        <motion.div
-          animate={{ y: [0, 16, 0] }}
-          transition={{ repeat: Infinity, duration: 11, ease: 'easeInOut' }}
-          className="absolute bottom-[14%] left-[8%] hidden size-48 rounded-full bg-white/10 blur-3xl lg:block"
-        />
-
-        <div className="mx-auto w-full max-w-4xl px-5 py-20 text-center sm:px-6">
-          <motion.span
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-            className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-1.5 text-sm font-medium text-white backdrop-blur-md"
+      {/* ===== HERO — split layout (text left, visual right) ===== */}
+      <section className="relative overflow-hidden bg-gradient-to-b from-cream to-background">
+        {/* Subtle pattern */}
+        <div className="pattern-islamic absolute inset-0" />
+        <div className="relative mx-auto grid max-w-7xl items-center gap-12 px-5 py-16 sm:px-6 lg:grid-cols-2 lg:gap-16 lg:py-24 lg:px-8">
+          {/* Left: text */}
+          <motion.div
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.6 }}
+            className="order-2 lg:order-1"
           >
-            <Sparkles className="size-4 text-amber-200" />
-            Addis Ababa, Ethiopia · Est. {SCHOOL.established}
-          </motion.span>
-
-          <motion.h1
-            initial={{ opacity: 0, y: 24 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.1 }}
-            className="mt-6 text-balance text-4xl font-bold leading-[1.08] tracking-tight text-white sm:text-5xl lg:text-6xl"
-          >
-            Where every child is{' '}
-            <span className="bg-gradient-to-r from-amber-200 to-amber-400 bg-clip-text text-transparent">
-              seen, valued & inspired
+            <span className="inline-flex items-center gap-2 rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-primary">
+              <span className="size-1.5 rounded-full bg-primary" />
+              Welcome to Hamza School
             </span>
-          </motion.h1>
 
-          <motion.p
-            initial={{ opacity: 0, y: 24 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.2 }}
-            className="mx-auto mt-6 max-w-xl text-balance text-lg text-white/85 sm:text-xl"
-          >
-            A warm, family-like school in the heart of Addis Ababa.
-            Grades 1–8. Caring teachers. Real learning.
-          </motion.p>
+            <h1 className="mt-5 text-balance font-serif text-4xl font-bold leading-[1.08] tracking-tight text-foreground sm:text-5xl lg:text-6xl">
+              Nurturing Faith,{' '}
+              <span className="text-primary">Inspiring Futures.</span>
+            </h1>
 
-          <motion.div
-            initial={{ opacity: 0, y: 24 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.3 }}
-            className="mt-9 flex flex-col items-center justify-center gap-3 sm:flex-row"
-          >
-            <Button
-              size="lg"
-              onClick={() => goPage('contact')}
-              className="h-12 bg-white px-8 text-base text-primary shadow-xl hover:bg-white/90"
-            >
-              Visit Our School
-              <ArrowRight className="size-4.5" />
-            </Button>
-            <Button
-              size="lg"
-              variant="outline"
-              onClick={() => goPage('about')}
-              className="h-12 border-white/30 bg-transparent px-8 text-base text-white hover:bg-white/10 hover:text-white"
-            >
-              Our Story
-            </Button>
-          </motion.div>
+            <p className="mt-6 max-w-lg text-balance text-base text-muted-foreground sm:text-lg">
+              A warm, faith-based school in the heart of Addis Ababa. We blend
+              quality education with strong values — helping every child grow in
+              knowledge, character, and faith from Grade 1 to 8.
+            </p>
 
-          {/* Trust badges */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.6, delay: 0.5 }}
-            className="mt-12 flex flex-wrap items-center justify-center gap-x-7 gap-y-3 text-sm text-white/75"
-          >
-            {['Licensed by MoE', 'Grades 1–8', 'Small Classes', '96% National Exam Pass'].map(
-              (item) => (
-                <span key={item} className="flex items-center gap-2">
-                  <CheckCircle2 className="size-4 text-amber-200" />
+            <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+              <Button
+                size="lg"
+                onClick={() => goPage('contact')}
+                className="h-12 bg-primary px-7 text-base shadow-lg shadow-primary/20 hover:bg-primary/90"
+              >
+                Enroll Now
+                <ArrowRight className="size-4.5" />
+              </Button>
+              <Button
+                size="lg"
+                variant="outline"
+                onClick={() => goPage('about')}
+                className="h-12 border-primary/30 px-7 text-base text-primary hover:bg-primary/5"
+              >
+                Discover More
+              </Button>
+            </div>
+
+            {/* Admissions banner */}
+            <div className="mt-7 flex items-center gap-3 rounded-xl border border-amber-500/30 bg-amber-50 p-3.5 dark:bg-amber-950/20">
+              <Calendar className="size-5 shrink-0 text-amber-600" />
+              <p className="text-sm font-medium text-amber-900 dark:text-amber-200">
+                Admissions Open for 2025/2026 —{' '}
+                <button onClick={() => goPage('contact')} className="font-bold underline underline-offset-2">
+                  enroll your child today
+                </button>
+              </p>
+            </div>
+
+            {/* Trust badges */}
+            <div className="mt-7 flex flex-wrap gap-x-5 gap-y-2 text-xs text-muted-foreground">
+              {['Licensed by MoE', 'Grades 1–8', 'Small Classes', 'Faith-Based'].map((item) => (
+                <span key={item} className="flex items-center gap-1.5">
+                  <CheckCircle2 className="size-3.5 text-primary" />
                   {item}
                 </span>
-              )
-            )}
+              ))}
+            </div>
+          </motion.div>
+
+          {/* Right: visual — books + notebook + plant scene */}
+          <motion.div
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.6, delay: 0.15 }}
+            className="order-1 lg:order-2"
+          >
+            <div className="relative">
+              <SmartImage
+                seed="hamza-hero-books"
+                alt="A warm study scene with books labeled Knowledge, Faith, Character, Excellence"
+                icon="BookOpen"
+                label="Knowledge · Faith · Character · Excellence"
+                className="aspect-[4/3] w-full shadow-2xl"
+              />
+              {/* Floating quote card */}
+              <motion.div
+                animate={{ y: [0, -8, 0] }}
+                transition={{ repeat: Infinity, duration: 5, ease: 'easeInOut' }}
+                className="absolute -bottom-5 -left-3 max-w-[230px] rounded-xl border bg-card p-4 shadow-xl sm:-left-5"
+              >
+                <Quote className="size-5 text-primary/40" />
+                <p className="mt-1.5 font-serif text-sm italic leading-snug text-foreground">
+                  “Seeking knowledge is an obligation upon every Muslim.”
+                </p>
+                <p className="mt-2 text-xs font-semibold text-primary">
+                  — Prophet Muhammad ﷺ
+                </p>
+              </motion.div>
+            </div>
           </motion.div>
         </div>
       </section>
 
-      {/* ===== STATS — minimal, clean strip ===== */}
-      <section className="border-b border-border/60 bg-card py-14">
+      {/* ===== FEATURES BAR — 4 pillars ===== */}
+      <section className="border-y border-border/60 bg-card py-14">
+        <div className="mx-auto max-w-7xl px-5 sm:px-6 lg:px-8">
+          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+            {WHY_CHOOSE.map((item, i) => (
+              <Reveal key={item.title} delay={i * 0.08}>
+                <div className="flex flex-col items-center text-center sm:items-start sm:text-left">
+                  <div className="flex size-12 items-center justify-center rounded-xl bg-primary/10 text-primary">
+                    <DynamicIcon name={item.icon} className="size-6" />
+                  </div>
+                  <h3 className="mt-4 font-serif text-lg font-semibold">{item.title}</h3>
+                  <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">
+                    {item.description}
+                  </p>
+                </div>
+              </Reveal>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ===== STATS — clean strip ===== */}
+      <section className="bg-primary py-16 text-primary-foreground">
         <div className="mx-auto max-w-6xl px-5 sm:px-6">
           <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
             {STATS.map((stat, i) => (
               <Reveal key={stat.label} delay={i * 0.08} className="text-center">
-                <div className="text-4xl font-bold tracking-tight text-primary sm:text-5xl">
+                <div className="text-4xl font-bold tracking-tight sm:text-5xl">
                   <AnimatedCounter value={stat.value} suffix={stat.suffix} />
                 </div>
-                <p className="mt-1.5 text-sm text-muted-foreground">{stat.label}</p>
+                <p className="mt-1.5 text-sm text-primary-foreground/80">{stat.label}</p>
               </Reveal>
             ))}
           </div>
         </div>
       </section>
 
-      {/* ===== WHY CHOOSE — 6 cards, generous spacing ===== */}
-      <section className="py-20 sm:py-28">
-        <div className="mx-auto max-w-6xl px-5 sm:px-6">
+      {/* ===== MISSION — with Hadith quote ===== */}
+      <section className="relative overflow-hidden py-20 sm:py-28">
+        <div className="pattern-islamic absolute inset-0" />
+        <div className="relative mx-auto grid max-w-7xl items-center gap-12 px-5 sm:px-6 lg:grid-cols-2 lg:px-8">
           <Reveal>
-            <SectionHeader
-              eyebrow="Why Hamza"
-              title="A school that feels like home"
-              description="Small classes, caring teachers, and a real focus on learning that lasts. Here's what makes us different."
+            <SmartImage
+              seed="hamza-mission"
+              alt="Students learning together"
+              icon="HeartHandshake"
+              label="Faith & Knowledge"
+              className="aspect-[4/3] w-full shadow-xl"
             />
           </Reveal>
-          <div className="mt-14 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-            {WHY_CHOOSE.map((item, i) => (
-              <Reveal key={item.title} delay={i * 0.07}>
-                <Card className="group h-full border-border/60 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg hover:shadow-primary/5">
-                  <CardContent className="p-7">
-                    <div className="flex size-12 items-center justify-center rounded-xl bg-primary/10 text-primary transition-colors group-hover:bg-primary group-hover:text-primary-foreground">
-                      <DynamicIcon name={item.icon} className="size-6" />
-                    </div>
-                    <h3 className="mt-5 text-lg font-semibold">{item.title}</h3>
-                    <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-                      {item.description}
-                    </p>
-                  </CardContent>
-                </Card>
-              </Reveal>
-            ))}
-          </div>
+          <Reveal delay={0.15}>
+            <span className="inline-flex items-center gap-2 rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-primary">
+              <span className="size-1.5 rounded-full bg-primary" />
+              {MISSION.eyebrow}
+            </span>
+            <h2 className="mt-4 text-balance font-serif text-3xl font-bold tracking-tight sm:text-4xl">
+              {MISSION.title}
+            </h2>
+            <p className="mt-5 text-base leading-relaxed text-muted-foreground sm:text-lg">
+              {MISSION.description}
+            </p>
+            <div className="mt-6 rounded-xl border-l-4 border-primary bg-primary/5 p-4">
+              <p className="font-serif text-lg italic text-foreground">
+                “{MISSION.quote}”
+              </p>
+              <p className="mt-2 text-sm font-semibold text-primary">— {MISSION.quoteSource}</p>
+            </div>
+          </Reveal>
         </div>
       </section>
 
-      {/* ===== PRINCIPAL — personal, warm ===== */}
-      <section className="border-y border-border/60 bg-secondary/40 py-20 sm:py-28">
-        <div className="mx-auto grid max-w-6xl items-center gap-12 px-5 sm:px-6 lg:grid-cols-12 lg:px-8">
+      {/* ===== PRINCIPAL'S MESSAGE ===== */}
+      <section className="border-y border-border/60 bg-cream py-20 sm:py-28">
+        <div className="mx-auto grid max-w-7xl items-center gap-12 px-5 sm:px-6 lg:grid-cols-12 lg:px-8">
           <Reveal className="lg:col-span-5">
             <div className="relative mx-auto max-w-xs">
               <SmartImage
@@ -204,21 +239,17 @@ export function HomePage() {
           </Reveal>
           <Reveal delay={0.15} className="lg:col-span-7">
             <span className="inline-flex items-center gap-2 rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-primary">
-              <Heart className="size-3.5" />
+              <Sparkles className="size-3.5" />
               A Word from Our Founder
             </span>
             <Quote className="mt-5 size-10 text-primary/25" />
-            <p className="mt-3 text-balance text-lg leading-relaxed text-foreground/90 sm:text-xl">
+            <p className="mt-3 text-balance font-serif text-lg leading-relaxed text-foreground/90 sm:text-xl">
               {PRINCIPAL.message}
             </p>
-            <p className="mt-6 text-xl font-semibold text-primary">
+            <p className="mt-6 font-serif text-xl font-semibold text-primary">
               {PRINCIPAL.signature}
             </p>
-            <Button
-              onClick={() => goPage('about')}
-              variant="outline"
-              className="mt-6"
-            >
+            <Button onClick={() => goPage('about')} variant="outline" className="mt-6">
               Read Our Full Story
               <ArrowRight className="size-4" />
             </Button>
@@ -226,7 +257,7 @@ export function HomePage() {
         </div>
       </section>
 
-      {/* ===== PROGRAMS — 3 clean cards ===== */}
+      {/* ===== PROGRAMS ===== */}
       <section className="py-20 sm:py-28">
         <div className="mx-auto max-w-6xl px-5 sm:px-6">
           <Reveal>
@@ -253,7 +284,7 @@ export function HomePage() {
                     </Badge>
                   </div>
                   <CardContent className="p-6">
-                    <h3 className="text-lg font-semibold">{program.title}</h3>
+                    <h3 className="font-serif text-lg font-semibold">{program.title}</h3>
                     <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
                       {program.description}
                     </p>
@@ -271,8 +302,8 @@ export function HomePage() {
         </div>
       </section>
 
-      {/* ===== UPCOMING EVENTS — clean list ===== */}
-      <section className="border-t border-border/60 bg-secondary/40 py-20 sm:py-28">
+      {/* ===== UPCOMING EVENTS ===== */}
+      <section className="border-t border-border/60 bg-cream py-20 sm:py-28">
         <div className="mx-auto max-w-6xl px-5 sm:px-6">
           <div className="flex flex-col items-start justify-between gap-6 sm:flex-row sm:items-end">
             <Reveal>
@@ -307,7 +338,7 @@ export function HomePage() {
                         <Badge variant="outline" className="mb-1 text-[10px]">
                           {event.category}
                         </Badge>
-                        <h3 className="truncate text-base font-semibold">{event.title}</h3>
+                        <h3 className="truncate font-serif text-base font-semibold">{event.title}</h3>
                         <div className="mt-1 flex flex-wrap gap-x-3 gap-y-1 text-xs text-muted-foreground">
                           <span className="flex items-center gap-1">
                             <Clock className="size-3" /> {event.time}
@@ -326,14 +357,11 @@ export function HomePage() {
         </div>
       </section>
 
-      {/* ===== TESTIMONIALS — carousel ===== */}
+      {/* ===== TESTIMONIALS ===== */}
       <section className="py-20 sm:py-28">
         <div className="mx-auto max-w-6xl px-5 sm:px-6">
           <Reveal>
-            <SectionHeader
-              eyebrow="Voices"
-              title="What families say"
-            />
+            <SectionHeader eyebrow="Voices" title="What families say" />
           </Reveal>
           <Reveal delay={0.1} className="mt-12">
             <Carousel opts={{ align: 'start', loop: true }} className="w-full">
@@ -374,13 +402,12 @@ export function HomePage() {
         </div>
       </section>
 
-      {/* ===== CTA — soft, warm ===== */}
-      <section className="relative overflow-hidden py-20 sm:py-28">
-        <div className="absolute inset-0 -z-10 bg-gradient-to-br from-primary to-teal-700" />
-        <div className="absolute inset-0 -z-10 opacity-25 [background-image:radial-gradient(circle_at_30%_40%,rgba(245,200,120,0.4),transparent_45%)]" />
-        <div className="mx-auto max-w-3xl px-5 text-center sm:px-6">
+      {/* ===== CTA ===== */}
+      <section className="relative overflow-hidden bg-primary py-20 sm:py-28">
+        <div className="pattern-islamic absolute inset-0 opacity-20" />
+        <div className="relative mx-auto max-w-3xl px-5 text-center sm:px-6">
           <Reveal>
-            <h2 className="text-balance text-3xl font-bold tracking-tight text-white sm:text-4xl lg:text-5xl">
+            <h2 className="text-balance font-serif text-3xl font-bold tracking-tight text-white sm:text-4xl lg:text-5xl">
               Come see the Hamza difference
             </h2>
             <p className="mx-auto mt-5 max-w-xl text-balance text-lg text-white/85">

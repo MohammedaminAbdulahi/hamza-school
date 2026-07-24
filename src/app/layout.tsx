@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Geist, Geist_Mono, Playfair_Display } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as SonnerToaster } from "@/components/ui/sonner";
@@ -15,35 +15,40 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+const playfair = Playfair_Display({
+  variable: "--font-playfair",
+  subsets: ["latin"],
+  weight: ["500", "600", "700", "800"],
+});
+
 export const metadata: Metadata = {
-  title: "Hamza School | Learning Without Limits — Addis Ababa, Ethiopia",
+  title: "Hamza School | Nurturing Faith, Inspiring Futures — Addis Ababa",
   description:
-    "Hamza School is a warm, family-like school in Addis Ababa serving Grades 1–8. Caring teachers, a real biology lab, and a love for learning that lasts a lifetime.",
+    "Hamza School is a warm, faith-based school in Addis Ababa serving Grades 1–8. Caring teachers, a real biology lab, and a love for learning rooted in values.",
   keywords: [
     "Hamza School",
-    "school Addis Ababa",
+    "Islamic school Addis Ababa",
     "Ethiopia school",
     "primary school",
     "junior secondary",
     "Grades 1 to 8",
-    "private school Ethiopia",
+    "faith-based school",
   ],
   authors: [{ name: "Hamza School" }],
   icons: {
     icon: "/logo.svg",
   },
   openGraph: {
-    title: "Hamza School | Inspiring Excellence, Building Tomorrow's Leaders",
+    title: "Hamza School | Nurturing Faith, Inspiring Futures",
     description:
-      "A premier institution committed to academic excellence and character development.",
+      "A warm, faith-based school in Addis Ababa serving Grades 1–8.",
     siteName: "Hamza School",
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
     title: "Hamza School",
-    description:
-      "Inspiring Excellence, Building Tomorrow's Leaders.",
+    description: "Nurturing Faith, Inspiring Futures.",
   },
 };
 
@@ -56,7 +61,7 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <body
         suppressHydrationWarning
-        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-background text-foreground`}
+        className={`${geistSans.variable} ${geistMono.variable} ${playfair.variable} antialiased bg-background text-foreground`}
       >
         <ThemeProvider
           attribute="class"
