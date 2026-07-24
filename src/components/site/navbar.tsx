@@ -26,8 +26,8 @@ const PAGES: { id: PageId; label: string }[] = [
   { id: 'home', label: 'Home' },
   { id: 'about', label: 'About Us' },
   { id: 'academics', label: 'Academics' },
-  { id: 'news', label: 'News & Events' },
-  { id: 'gallery', label: 'Gallery' },
+  { id: 'gallery', label: 'Student Life' },
+  { id: 'news', label: 'News' },
   { id: 'contact', label: 'Contact' },
 ]
 

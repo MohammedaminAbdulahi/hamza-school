@@ -36,7 +36,7 @@ export const metadata: Metadata = {
   ],
   authors: [{ name: "Hamza School" }],
   icons: {
-    icon: "/logo.svg",
+    icon: "/hamza-logo.png",
   },
   openGraph: {
     title: "Hamza School | Nurturing Faith, Inspiring Futures",

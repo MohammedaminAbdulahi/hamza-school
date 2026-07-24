@@ -28,6 +28,7 @@ import { SectionHeader } from '@/components/site/section-header'
 import { AnimatedCounter } from '@/components/site/animated-counter'
 import { DynamicIcon } from '@/components/site/dynamic-icon'
 import { SmartImage } from '@/components/site/smart-image'
+import { HeroScene } from '@/components/site/hero-scene'
 import { useNav } from '@/lib/nav-store'
 import {
   STATS,
@@ -114,36 +115,14 @@ export function HomePage() {
             </div>
           </motion.div>
 
-          {/* Right: visual — books + notebook + plant scene */}
+          {/* Right: visual — desk scene with books, notebook, plant */}
           <motion.div
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.6, delay: 0.15 }}
             className="order-1 lg:order-2"
           >
-            <div className="relative">
-              <SmartImage
-                seed="hamza-hero-books"
-                alt="A warm study scene with books labeled Knowledge, Faith, Character, Excellence"
-                icon="BookOpen"
-                label="Knowledge · Faith · Character · Excellence"
-                className="aspect-[4/3] w-full shadow-2xl"
-              />
-              {/* Floating quote card */}
-              <motion.div
-                animate={{ y: [0, -8, 0] }}
-                transition={{ repeat: Infinity, duration: 5, ease: 'easeInOut' }}
-                className="absolute -bottom-5 -left-3 max-w-[230px] rounded-xl border bg-card p-4 shadow-xl sm:-left-5"
-              >
-                <Quote className="size-5 text-primary/40" />
-                <p className="mt-1.5 font-serif text-sm italic leading-snug text-foreground">
-                  “Seeking knowledge is an obligation upon every Muslim.”
-                </p>
-                <p className="mt-2 text-xs font-semibold text-primary">
-                  — Prophet Muhammad ﷺ
-                </p>
-              </motion.div>
-            </div>
+            <HeroScene />
           </motion.div>
         </div>
       </section>
