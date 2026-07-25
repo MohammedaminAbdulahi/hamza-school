@@ -308,52 +308,51 @@ export function AcademicsPage() {
       </section>
 
       {/* Science & Discovery */}
-      <section className="py-20 sm:py-24">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+      <section className="paper-texture relative overflow-hidden py-20 sm:py-24">
+        <div className="geo-pattern pointer-events-none absolute inset-0" />
+        <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <Reveal>
-            <div className="relative overflow-hidden rounded-3xl border bg-gradient-to-br from-emerald-600 via-emerald-700 to-teal-800 p-8 text-primary-foreground sm:p-12">
-              <div className="absolute -right-16 -top-16 size-72 rounded-full bg-amber-400/20 blur-3xl" />
-              <div className="absolute -bottom-20 -left-10 size-80 rounded-full bg-white/10 blur-3xl" />
-              <div className="relative grid items-center gap-10 lg:grid-cols-2">
-                <div>
-                  <span className="inline-flex items-center gap-2 rounded-full bg-white/15 px-3 py-1 text-xs font-semibold uppercase tracking-wider">
-                    <span className="size-1.5 rounded-full bg-amber-300" />
-                    Science &amp; Discovery
-                  </span>
-                  <h2 className="mt-4 text-balance text-3xl font-bold tracking-tight sm:text-4xl">
-                    Where curiosity meets the natural world
-                  </h2>
-                  <p className="mt-4 text-base text-primary-foreground/85 sm:text-lg">
-                    At Hamza, science is hands-on. From observing plants in our
-                    garden to using microscopes in our biology lab, students learn
-                    science by doing — asking questions about the world around them
-                    in Addis Ababa and beyond.
-                  </p>
-                  <div className="mt-8 grid gap-5 sm:grid-cols-2">
-                    {SCIENCE_FEATURES.map((feature) => (
-                      <div key={feature.title} className="flex gap-3">
-                        <div className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-white/15">
-                          <feature.icon className="size-5" />
-                        </div>
-                        <div>
-                          <div className="text-sm font-semibold">{feature.title}</div>
-                          <p className="mt-1 text-xs leading-relaxed text-primary-foreground/80">
-                            {feature.description}
-                          </p>
-                        </div>
+            <div className="relative grid items-center gap-10 rounded-sm border border-gold/18 bg-paper p-8 shadow-lg sm:p-12 lg:grid-cols-2">
+              {/* Corner ornaments */}
+              <div className="absolute left-4 top-4 size-3 border-l border-t border-gold/40" />
+              <div className="absolute right-4 top-4 size-3 border-r border-t border-gold/40" />
+              <div className="absolute bottom-4 left-4 size-3 border-b border-l border-gold/40" />
+              <div className="absolute bottom-4 right-4 size-3 border-b border-r border-gold/40" />
+              <div>
+                <p className="section-label">Science &amp; Discovery</p>
+                <h2 className="mt-3 font-serif text-3xl font-medium tracking-tight text-foreground sm:text-4xl">
+                  Where curiosity meets the <em className="italic text-gold-deep">natural world</em>
+                </h2>
+                <p className="mt-4 text-base text-muted-foreground sm:text-lg">
+                  At Hamza, science is hands-on. From observing plants in our
+                  garden to using microscopes in our biology lab, students learn
+                  science by doing — asking questions about the world around them
+                  in Addis Ababa and beyond.
+                </p>
+                <div className="mt-8 grid gap-5 sm:grid-cols-2">
+                  {SCIENCE_FEATURES.map((feature) => (
+                    <div key={feature.title} className="flex gap-3">
+                      <div className="flex size-10 shrink-0 items-center justify-center rounded-full bg-forest text-gold-light">
+                        <feature.icon className="size-5" />
                       </div>
-                    ))}
-                  </div>
+                      <div>
+                        <div className="font-serif text-sm font-semibold text-foreground">{feature.title}</div>
+                        <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
+                          {feature.description}
+                        </p>
+                      </div>
+                    </div>
+                  ))}
                 </div>
-                <div className="relative">
-                  <SmartImage
-                    seed="academics-science-discovery"
-                    alt="Students observing plants and using microscopes in the biology lab"
-                    icon="Microscope"
-                    label="Biology Lab & Discovery"
-                    className="aspect-[4/3] w-full border border-white/20"
-                  />
-                </div>
+              </div>
+              <div className="relative">
+                <SmartImage
+                  seed="academics-science-discovery"
+                  alt="Students observing plants and using microscopes in the biology lab"
+                  icon="Microscope"
+                  label="Biology Lab & Discovery"
+                  className="aspect-[4/3] w-full"
+                />
               </div>
             </div>
           </Reveal>
@@ -618,21 +617,15 @@ export function AcademicsPage() {
       <section className="pb-24 pt-4">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <Reveal>
-            <div className="relative overflow-hidden rounded-3xl border bg-gradient-to-br from-amber-500 via-orange-500 to-amber-600 p-8 text-white sm:p-12">
-              <div className="absolute -right-16 -top-16 size-64 rounded-full bg-white/20 blur-3xl" />
-              <div className="absolute -bottom-20 -left-10 size-72 rounded-full bg-emerald-600/20 blur-3xl" />
+            <div className="relative overflow-hidden rounded-sm p-8 text-cream sm:p-12" style={{ background: 'linear-gradient(135deg, #0F2530 0%, #1B3A4B 50%, #1F3D2F 100%)' }}>
+              <div className="geo-pattern pointer-events-none absolute inset-0 opacity-20" />
               <div className="relative flex flex-col items-start gap-6 lg:flex-row lg:items-center lg:justify-between">
                 <div className="max-w-2xl">
-                  <div className="flex items-center gap-2">
-                    <GraduationCap className="size-7" />
-                    <span className="text-xs font-semibold uppercase tracking-wider">
-                      Visit Us This Term
-                    </span>
-                  </div>
-                  <h2 className="mt-3 text-2xl font-bold tracking-tight sm:text-3xl">
-                    Begin your child's academic journey with us
+                  <p className="section-label text-gold-light">Visit Us This Term</p>
+                  <h2 className="mt-3 font-serif text-3xl font-medium tracking-tight sm:text-4xl">
+                    Begin your child's <em className="italic text-gold-light">academic journey</em> with us
                   </h2>
-                  <p className="mt-3 text-base text-white/85 sm:text-lg">
+                  <p className="mt-3 text-base text-cream/80 sm:text-lg">
                     Explore our programs in person. Schedule a personalized tour and see
                     our classrooms, biology lab, and reading corner in action.
                   </p>
@@ -640,19 +633,19 @@ export function AcademicsPage() {
                 <div className="flex flex-col gap-3 sm:flex-row">
                   <Button
                     size="lg"
-                    className="bg-white text-amber-700 hover:bg-white/90"
+                    className="h-12 gap-2.5 rounded-sm bg-gold-deep px-8 text-xs font-medium uppercase tracking-[0.12em] text-cream hover:bg-gold"
                     onClick={() => goPage('contact')}
                   >
-                    Start Application
-                    <ArrowRight className="size-4" />
+                    Book a Visit
+                    <ArrowRight className="size-3.5" />
                   </Button>
                   <Button
                     size="lg"
                     variant="outline"
-                    className="border-white/40 bg-transparent text-white hover:bg-white/10 hover:text-white"
-                    onClick={() => goPage('contact')}
+                    className="h-12 gap-2.5 rounded-sm border border-cream/40 bg-transparent px-8 text-xs font-medium uppercase tracking-[0.12em] text-cream hover:bg-cream/10 hover:text-cream"
+                    onClick={() => goPage('gallery')}
                   >
-                    Book a Tour
+                    See Photos
                   </Button>
                 </div>
               </div>

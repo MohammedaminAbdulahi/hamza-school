@@ -453,15 +453,14 @@ export function AboutPage() {
       <section className="pb-24 pt-4">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <Reveal>
-            <div className="relative overflow-hidden rounded-3xl border bg-gradient-to-br from-emerald-600 via-emerald-700 to-teal-800 p-8 text-primary-foreground sm:p-12">
-              <div className="absolute -right-16 -top-16 size-64 rounded-full bg-white/10 blur-3xl" />
-              <div className="absolute -bottom-20 -left-10 size-72 rounded-full bg-amber-400/20 blur-3xl" />
+            <div className="relative overflow-hidden rounded-sm p-8 text-cream sm:p-12" style={{ background: 'linear-gradient(135deg, #0F2530 0%, #1B3A4B 50%, #1F3D2F 100%)' }}>
+              <div className="geo-pattern pointer-events-none absolute inset-0 opacity-20" />
               <div className="relative flex flex-col items-start gap-6 lg:flex-row lg:items-center lg:justify-between">
                 <div className="max-w-2xl">
-                  <h2 className="text-2xl font-bold tracking-tight sm:text-3xl">
-                    Ready to become part of our story?
+                  <h2 className="font-serif text-3xl font-medium tracking-tight sm:text-4xl">
+                    Ready to become part of our <em className="italic text-gold-light">story?</em>
                   </h2>
-                  <p className="mt-3 text-base text-primary-foreground/80 sm:text-lg">
+                  <p className="mt-3 text-base text-cream/80 sm:text-lg">
                     Schedule a campus visit, meet our educators, and discover why families
                     across Addis Ababa choose {SCHOOL.name} for their children's education.
                   </p>
@@ -469,20 +468,19 @@ export function AboutPage() {
                 <div className="flex flex-col gap-3 sm:flex-row">
                   <Button
                     size="lg"
-                    variant="secondary"
-                    className="bg-amber-400 text-amber-950 hover:bg-amber-300"
+                    className="h-12 gap-2.5 rounded-sm bg-gold-deep px-8 text-xs font-medium uppercase tracking-[0.12em] text-cream hover:bg-gold"
                     onClick={() => goPage('contact')}
                   >
                     Contact Us
-                    <ArrowRight className="size-4" />
+                    <ArrowRight className="size-3.5" />
                   </Button>
                   <Button
                     size="lg"
                     variant="outline"
-                    className="border-primary-foreground/30 bg-transparent text-primary-foreground hover:bg-primary-foreground/10 hover:text-primary-foreground"
-                    onClick={() => goPage('contact')}
+                    className="h-12 gap-2.5 rounded-sm border border-cream/40 bg-transparent px-8 text-xs font-medium uppercase tracking-[0.12em] text-cream hover:bg-cream/10 hover:text-cream"
+                    onClick={() => goPage('gallery')}
                   >
-                    Contact Us
+                    See Photos
                   </Button>
                 </div>
               </div>
