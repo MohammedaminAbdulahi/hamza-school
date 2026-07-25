@@ -4,20 +4,15 @@ import * as React from 'react'
 import { cn } from '@/lib/utils'
 import { DynamicIcon } from './dynamic-icon'
 
-// Deterministic gradient palettes (avoiding blue/indigo)
-const PALETTES: { from: string; to: string; icon: string }[] = [
-  { from: 'from-emerald-500', to: 'to-teal-600', icon: 'GraduationCap' },
-  { from: 'from-amber-500', to: 'to-orange-600', icon: 'Trophy' },
-  { from: 'from-teal-500', to: 'to-emerald-700', icon: 'BookOpen' },
-  { from: 'from-rose-500', to: 'to-pink-600', icon: 'Palette' },
-  { from: 'from-orange-500', to: 'to-amber-700', icon: 'FlaskConical' },
-  { from: 'from-emerald-600', to: 'to-green-800', icon: 'Trees' },
-  { from: 'from-yellow-500', to: 'to-amber-600', icon: 'Music' },
-  { from: 'from-teal-600', to: 'to-cyan-700', icon: 'Dumbbell' },
-  { from: 'from-rose-600', to: 'to-red-700', icon: 'Users' },
-  { from: 'from-amber-600', to: 'to-yellow-700', icon: 'Lightbulb' },
-  { from: 'from-emerald-500', to: 'to-green-700', icon: 'Globe' },
-  { from: 'from-orange-600', to: 'to-rose-700', icon: 'Sparkles' },
+// Elegant paper-textured panel with a refined circular icon.
+// Replaces the old ugly gradient placeholders.
+const ACCENTS = [
+  { bg: 'bg-forest', text: 'text-gold-light' },
+  { bg: 'bg-gold-deep', text: 'text-cream' },
+  { bg: 'bg-navy', text: 'text-gold-light' },
+  { bg: 'bg-crimson', text: 'text-cream' },
+  { bg: 'bg-green-mid', text: 'text-cream' },
+  { bg: 'bg-wood-dark', text: 'text-gold-light' },
 ]
 
 function hashSeed(seed: string): number {
@@ -37,46 +32,44 @@ interface SmartImageProps {
   rounded?: string
 }
 
-/**
- * A reliable, premium gradient-based image placeholder.
- * Renders a deterministic gradient + icon + subtle pattern.
- */
 export function SmartImage({
   seed,
   alt,
   className,
   icon,
   label,
-  rounded = 'rounded-2xl',
+  rounded = 'rounded-sm',
 }: SmartImageProps) {
-  const palette = PALETTES[hashSeed(seed) % PALETTES.length]
-  const iconName = icon ?? palette.icon
+  const palette = ACCENTS[hashSeed(seed) % ACCENTS.length]
+  const iconName = icon ?? 'BookOpen'
   return (
     <div
       role="img"
       aria-label={alt}
       className={cn(
-        'relative overflow-hidden bg-gradient-to-br',
-        palette.from,
-        palette.to,
+        'paper-texture relative flex flex-col items-center justify-center gap-4 overflow-hidden border border-gold/15 p-8',
         rounded,
         className
       )}
     >
-      {/* Decorative pattern */}
-      <div className="absolute inset-0 opacity-20 [background-image:radial-gradient(circle_at_1px_1px,white_1px,transparent_0)] [background-size:24px_24px]" />
-      {/* Glow */}
-      <div className="absolute -right-10 -top-10 size-40 rounded-full bg-white/20 blur-3xl" />
-      <div className="absolute -bottom-12 -left-8 size-44 rounded-full bg-black/10 blur-3xl" />
-      {/* Content */}
-      <div className="relative flex h-full w-full flex-col items-center justify-center gap-3 p-4 text-white">
-        <DynamicIcon name={iconName} className="size-12 drop-shadow-lg sm:size-14" strokeWidth={1.5} />
-        {label && (
-          <span className="text-center text-xs font-semibold uppercase tracking-wider drop-shadow sm:text-sm">
-            {label}
-          </span>
-        )}
+      {/* Geometric pattern overlay */}
+      <div className="geo-pattern pointer-events-none absolute inset-0" />
+      {/* Corner ornaments */}
+      <div className="absolute left-3 top-3 size-2 border-l border-t border-gold/40" />
+      <div className="absolute right-3 top-3 size-2 border-r border-t border-gold/40" />
+      <div className="absolute bottom-3 left-3 size-2 border-b border-l border-gold/40" />
+      <div className="absolute bottom-3 right-3 size-2 border-b border-r border-gold/40" />
+
+      {/* Circular icon */}
+      <div className={cn('relative flex size-20 items-center justify-center rounded-full shadow-lg', palette.bg)}>
+        <DynamicIcon name={iconName} className={cn('size-9', palette.text)} strokeWidth={1.5} />
       </div>
+
+      {label && (
+        <span className="relative font-serif text-sm font-medium uppercase tracking-[0.2em] text-foreground/70">
+          {label}
+        </span>
+      )}
     </div>
   )
 }
