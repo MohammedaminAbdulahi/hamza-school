@@ -44,49 +44,39 @@ export function HomePage() {
 
   return (
     <div className="flex flex-col">
-      {/* ===== HERO — full background photo + "Guiding Hearts. Growing Minds." ===== */}
-      <section className="relative flex min-h-screen items-center overflow-hidden pt-24 pb-12">
-        {/* Background photo */}
-        <div className="absolute inset-0 -z-10">
-          <img
-            src="/hero-desk.jpeg"
-            alt="A warm study desk with books labeled Knowledge, Faith, Character, Excellence"
-            className="h-full w-full object-cover"
-          />
-          <div className="absolute inset-0 bg-gradient-to-br from-navy-deep/85 via-forest/75 to-wood-dark/65" style={{ background: 'linear-gradient(135deg, rgba(15,37,48,0.88) 0%, rgba(31,61,47,0.78) 50%, rgba(92,66,38,0.68) 100%)' }} />
-        </div>
-
-        <div className="relative z-10 mx-auto grid w-full max-w-7xl items-center gap-12 px-6 py-12 lg:grid-cols-2 lg:px-12 lg:py-20">
-          {/* Left: text */}
+      {/* ===== HERO — split layout: cream text side + photo side (no dark overlay) ===== */}
+      <section className="relative overflow-hidden pt-28 pb-12">
+        <div className="mx-auto grid min-h-[88vh] w-full max-w-7xl items-center gap-12 px-6 py-12 lg:grid-cols-2 lg:px-12 lg:py-16">
+          {/* Left: text on cream paper */}
           <motion.div
             initial={{ opacity: 0, y: 24 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7 }}
-            className="text-cream"
+            className="order-2 lg:order-1"
           >
             {/* Welcome label with line */}
             <div className="mb-8 flex items-center gap-3">
               <div className="h-px w-12 bg-gold" />
-              <span className="text-xs uppercase tracking-[0.4em] text-gold-light">
+              <span className="text-xs uppercase tracking-[0.4em] text-gold-deep">
                 Welcome to Hamza School
               </span>
             </div>
 
-            {/* Hero title — "Guiding Hearts. Growing Minds." */}
-            <h1 className="font-serif text-6xl font-medium leading-[0.92] tracking-tight drop-shadow-lg sm:text-7xl lg:text-8xl xl:text-9xl">
+            {/* Hero title */}
+            <h1 className="font-serif text-6xl font-medium leading-[0.92] tracking-tight text-forest sm:text-7xl lg:text-8xl xl:text-9xl">
               Guiding
               <br />
-              <em className="font-normal italic text-gold-light">Hearts.</em>
+              <em className="font-normal italic text-gold-deep">Hearts.</em>
               <br />
               Growing
               <br />
-              <em className="font-normal italic text-gold-light">Minds.</em>
+              <em className="font-normal italic text-gold-deep">Minds.</em>
             </h1>
 
             {/* Gold accent line */}
             <div className="mt-6 h-px w-24 bg-gradient-to-r from-gold to-transparent" />
 
-            <p className="mt-6 max-w-lg text-lg font-light leading-relaxed text-cream/95 drop-shadow">
+            <p className="mt-6 max-w-lg text-lg font-light leading-relaxed text-foreground/80">
               An institution where knowledge meets character — nurturing faith,
               excellence, and a lifelong love of learning in every child.
             </p>
@@ -95,84 +85,62 @@ export function HomePage() {
             <div className="mt-10 flex flex-wrap gap-4">
               <Button
                 onClick={() => goPage('contact')}
-                className="h-14 gap-2.5 rounded-sm bg-gold-deep px-9 text-xs font-medium uppercase tracking-[0.12em] text-cream transition-all hover:bg-gold"
+                className="h-14 gap-2.5 rounded-sm bg-forest px-9 text-xs font-medium uppercase tracking-[0.12em] text-cream transition-all hover:bg-gold-deep"
               >
                 Begin Enrollment
                 <ArrowRight className="size-3.5" />
               </Button>
               <Button
                 onClick={() => goPage('about')}
-                className="h-14 gap-2.5 rounded-sm border border-gold/60 bg-cream/95 px-8 text-xs font-medium uppercase tracking-[0.12em] text-forest backdrop-blur-md transition-all hover:bg-cream"
+                className="h-14 gap-2.5 rounded-sm border border-forest px-8 text-xs font-medium uppercase tracking-[0.12em] text-forest transition-all hover:bg-forest hover:text-cream"
               >
                 Discover Hamza
               </Button>
             </div>
 
             {/* Prophetic message badge */}
-            <div className="mt-14 inline-flex max-w-xl items-center gap-4 rounded-sm border border-gold/30 bg-cream/10 px-6 py-4 backdrop-blur-md">
-              <Feather className="size-5 shrink-0 text-gold-light" />
-              <span className="font-serif text-sm italic tracking-wide text-cream/90">
+            <div className="mt-12 inline-flex max-w-xl items-center gap-4 rounded-sm border border-gold/30 bg-paper px-6 py-4">
+              <Feather className="size-5 shrink-0 text-gold-deep" />
+              <span className="font-serif text-sm italic tracking-wide text-foreground/80">
                 &ldquo;Seeking knowledge is an obligation upon every individual.&rdquo; — Prophet Muhammad ﷺ
               </span>
             </div>
           </motion.div>
 
-          {/* Right: floating info cards (desktop only) */}
-          <div className="relative hidden h-[600px] lg:block">
-            {/* Card 1: Our Foundation — books reference */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.7, delay: 0.3 }}
-              className="animate-float absolute right-0 top-8 w-80 border-l-4 border-forest bg-cream/95 p-8 shadow-2xl backdrop-blur-md"
-            >
-              <div className="mb-4 flex items-center gap-3">
-                <BookOpen className="size-6 text-forest" />
-                <span className="font-serif text-xl font-semibold text-foreground">Our Foundation</span>
+          {/* Right: the photo (clean, no dark overlay) */}
+          <motion.div
+            initial={{ opacity: 0, scale: 0.97 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.7, delay: 0.15 }}
+            className="order-1 lg:order-2"
+          >
+            <div className="relative">
+              <div className="overflow-hidden rounded-sm border border-gold/20 shadow-2xl">
+                <img
+                  src="/hero-desk.jpeg"
+                  alt="A warm study desk with books labeled Knowledge, Faith, Character, Excellence"
+                  className="aspect-[4/5] w-full object-cover lg:aspect-[4/3]"
+                />
               </div>
-              <div className="flex flex-wrap gap-2">
-                <span className="rounded-sm bg-forest px-4 py-1.5 text-[11px] uppercase tracking-widest text-cream">Knowledge</span>
-                <span className="rounded-sm bg-gold-deep px-4 py-1.5 text-[11px] uppercase tracking-widest text-cream">Faith</span>
-                <span className="rounded-sm bg-navy px-4 py-1.5 text-[11px] uppercase tracking-widest text-cream">Character</span>
-                <span className="rounded-sm bg-crimson px-4 py-1.5 text-[11px] uppercase tracking-widest text-cream">Excellence</span>
-              </div>
-            </motion.div>
-
-            {/* Card 2: Quote */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.7, delay: 0.6 }}
-              className="animate-float absolute bottom-20 right-16 w-72 border border-gold/30 bg-paper p-8 shadow-2xl"
-              style={{ animationDelay: '1.5s' }}
-            >
-              <Quote className="mb-3 block size-6 text-gold" />
-              <p className="font-serif text-base italic leading-relaxed text-foreground">
-                The beautiful thing about learning is that no one can take it away from you.
-              </p>
-              <p className="mt-4 text-right text-sm font-medium text-gold-deep">— B.B. King</p>
-            </motion.div>
-
-            {/* Card 3: Stats */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.7, delay: 0.45 }}
-              className="animate-float absolute left-0 top-1/2 w-56 bg-forest p-6 shadow-2xl"
-              style={{ animationDelay: '0.8s' }}
-            >
-              <div className="font-serif text-5xl font-semibold text-gold-light">10+</div>
-              <div className="mt-2 text-sm uppercase tracking-wider text-cream/80">Years of Excellence</div>
-            </motion.div>
-          </div>
-        </div>
-
-        {/* Scroll indicator */}
-        <div className="absolute bottom-8 left-1/2 flex -translate-x-1/2 flex-col items-center gap-2 text-cream/60">
-          <span className="text-[10px] uppercase tracking-[0.3em]">Scroll</span>
-          <div className="relative h-12 w-px bg-cream/30">
-            <div className="absolute left-0 top-0 h-3 w-px bg-gold" />
-          </div>
+              {/* Floating foundation card */}
+              <motion.div
+                animate={{ y: [0, -10, 0] }}
+                transition={{ repeat: Infinity, duration: 6, ease: 'easeInOut' }}
+                className="absolute -bottom-6 -left-4 hidden w-64 border-l-4 border-forest bg-cream p-5 shadow-xl sm:block"
+              >
+                <div className="mb-2 flex items-center gap-2">
+                  <BookOpen className="size-5 text-forest" />
+                  <span className="font-serif text-base font-semibold text-foreground">Our Foundation</span>
+                </div>
+                <div className="flex flex-wrap gap-1.5">
+                  <span className="rounded-sm bg-forest px-2.5 py-1 text-[10px] uppercase tracking-widest text-cream">Knowledge</span>
+                  <span className="rounded-sm bg-gold-deep px-2.5 py-1 text-[10px] uppercase tracking-widest text-cream">Faith</span>
+                  <span className="rounded-sm bg-navy px-2.5 py-1 text-[10px] uppercase tracking-widest text-cream">Character</span>
+                  <span className="rounded-sm bg-crimson px-2.5 py-1 text-[10px] uppercase tracking-widest text-cream">Excellence</span>
+                </div>
+              </motion.div>
+            </div>
+          </motion.div>
         </div>
       </section>
 
@@ -215,20 +183,20 @@ export function HomePage() {
       </section>
 
       {/* ===== PROPHETIC WISDOM QUOTE ===== */}
-      <section className="relative overflow-hidden py-28" style={{ background: 'linear-gradient(135deg, #0F2530 0%, #1B3A4B 50%, #1F3D2F 100%)' }}>
-        <div className="geo-pattern pointer-events-none absolute inset-0 opacity-20" />
+      <section className="paper-texture relative overflow-hidden py-28">
+        <div className="geo-pattern pointer-events-none absolute inset-0" />
         <div className="relative mx-auto max-w-4xl px-6 text-center lg:px-12">
           <Reveal>
             <div className="ornament mb-8">
               <span className="text-gold text-2xl">✦</span>
             </div>
             <Quote className="mx-auto mb-8 size-12 text-gold/60" />
-            <p className="font-serif text-3xl font-light italic leading-relaxed text-cream sm:text-4xl lg:text-5xl">
+            <p className="font-serif text-3xl font-light italic leading-relaxed text-forest sm:text-4xl lg:text-5xl">
               &ldquo;Seeking knowledge is an obligation upon every Muslim.&rdquo;
             </p>
             <div className="mt-8 flex items-center justify-center gap-3">
               <div className="h-px w-12 bg-gold/50" />
-              <p className="font-serif text-lg text-gold-light">Prophet Muhammad ﷺ</p>
+              <p className="font-serif text-lg text-gold-deep">Prophet Muhammad ﷺ</p>
               <div className="h-px w-12 bg-gold/50" />
             </div>
           </Reveal>
@@ -426,8 +394,8 @@ export function HomePage() {
       </section>
 
       {/* ===== PRINCIPAL'S MESSAGE ===== */}
-      <section className="relative overflow-hidden py-32" style={{ background: 'linear-gradient(135deg, #0F2530 0%, #1B3A4B 50%, #1F3D2F 100%)' }}>
-        <div className="geo-pattern pointer-events-none absolute inset-0 opacity-20" />
+      <section className="paper-texture relative overflow-hidden py-32">
+        <div className="geo-pattern pointer-events-none absolute inset-0" />
         <div className="relative mx-auto grid max-w-7xl items-center gap-12 px-6 lg:grid-cols-12 lg:px-12">
           <Reveal className="lg:col-span-5">
             <div className="relative mx-auto max-w-xs">
@@ -438,19 +406,19 @@ export function HomePage() {
                   className="h-full w-full object-cover"
                 />
               </div>
-              <div className="absolute -bottom-5 left-1/2 w-[85%] -translate-x-1/2 border border-gold/30 bg-cream p-4 text-center shadow-xl">
-                <p className="font-serif text-base font-bold text-forest">{PRINCIPAL.name}</p>
-                <p className="text-xs text-muted-foreground">{PRINCIPAL.title}</p>
+              <div className="absolute -bottom-5 left-1/2 w-[85%] -translate-x-1/2 border border-gold/30 bg-forest p-4 text-center shadow-xl">
+                <p className="font-serif text-base font-bold text-cream">{PRINCIPAL.name}</p>
+                <p className="text-xs text-gold-light">{PRINCIPAL.title}</p>
               </div>
             </div>
           </Reveal>
-          <Reveal delay={0.15} className="lg:col-span-7 text-cream">
-            <p className="section-label text-gold-light">A Word from Our Founder</p>
-            <Quote className="mt-6 size-12 text-gold/40" />
-            <p className="mt-4 font-serif text-2xl font-light italic leading-relaxed text-cream/90 sm:text-3xl">
+          <Reveal delay={0.15} className="lg:col-span-7">
+            <p className="section-label">A Word from Our Founder</p>
+            <Quote className="mt-6 size-12 text-gold/50" />
+            <p className="mt-4 font-serif text-2xl font-light italic leading-relaxed text-foreground/80 sm:text-3xl">
               {PRINCIPAL.message}
             </p>
-            <p className="mt-8 font-serif text-2xl font-semibold text-gold-light">{PRINCIPAL.signature}</p>
+            <p className="mt-8 font-serif text-2xl font-semibold text-gold-deep">{PRINCIPAL.signature}</p>
           </Reveal>
         </div>
       </section>

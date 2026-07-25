@@ -617,15 +617,15 @@ export function AcademicsPage() {
       <section className="pb-24 pt-4">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <Reveal>
-            <div className="relative overflow-hidden rounded-sm p-8 text-cream sm:p-12" style={{ background: 'linear-gradient(135deg, #0F2530 0%, #1B3A4B 50%, #1F3D2F 100%)' }}>
+            <div className="relative overflow-hidden rounded-sm border border-gold/20 bg-paper p-8 shadow-lg sm:p-12">
               <div className="geo-pattern pointer-events-none absolute inset-0 opacity-20" />
               <div className="relative flex flex-col items-start gap-6 lg:flex-row lg:items-center lg:justify-between">
                 <div className="max-w-2xl">
-                  <p className="section-label text-gold-light">Visit Us This Term</p>
+                  <p className="section-label text-gold-deep">Visit Us This Term</p>
                   <h2 className="mt-3 font-serif text-3xl font-medium tracking-tight sm:text-4xl">
-                    Begin your child's <em className="italic text-gold-light">academic journey</em> with us
+                    Begin your child's <em className="italic text-gold-deep">academic journey</em> with us
                   </h2>
-                  <p className="mt-3 text-base text-cream/80 sm:text-lg">
+                  <p className="mt-3 text-base text-foreground/80 sm:text-lg">
                     Explore our programs in person. Schedule a personalized tour and see
                     our classrooms, biology lab, and reading corner in action.
                   </p>
@@ -642,7 +642,7 @@ export function AcademicsPage() {
                   <Button
                     size="lg"
                     variant="outline"
-                    className="h-12 gap-2.5 rounded-sm border border-cream/40 bg-transparent px-8 text-xs font-medium uppercase tracking-[0.12em] text-cream hover:bg-cream/10 hover:text-cream"
+                    className="h-12 gap-2.5 rounded-sm border border-forest px-8 text-xs font-medium uppercase tracking-[0.12em] text-forest hover:bg-forest hover:text-cream"
                     onClick={() => goPage('gallery')}
                   >
                     See Photos
