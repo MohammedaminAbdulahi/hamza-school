@@ -1,0 +1,1525 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Hamza School — Guiding Hearts. Growing Minds.</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Inter:wght@300;400;500;600;700&family=Amiri:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+  :root {
+    --bg-cream: #F4ECD8;
+    --bg-warm: #EBE0C7;
+    --wood-dark: #5C4226;
+    --wood-mid: #8B6A43;
+    --green-deep: #1F3D2F;
+    --green-mid: #4A7C5A;
+    --gold: #C9A961;
+    --gold-deep: #9B7B36;
+    --gold-light: #E4D4A8;
+    --navy: #1B3A4B;
+    --navy-deep: #0F2530;
+    --cream: #FBF6E9;
+    --paper: #FDFBF3;
+    --text-dark: #2A2520;
+    --text-mid: #5A5048;
+    --crimson: #8C3A2E;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0;
+    font-family: 'Inter', sans-serif;
+    background: var(--bg-cream);
+    color: var(--text-dark);
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+  }
+  .font-display { font-family: 'Cormorant Garamond', serif; }
+  .font-arabic { font-family: 'Amiri', serif; }
+
+  /* Hero with actual background image */
+  .hero-bg {
+    position: relative;
+    background-image: url('https://z-cdn-media.chatglm.cn/files/77ebb06d-1f50-483c-bfa7-270a54336df5.jpeg?auth_key=1885006111-dcf57d08006a456d860b14df3f6904ea-0-f32268de2d3e00b9f92f3a8217bfce7c');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+  }
+  .hero-bg::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: linear-gradient(135deg, rgba(15, 37, 48, 0.85) 0%, rgba(31, 61, 47, 0.75) 50%, rgba(92, 66, 38, 0.65) 100%);
+  }
+
+  /* Paper texture */
+  .paper-texture {
+    background-color: var(--paper);
+    background-image:
+      radial-gradient(circle at 15% 20%, rgba(201, 169, 97, 0.06) 0%, transparent 40%),
+      radial-gradient(circle at 85% 80%, rgba(31, 61, 47, 0.05) 0%, transparent 40%);
+  }
+
+  /* Geometric pattern */
+  .geo-pattern {
+    background-image:
+      radial-gradient(circle at 50% 50%, transparent 38%, var(--gold) 38%, var(--gold) 40%, transparent 40%),
+      radial-gradient(circle at 0% 0%, transparent 38%, var(--gold) 38%, var(--gold) 40%, transparent 40%),
+      radial-gradient(circle at 100% 0%, transparent 38%, var(--gold) 38%, var(--gold) 40%, transparent 40%),
+      radial-gradient(circle at 0% 100%, transparent 38%, var(--gold) 38%, var(--gold) 40%, transparent 40%),
+      radial-gradient(circle at 100% 100%, transparent 38%, var(--gold) 38%, var(--gold) 40%, transparent 40%);
+    background-size: 80px 80px;
+    opacity: 0.08;
+  }
+
+  /* Navigation */
+  #navbar { transition: all 0.4s ease; }
+  #navbar.scrolled {
+    background: rgba(251, 246, 233, 0.97);
+    backdrop-filter: blur(14px);
+    box-shadow: 0 4px 30px rgba(60, 35, 10, 0.1);
+  }
+  #navbar.scrolled .nav-link,
+  #navbar.scrolled .nav-brand-text { color: var(--text-dark); }
+  #navbar.scrolled .nav-brand-sub { color: var(--gold-deep); }
+
+  .nav-link {
+    position: relative;
+    transition: color 0.3s;
+    color: var(--cream);
+  }
+  .nav-brand-text { color: var(--cream); }
+  .nav-brand-sub { color: var(--gold-light); }
+
+  .nav-link::after {
+    content: '';
+    position: absolute;
+    bottom: -6px; left: 50%;
+    width: 0; height: 1.5px;
+    background: var(--gold);
+    transition: all 0.35s ease;
+    transform: translateX(-50%);
+  }
+  .nav-link:hover::after, .nav-link.active::after { width: 100%; }
+  .nav-link:hover { color: var(--gold-light); }
+
+  /* Primary button */
+  .btn-primary {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    background: var(--green-deep);
+    color: var(--cream);
+    padding: 16px 36px;
+    border-radius: 2px;
+    font-weight: 500;
+    font-size: 14px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    position: relative;
+    overflow: hidden;
+    cursor: pointer;
+    border: none;
+    transition: all 0.4s ease;
+  }
+  .btn-primary::before {
+    content: '';
+    position: absolute;
+    top: 0; left: -100%;
+    width: 100%; height: 100%;
+    background: linear-gradient(90deg, var(--gold-deep), var(--gold));
+    transition: left 0.5s ease;
+  }
+  .btn-primary:hover::before { left: 0; }
+  .btn-primary > * { position: relative; z-index: 1; }
+
+  .btn-ghost {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    color: var(--green-deep);
+    padding: 16px 32px;
+    border: 1px solid var(--green-deep);
+    border-radius: 2px;
+    font-weight: 500;
+    font-size: 14px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    transition: all 0.3s;
+    cursor: pointer;
+    background: transparent;
+  }
+  .btn-ghost:hover {
+    background: var(--green-deep);
+    color: var(--cream);
+  }
+
+  /* Hero typography */
+  .hero-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-weight: 500;
+    line-height: 0.92;
+    letter-spacing: -0.02em;
+  }
+  .hero-title em {
+    font-style: italic;
+    color: var(--gold-light);
+    font-weight: 400;
+  }
+
+  /* Section labels */
+  .section-label {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-size: 16px;
+    letter-spacing: 0.3em;
+    color: var(--gold-deep);
+    text-transform: uppercase;
+  }
+
+  /* Ornament divider */
+  .ornament {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
+    color: var(--gold);
+  }
+  .ornament::before, .ornament::after {
+    content: '';
+    height: 1px;
+    width: 100px;
+    background: linear-gradient(90deg, transparent, var(--gold), transparent);
+  }
+
+  /* Reveal animation */
+  .reveal {
+    opacity: 0;
+    transform: translateY(40px);
+    transition: opacity 0.9s ease, transform 0.9s ease;
+  }
+  .reveal.active { opacity: 1; transform: translateY(0); }
+
+  /* Floating animation */
+  @keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-14px); }
+  }
+  .animate-float { animation: float 6s ease-in-out infinite; }
+
+  /* Value cards */
+  .value-card {
+    background: var(--paper);
+    border: 1px solid rgba(155, 123, 54, 0.18);
+    padding: 48px 36px;
+    transition: all 0.5s ease;
+    position: relative;
+    overflow: hidden;
+  }
+  .value-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 3px;
+    background: linear-gradient(90deg, var(--gold), var(--green-mid));
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.5s ease;
+  }
+  .value-card:hover::before { transform: scaleX(1); }
+  .value-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 24px 48px rgba(60, 35, 10, 0.12);
+    border-color: var(--gold);
+  }
+  .value-icon {
+    width: 72px; height: 72px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, var(--green-deep), var(--green-mid));
+    color: var(--gold-light);
+    font-size: 28px;
+    margin-bottom: 28px;
+    box-shadow: 0 8px 20px rgba(31, 61, 47, 0.25);
+  }
+
+  /* Quote section */
+  .quote-section {
+    background: linear-gradient(135deg, var(--navy-deep) 0%, var(--navy) 50%, var(--green-deep) 100%);
+    position: relative;
+    overflow: hidden;
+  }
+
+  /* Form */
+  .form-input {
+    width: 100%;
+    background: rgba(255, 255, 255, 0.7);
+    border: 1px solid rgba(155, 123, 54, 0.25);
+    padding: 16px 20px;
+    border-radius: 2px;
+    color: var(--text-dark);
+    font-size: 15px;
+    transition: all 0.3s;
+    font-family: 'Inter', sans-serif;
+  }
+  .form-input:focus {
+    outline: none;
+    border-color: var(--green-mid);
+    background: #fff;
+    box-shadow: 0 0 0 3px rgba(74, 124, 90, 0.15);
+  }
+  .form-label {
+    display: block;
+    font-size: 12px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--text-mid);
+    margin-bottom: 8px;
+    font-weight: 500;
+  }
+
+  /* Toast */
+  .toast {
+    position: fixed;
+    bottom: 32px; right: 32px;
+    background: var(--green-deep);
+    color: var(--cream);
+    padding: 18px 28px;
+    border-radius: 2px;
+    box-shadow: 0 16px 40px rgba(0,0,0,0.25);
+    transform: translateX(450px);
+    transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    max-width: 380px;
+    border-left: 3px solid var(--gold);
+  }
+  .toast.show { transform: translateX(0); }
+
+  /* Mobile menu */
+  .mobile-menu {
+    transform: translateX(100%);
+    transition: transform 0.4s ease;
+  }
+  .mobile-menu.open { transform: translateX(0); }
+
+  /* Stats */
+  .stat-number {
+    font-family: 'Cormorant Garamond', serif;
+    font-weight: 600;
+    font-size: 72px;
+    line-height: 1;
+    color: var(--gold-deep);
+  }
+
+  /* Tabs */
+  .tab-btn {
+    padding: 14px 32px;
+    border: 1px solid rgba(155, 123, 54, 0.3);
+    background: transparent;
+    color: var(--text-mid);
+    cursor: pointer;
+    transition: all 0.3s;
+    font-size: 14px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    font-weight: 500;
+    border-radius: 2px;
+  }
+  .tab-btn.active {
+    background: var(--green-deep);
+    color: var(--cream);
+    border-color: var(--green-deep);
+  }
+
+  /* Faculty card */
+  .faculty-card {
+    background: var(--paper);
+    border: 1px solid rgba(155, 123, 54, 0.15);
+    transition: all 0.4s;
+  }
+  .faculty-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 16px 32px rgba(60, 35, 10, 0.1);
+  }
+  .faculty-avatar {
+    width: 110px; height: 110px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--green-mid), var(--green-deep));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--gold-light);
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 36px;
+    font-weight: 600;
+    margin: 0 auto 24px;
+    border: 3px solid var(--gold);
+  }
+
+  .star { color: var(--gold); }
+
+  .quote-card {
+    background: linear-gradient(135deg, #FBF6E9 0%, #F4ECD8 100%);
+    border: 1px solid var(--gold);
+    box-shadow: 0 20px 50px rgba(0,0,0,0.15);
+  }
+
+  /* Scroll indicator */
+  @keyframes scrollDown {
+    0% { transform: translateY(0); opacity: 1; }
+    100% { transform: translateY(20px); opacity: 0; }
+  }
+  .scroll-dot { animation: scrollDown 2s ease-in-out infinite; }
+
+  /* Custom scrollbar */
+  ::-webkit-scrollbar { width: 10px; }
+  ::-webkit-scrollbar-track { background: var(--bg-warm); }
+  ::-webkit-scrollbar-thumb { background: var(--green-mid); border-radius: 5px; }
+  ::-webkit-scrollbar-thumb:hover { background: var(--green-deep); }
+
+  ::selection { background: var(--gold); color: var(--text-dark); }
+
+  /* Circular Logo Crop from Screenshot */
+  .logo-img {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    object-fit: cover;
+    object-position: center;
+    border: 2px solid var(--gold);
+    background: #fff;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+    transition: transform 0.3s ease;
+  }
+  .logo-img:hover {
+    transform: scale(1.05);
+  }
+  @media (min-width: 1024px) {
+    .logo-img { width: 72px; height: 72px; }
+  }
+
+  /* Mission section background */
+  .mission-bg {
+    background-image: url('https://z-cdn-media.chatglm.cn/files/a079e60e-74c8-4dea-9992-d1ca2463e16d.png?auth_key=1885006111-bf2c813e16924f8894c6b60f7c679ae6-0-a9ccb11a9fb24763a3862561be95b637');
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+  }
+  .mission-bg::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: linear-gradient(180deg, rgba(15, 37, 48, 0.9) 0%, rgba(27, 58, 75, 0.85) 100%);
+  }
+
+  /* Container width */
+  .max-w-1440 { max-width: 1440px; margin-left: auto; margin-right: auto; }
+</style>
+</head>
+<body>
+
+<!-- Toast notification -->
+<div id="toast" class="toast">
+  <i class="fas fa-check-circle text-[var(--gold-light)] text-xl"></i>
+  <div>
+    <div class="font-semibold text-sm" id="toastTitle">Success</div>
+    <div class="text-xs opacity-90" id="toastMsg">Your message has been received.</div>
+  </div>
+</div>
+
+<!-- ============ NAVIGATION ============ -->
+<nav id="navbar" class="fixed top-0 left-0 right-0 z-50 py-4">
+  <div class="max-w-1440 px-6 lg:px-12 flex items-center justify-between">
+    <a href="#home" class="flex items-center gap-4">
+      <img src="https://z-cdn-media.chatglm.cn/files/2465831c-8358-4f82-b4ce-140eb249f739.png?auth_key=1885006111-25b9eb7c612a48b48aebbeff0fd896c8-0-a8f6efc6c3d22539010b38f3ac7d5bf9" alt="Hamza School Logo" class="logo-img" />
+      <div>
+        <div class="font-display text-2xl lg:text-3xl font-semibold nav-brand-text leading-none">Hamza School</div>
+        <div class="text-[11px] tracking-[0.25em] nav-brand-sub uppercase mt-1">P/ &amp; M/ Level</div>
+      </div>
+    </a>
+
+    <div class="hidden lg:flex items-center gap-10">
+      <a href="#home" class="nav-link text-sm font-medium active">Home</a>
+      <a href="#about" class="nav-link text-sm font-medium">About Us</a>
+      <a href="#values" class="nav-link text-sm font-medium">Values</a>
+      <a href="#community" class="nav-link text-sm font-medium">Community</a>
+      <a href="#programs" class="nav-link text-sm font-medium">Programs</a>
+      <a href="#contact" class="btn-primary text-xs"><span>Enroll Now</span><i class="fas fa-arrow-right text-xs"></i></a>
+    </div>
+
+    <button id="menuBtn" class="lg:hidden w-10 h-10 flex items-center justify-center text-[var(--cream)]">
+      <i class="fas fa-bars text-xl"></i>
+    </button>
+  </div>
+</nav>
+
+<!-- Mobile menu -->
+<div id="mobileMenu" class="mobile-menu fixed top-0 right-0 w-full h-full bg-[var(--cream)] z-50 p-8 flex flex-col">
+  <button id="closeMenu" class="self-end w-10 h-10 flex items-center justify-center">
+    <i class="fas fa-times text-xl text-[var(--text-dark)]"></i>
+  </button>
+  <nav class="flex flex-col gap-6 mt-12">
+    <a href="#home" class="mobile-link font-display text-3xl text-[var(--text-dark)]">Home</a>
+    <a href="#about" class="mobile-link font-display text-3xl text-[var(--text-dark)]">About Us</a>
+    <a href="#values" class="mobile-link font-display text-3xl text-[var(--text-dark)]">Values</a>
+    <a href="#community" class="mobile-link font-display text-3xl text-[var(--text-dark)]">Community</a>
+    <a href="#programs" class="mobile-link font-display text-3xl text-[var(--text-dark)]">Programs</a>
+    <a href="#contact" class="mobile-link font-display text-3xl text-[var(--text-dark)]">Contact</a>
+  </nav>
+</div>
+
+<!-- ============ HERO ============ -->
+<section id="home" class="min-h-screen relative hero-bg pt-24 pb-12 flex items-center">
+  <div class="max-w-1440 px-6 lg:px-12 relative z-10 grid lg:grid-cols-2 gap-12 items-center w-full">
+    <!-- Left: Text -->
+    <div class="text-[var(--cream)] py-20">
+      <div class="flex items-center gap-3 mb-8">
+        <div class="w-12 h-px bg-[var(--gold)]"></div>
+        <span class="text-xs tracking-[0.4em] uppercase text-[var(--gold-light)]">Welcome to Hamza School</span>
+      </div>
+      <h1 class="hero-title text-7xl lg:text-9xl mb-8">
+        Guiding<br>
+        <em>Hearts.</em><br>
+        Growing<br>
+        <em>Minds.</em>
+      </h1>
+      <p class="text-lg text-[var(--cream)]/85 max-w-lg mb-10 leading-relaxed font-light">
+        An institution where knowledge meets character — nurturing faith, excellence, and a lifelong love of learning in every child.
+      </p>
+      <div class="flex flex-wrap gap-4">
+        <a href="#contact" class="btn-primary" style="background: var(--gold-deep);">
+          <span>Begin Enrollment</span>
+          <i class="fas fa-arrow-right text-xs"></i>
+        </a>
+        <a href="#about" class="btn-ghost" style="color: var(--cream); border-color: var(--cream);">
+          <span>Discover Hamza</span>
+        </a>
+      </div>
+
+      <!-- Prophetic Message Badge -->
+      <div class="mt-14 inline-flex items-center gap-4 px-6 py-4 bg-[var(--cream)]/10 backdrop-blur-md border border-[var(--gold)]/30 rounded-sm max-w-xl">
+        <i class="fas fa-feather-alt text-[var(--gold-light)] text-xl"></i>
+        <span class="text-sm tracking-wide text-[var(--cream)]/90 font-display italic">"Seeking knowledge is an obligation upon every individual." — Prophet Muhammad ﷺ</span>
+      </div>
+    </div>
+
+    <!-- Right: Decorative info cards floating over the image -->
+    <div class="hidden lg:block relative h-[600px]">
+      <!-- Card 1: Books illustration reference -->
+      <div class="absolute top-8 right-0 w-80 bg-[var(--cream)]/95 backdrop-blur-md p-8 shadow-2xl border-l-4 border-[var(--green-deep)] animate-float">
+        <div class="flex items-center gap-3 mb-4">
+          <i class="fas fa-book-open text-[var(--green-deep)] text-2xl"></i>
+          <span class="font-display text-xl font-semibold text-[var(--text-dark)]">Our Foundation</span>
+        </div>
+        <div class="flex flex-wrap gap-2">
+          <span class="px-4 py-1.5 bg-[var(--green-deep)] text-[var(--cream)] text-[11px] tracking-widest uppercase rounded-sm">Knowledge</span>
+          <span class="px-4 py-1.5 bg-[var(--gold-deep)] text-[var(--cream)] text-[11px] tracking-widest uppercase rounded-sm">Faith</span>
+          <span class="px-4 py-1.5 bg-[var(--navy)] text-[var(--cream)] text-[11px] tracking-widest uppercase rounded-sm">Character</span>
+          <span class="px-4 py-1.5 bg-[var(--crimson)] text-[var(--cream)] text-[11px] tracking-widest uppercase rounded-sm">Excellence</span>
+        </div>
+      </div>
+
+      <!-- Card 2: Quote from notebook -->
+      <div class="absolute bottom-20 right-16 w-72 bg-[var(--paper)] p-8 shadow-2xl border border-[var(--gold)]/30 animate-float" style="animation-delay: 1.5s;">
+        <i class="fas fa-quote-left text-[var(--gold)] text-2xl mb-3 block"></i>
+        <p class="font-display italic text-base text-[var(--text-dark)] leading-relaxed">
+          The beautiful thing about learning is that no one can take it away from you.
+        </p>
+        <p class="text-right text-sm text-[var(--gold-deep)] mt-4 font-medium">— B.B. King</p>
+      </div>
+
+      <!-- Card 3: Stats -->
+      <div class="absolute top-1/2 left-0 w-56 bg-[var(--green-deep)] p-6 shadow-2xl animate-float" style="animation-delay: 0.8s;">
+        <div class="font-display text-5xl font-semibold text-[var(--gold-light)]">15+</div>
+        <div class="text-sm tracking-wider uppercase text-[var(--cream)]/80 mt-2">Years of Excellence</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scroll indicator -->
+  <div class="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 text-[var(--cream)]/60">
+    <span class="text-[10px] tracking-[0.3em] uppercase">Scroll</span>
+    <div class="w-px h-12 bg-[var(--cream)]/30 relative">
+      <div class="absolute top-0 left-0 w-px h-3 bg-[var(--gold)] scroll-dot"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ ABOUT ============ -->
+<section id="about" class="py-40 paper-texture relative overflow-hidden">
+  <div class="absolute inset-0 geo-pattern pointer-events-none"></div>
+  <div class="max-w-1440 px-6 lg:px-12 relative">
+    <div class="grid lg:grid-cols-12 gap-16 items-center">
+      <!-- Left visual -->
+      <div class="lg:col-span-5 reveal">
+        <div class="relative">
+          <!-- Main image card using the homepage screenshot -->
+          <div class="aspect-[4/5] rounded-sm overflow-hidden relative shadow-2xl border-8 border-[var(--paper)]">
+            <img src="https://z-cdn-media.chatglm.cn/files/a079e60e-74c8-4dea-9992-d1ca2463e16d.png?auth_key=1885006111-bf2c813e16924f8894c6b60f7c679ae6-0-a9ccb11a9fb24763a3862561be95b637" alt="Hamza School campus life" class="w-full h-full object-cover" />
+            <div class="absolute inset-0 bg-gradient-to-t from-[var(--navy-deep)]/40 to-transparent"></div>
+          </div>
+          <!-- Floating stat card -->
+          <div class="absolute -bottom-10 -right-10 bg-[var(--paper)] border border-[var(--gold)]/30 p-8 shadow-2xl max-w-[220px]">
+            <div class="font-display text-6xl font-semibold text-[var(--green-deep)]">420+</div>
+            <div class="text-sm tracking-wider uppercase text-[var(--text-mid)] mt-2">Students &amp; Growing</div>
+          </div>
+          <!-- Decorative corner -->
+          <div class="absolute -top-6 -left-6 w-20 h-20 border-t-2 border-l-2 border-[var(--gold)]"></div>
+        </div>
+      </div>
+
+      <!-- Right content -->
+      <div class="lg:col-span-7 reveal">
+        <div class="section-label mb-6">— About Our School</div>
+        <h2 class="font-display text-6xl lg:text-7xl font-medium leading-tight text-[var(--text-dark)] mb-8">
+          A place where <em class="text-[var(--gold-deep)] italic">curiosity</em> meets <em class="text-[var(--green-deep)] italic">character</em>.
+        </h2>
+        <p class="text-lg text-[var(--text-mid)] leading-relaxed mb-6">
+          Hamza School was founded on a simple but powerful belief: that education should nurture the whole child. We exist to develop not only sharp minds, but kind hearts, strong character, and the confidence to face an ever-changing world.
+        </p>
+        <p class="text-lg text-[var(--text-mid)] leading-relaxed mb-10">
+          From the Primary level through Middle school, we blend a rigorous academic curriculum with timeless values — preparing students who are not only scholars, but also thoughtful, responsible citizens of their communities.
+        </p>
+
+        <!-- Feature list -->
+        <div class="grid sm:grid-cols-2 gap-8 mb-12">
+          <div class="flex gap-4">
+            <div class="w-12 h-12 flex-shrink-0 rounded-full bg-[var(--green-deep)]/10 flex items-center justify-center text-[var(--green-deep)]">
+              <i class="fas fa-book-open"></i>
+            </div>
+            <div>
+              <div class="font-semibold text-[var(--text-dark)] mb-1 text-lg">Integrated Curriculum</div>
+              <div class="text-sm text-[var(--text-mid)]">Academics balanced with character education</div>
+            </div>
+          </div>
+          <div class="flex gap-4">
+            <div class="w-12 h-12 flex-shrink-0 rounded-full bg-[var(--green-deep)]/10 flex items-center justify-center text-[var(--green-deep)]">
+              <i class="fas fa-users"></i>
+            </div>
+            <div>
+              <div class="font-semibold text-[var(--text-dark)] mb-1 text-lg">Small Class Sizes</div>
+              <div class="text-sm text-[var(--text-mid)]">Personalized attention for every student</div>
+            </div>
+          </div>
+          <div class="flex gap-4">
+            <div class="w-12 h-12 flex-shrink-0 rounded-full bg-[var(--green-deep)]/10 flex items-center justify-center text-[var(--green-deep)]">
+              <i class="fas fa-lightbulb"></i>
+            </div>
+            <div>
+              <div class="font-semibold text-[var(--text-dark)] mb-1 text-lg">Creative Learning</div>
+              <div class="text-sm text-[var(--text-mid)]">Hands-on projects and critical thinking</div>
+            </div>
+          </div>
+          <div class="flex gap-4">
+            <div class="w-12 h-12 flex-shrink-0 rounded-full bg-[var(--green-deep)]/10 flex items-center justify-center text-[var(--green-deep)]">
+              <i class="fas fa-heart"></i>
+            </div>
+            <div>
+              <div class="font-semibold text-[var(--text-dark)] mb-1 text-lg">Character First</div>
+              <div class="text-sm text-[var(--text-mid)]">Values woven into every subject</div>
+            </div>
+          </div>
+        </div>
+
+        <a href="#values" class="btn-ghost">
+          <span>Explore Our Values</span>
+          <i class="fas fa-arrow-right text-xs"></i>
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ VALUES ============ -->
+<section id="values" class="py-40 bg-[var(--bg-warm)] relative">
+  <div class="max-w-1440 px-6 lg:px-12">
+    <div class="text-center mb-24 reveal">
+      <div class="section-label mb-6">— The Four Pillars</div>
+      <h2 class="font-display text-6xl lg:text-8xl font-medium text-[var(--text-dark)] mb-6">
+        Faith &amp; Values
+      </h2>
+      <div class="ornament mb-6">
+        <i class="fas fa-star text-xs"></i>
+      </div>
+      <p class="text-lg text-[var(--text-mid)] max-w-2xl mx-auto leading-relaxed">
+        Every book in our library, every lesson in our classroom, and every interaction in our halls is rooted in four enduring principles.
+      </p>
+    </div>
+
+    <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+      <!-- Knowledge -->
+      <div class="value-card reveal">
+        <div class="value-icon">
+          <i class="fas fa-book"></i>
+        </div>
+        <div class="text-[11px] tracking-[0.3em] uppercase text-[var(--gold-deep)] mb-2">Pillar I</div>
+        <h3 class="font-display text-4xl font-semibold text-[var(--text-dark)] mb-4">Knowledge</h3>
+        <p class="text-base text-[var(--text-mid)] leading-relaxed mb-6">
+          The foundation of every child's journey. We cultivate critical thinking, curiosity, and a deep reverence for learning across sciences, humanities, and the arts.
+        </p>
+        <div class="pt-4 border-t border-[var(--gold)]/20">
+          <div class="font-display text-lg italic text-[var(--green-deep)]">Learn • Discover • Understand</div>
+        </div>
+      </div>
+
+      <!-- Faith -->
+      <div class="value-card reveal" style="transition-delay: 0.1s;">
+        <div class="value-icon" style="background: linear-gradient(135deg, var(--gold-deep), var(--gold));">
+          <i class="fas fa-hand-holding-heart"></i>
+        </div>
+        <div class="text-[11px] tracking-[0.3em] uppercase text-[var(--gold-deep)] mb-2">Pillar II</div>
+        <h3 class="font-display text-4xl font-semibold text-[var(--text-dark)] mb-4">Faith</h3>
+        <p class="text-base text-[var(--text-mid)] leading-relaxed mb-6">
+          Faith in oneself, faith in others, and faith in the future. We help students build the inner confidence and trust that empowers them to dream boldly and persevere.
+        </p>
+        <div class="pt-4 border-t border-[var(--gold)]/20">
+          <div class="font-display text-lg italic text-[var(--green-deep)]">Believe • Trust • Aspire</div>
+        </div>
+      </div>
+
+      <!-- Character -->
+      <div class="value-card reveal" style="transition-delay: 0.2s;">
+        <div class="value-icon" style="background: linear-gradient(135deg, var(--navy), var(--navy-deep));">
+          <i class="fas fa-shield-alt"></i>
+        </div>
+        <div class="text-[11px] tracking-[0.3em] uppercase text-[var(--gold-deep)] mb-2">Pillar III</div>
+        <h3 class="font-display text-4xl font-semibold text-[var(--text-dark)] mb-4">Character</h3>
+        <p class="text-base text-[var(--text-mid)] leading-relaxed mb-6">
+          The measure of a person lies in their character. Honesty, kindness, respect, and responsibility are taught not as slogans, but as daily practice in everything we do.
+        </p>
+        <div class="pt-4 border-t border-[var(--gold)]/20">
+          <div class="font-display text-lg italic text-[var(--green-deep)]">Respect • Integrity • Kindness</div>
+        </div>
+      </div>
+
+      <!-- Excellence -->
+      <div class="value-card reveal" style="transition-delay: 0.3s;">
+        <div class="value-icon" style="background: linear-gradient(135deg, var(--crimson), #6B2A20);">
+          <i class="fas fa-trophy"></i>
+        </div>
+        <div class="text-[11px] tracking-[0.3em] uppercase text-[var(--gold-deep)] mb-2">Pillar IV</div>
+        <h3 class="font-display text-4xl font-semibold text-[var(--text-dark)] mb-4">Excellence</h3>
+        <p class="text-base text-[var(--text-mid)] leading-relaxed mb-6">
+          We hold our students to the highest standards — academically, creatively, and personally. Because anything worth doing is worth doing well, and beauty lives in the effort.
+        </p>
+        <div class="pt-4 border-t border-[var(--gold)]/20">
+          <div class="font-display text-lg italic text-[var(--green-deep)]">Strive • Achieve • Inspire</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ PROPHETIC WISDOM QUOTE ============ -->
+<section class="py-40 quote-section relative">
+  <div class="max-w-5xl mx-auto px-6 lg:px-12 relative z-10 text-center">
+    <div class="reveal">
+      <!-- Ornament top -->
+      <div class="flex justify-center mb-10">
+        <svg viewBox="0 0 100 40" class="w-32 h-12">
+          <g fill="none" stroke="#C9A961" stroke-width="1">
+            <path d="M 50,5 L 55,15 L 65,15 L 57,22 L 60,32 L 50,26 L 40,32 L 43,22 L 35,15 L 45,15 Z" fill="#C9A961"/>
+            <line x1="10" y1="20" x2="30" y2="20"/>
+            <line x1="70" y1="20" x2="90" y2="20"/>
+            <circle cx="5" cy="20" r="2" fill="#C9A961"/>
+            <circle cx="95" cy="20" r="2" fill="#C9A961"/>
+          </g>
+        </svg>
+      </div>
+
+      <!-- Arabic Calligraphy -->
+      <div class="font-arabic text-4xl lg:text-5xl text-[var(--gold-light)] mb-8 leading-relaxed" dir="rtl">
+        مَنْ سَلَكَ طَرِيقًا يَلْتَمِسُ فِيهِ عِلْمًا سَهَّلَ اللَّهُ لَهُ طَرِيقًا إِلَى الْجَنَّةِ
+      </div>
+
+      <!-- English Quote -->
+      <blockquote class="font-display text-3xl lg:text-5xl font-medium text-[var(--cream)] leading-tight mb-8 italic">
+        "Whoever takes a path in search of knowledge, Allah makes easy for him a path to Paradise."
+      </blockquote>
+
+      <!-- Attribution -->
+      <div class="flex items-center justify-center gap-4 text-[var(--gold-light)]">
+        <div class="w-12 h-px bg-[var(--gold)]"></div>
+        <div class="text-sm tracking-[0.2em] uppercase">Prophet Muhammad ﷺ</div>
+        <div class="w-12 h-px bg-[var(--gold)]"></div>
+      </div>
+
+      <div class="mt-4 text-xs text-[var(--cream)]/50 italic">— Sahih Muslim 2699</div>
+    </div>
+  </div>
+
+  <!-- Decorative geometric pattern -->
+  <div class="absolute top-10 left-10 opacity-10">
+    <svg viewBox="0 0 100 100" class="w-32 h-32">
+      <g fill="none" stroke="#C9A961" stroke-width="1">
+        <path d="M 50,5 L 95,50 L 50,95 L 5,50 Z"/>
+        <path d="M 50,20 L 80,50 L 50,80 L 20,50 Z"/>
+        <circle cx="50" cy="50" r="15"/>
+      </g>
+    </svg>
+  </div>
+  <div class="absolute bottom-10 right-10 opacity-10">
+    <svg viewBox="0 0 100 100" class="w-32 h-32">
+      <g fill="none" stroke="#C9A961" stroke-width="1">
+        <path d="M 50,5 L 95,50 L 50,95 L 5,50 Z"/>
+        <path d="M 50,20 L 80,50 L 50,80 L 20,50 Z"/>
+        <circle cx="50" cy="50" r="15"/>
+      </g>
+    </svg>
+  </div>
+</section>
+
+<!-- ============ CARING COMMUNITY ============ -->
+<section id="community" class="py-40 paper-texture relative">
+  <div class="max-w-1440 px-6 lg:px-12">
+    <div class="grid lg:grid-cols-2 gap-20 items-center">
+      <div class="reveal">
+        <div class="section-label mb-6">— Together We Grow</div>
+        <h2 class="font-display text-6xl lg:text-7xl font-medium leading-tight text-[var(--text-dark)] mb-8">
+          A Caring Community, Not Just a School.
+        </h2>
+        <p class="text-lg text-[var(--text-mid)] leading-relaxed mb-6">
+          At Hamza School, education extends far beyond the classroom. Our students belong to a vibrant community — a family of teachers, parents, and mentors who walk alongside them in every step of their journey.
+        </p>
+        <p class="text-lg text-[var(--text-mid)] leading-relaxed mb-10">
+          From community service projects to family workshops, from art exhibitions to science fairs, we cultivate bonds that endure long after graduation.
+        </p>
+
+        <!-- Community stats -->
+        <div class="grid grid-cols-3 gap-8 mb-12">
+          <div>
+            <div class="stat-number">420+</div>
+            <div class="text-sm tracking-wider uppercase text-[var(--text-mid)] mt-2">Students</div>
+          </div>
+          <div>
+            <div class="stat-number">38</div>
+            <div class="text-sm tracking-wider uppercase text-[var(--text-mid)] mt-2">Educators</div>
+          </div>
+          <div>
+            <div class="stat-number">12</div>
+            <div class="text-sm tracking-wider uppercase text-[var(--text-mid)] mt-2">Clubs</div>
+          </div>
+        </div>
+
+        <a href="#contact" class="btn-primary">
+          <span>Join Our Family</span>
+          <i class="fas fa-arrow-right text-xs"></i>
+        </a>
+      </div>
+
+      <!-- Image grid -->
+      <div class="reveal grid grid-cols-2 gap-6">
+        <!-- Card 1 -->
+        <div class="aspect-[3/4] bg-gradient-to-br from-[var(--green-mid)] to-[var(--green-deep)] rounded-sm relative overflow-hidden p-8 flex flex-col justify-between">
+          <div class="absolute inset-0 geo-pattern" style="opacity: 0.15;"></div>
+          <i class="fas fa-hands-helping text-[var(--gold-light)] text-3xl relative z-10"></i>
+          <div class="relative z-10">
+            <div class="font-display text-2xl text-[var(--cream)] font-medium leading-tight mb-2">Service Projects</div>
+            <div class="text-sm text-[var(--cream)]/70">Monthly community outreach</div>
+          </div>
+        </div>
+        <!-- Card 2 -->
+        <div class="aspect-[3/4] bg-gradient-to-br from-[var(--gold-deep)] to-[var(--crimson)] rounded-sm relative overflow-hidden p-8 flex flex-col justify-between mt-12">
+          <div class="absolute inset-0 geo-pattern" style="opacity: 0.15;"></div>
+          <i class="fas fa-palette text-[var(--gold-light)] text-3xl relative z-10"></i>
+          <div class="relative z-10">
+            <div class="font-display text-2xl text-[var(--cream)] font-medium leading-tight mb-2">Arts &amp; Culture</div>
+            <div class="text-sm text-[var(--cream)]/70">Creativity in every form</div>
+          </div>
+        </div>
+        <!-- Card 3 -->
+        <div class="aspect-[3/4] bg-gradient-to-br from-[var(--navy)] to-[var(--navy-deep)] rounded-sm relative overflow-hidden p-8 flex flex-col justify-between">
+          <div class="absolute inset-0 geo-pattern" style="opacity: 0.15;"></div>
+          <i class="fas fa-flask text-[var(--gold-light)] text-3xl relative z-10"></i>
+          <div class="relative z-10">
+            <div class="font-display text-2xl text-[var(--cream)] font-medium leading-tight mb-2">Science Fairs</div>
+            <div class="text-sm text-[var(--cream)]/70">Discovery in action</div>
+          </div>
+        </div>
+        <!-- Card 4 -->
+        <div class="aspect-[3/4] bg-gradient-to-br from-[var(--wood-mid)] to-[var(--wood-dark)] rounded-sm relative overflow-hidden p-8 flex flex-col justify-between mt-12">
+          <div class="absolute inset-0 geo-pattern" style="opacity: 0.15;"></div>
+          <i class="fas fa-tree text-[var(--gold-light)] text-3xl relative z-10"></i>
+          <div class="relative z-10">
+            <div class="font-display text-2xl text-[var(--cream)] font-medium leading-tight mb-2">Outdoor Learning</div>
+            <div class="text-sm text-[var(--cream)]/70">Nature as classroom</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ OUR MISSION ============ -->
+<section class="py-48 relative mission-bg">
+  <div class="max-w-5xl mx-auto px-6 lg:px-12 relative z-10 text-center">
+    <div class="reveal">
+      <div class="section-label mb-6" style="color: var(--gold-light);">— Our Mission</div>
+      <h2 class="font-display text-6xl lg:text-8xl font-medium text-[var(--cream)] mb-8 leading-tight">
+        Guiding Hearts.<br>Growing Minds.
+      </h2>
+      <div class="ornament mb-10">
+        <i class="fas fa-star text-xs"></i>
+      </div>
+      <p class="text-xl text-[var(--cream)]/85 max-w-3xl mx-auto leading-relaxed mb-12">
+        Our mission is to balance academic excellence with strong moral values — creating a nurturing environment where every child is known, every voice is heard, and every potential is realized. We believe that true education shapes not just what students know, but who they become.
+      </p>
+      <div class="flex flex-wrap justify-center gap-4">
+        <div class="px-8 py-4 bg-[var(--cream)]/10 backdrop-blur-md border border-[var(--gold)]/30 rounded-sm">
+          <span class="text-base tracking-wider text-[var(--cream)]/90">Academic Excellence</span>
+        </div>
+        <div class="px-8 py-4 bg-[var(--cream)]/10 backdrop-blur-md border border-[var(--gold)]/30 rounded-sm">
+          <span class="text-base tracking-wider text-[var(--cream)]/90">Moral Foundation</span>
+        </div>
+        <div class="px-8 py-4 bg-[var(--cream)]/10 backdrop-blur-md border border-[var(--gold)]/30 rounded-sm">
+          <span class="text-base tracking-wider text-[var(--cream)]/90">Whole-Child Growth</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ PROGRAMS ============ -->
+<section id="programs" class="py-40 bg-[var(--bg-warm)] relative">
+  <div class="max-w-1440 px-6 lg:px-12">
+    <div class="text-center mb-20 reveal">
+      <div class="section-label mb-6">— Academic Pathways</div>
+      <h2 class="font-display text-6xl lg:text-8xl font-medium text-[var(--text-dark)] mb-6">Our Programs</h2>
+      <div class="ornament mb-6"><i class="fas fa-star text-xs"></i></div>
+      <p class="text-lg text-[var(--text-mid)] max-w-2xl mx-auto leading-relaxed">
+        Two stages of learning, one continuous journey of growth — from the first letters of the alphabet to the rigorous reasoning of the middle years.
+      </p>
+    </div>
+
+    <!-- Tabs -->
+    <div class="flex justify-center gap-4 mb-16 reveal">
+      <button class="tab-btn active" data-tab="primary">Primary Level</button>
+      <button class="tab-btn" data-tab="middle">Middle Level</button>
+    </div>
+
+    <!-- Tab content -->
+    <div id="tab-primary" class="tab-content reveal">
+      <div class="grid lg:grid-cols-2 gap-16 items-center">
+        <div class="relative">
+          <div class="aspect-square bg-gradient-to-br from-[var(--green-mid)] to-[var(--green-deep)] rounded-sm relative overflow-hidden">
+            <div class="absolute inset-0 geo-pattern" style="opacity: 0.15;"></div>
+            <div class="absolute inset-0 flex items-center justify-center">
+              <i class="fas fa-seedling text-[var(--gold-light)] text-[10rem] opacity-90"></i>
+            </div>
+            <div class="absolute top-8 left-8 text-[var(--gold-light)] font-display text-3xl italic">Ages 6 — 11</div>
+            <div class="absolute bottom-8 right-8 text-[var(--gold-light)] font-display text-3xl italic">Grades 1 — 5</div>
+          </div>
+        </div>
+        <div>
+          <h3 class="font-display text-5xl font-semibold text-[var(--text-dark)] mb-8">Primary Level</h3>
+          <p class="text-lg text-[var(--text-mid)] leading-relaxed mb-10">
+            The early years are sacred ground. We lay the foundation with gentle, joyful instruction — literacy, mathematics, science, social studies, and the love of reading. Every child is met where they are, and guided with patience and care.
+          </p>
+          <div class="space-y-6">
+            <div class="flex items-start gap-4 pb-6 border-b border-[var(--gold)]/20">
+              <div class="w-10 h-10 rounded-full bg-[var(--green-deep)]/10 flex items-center justify-center text-[var(--green-deep)] flex-shrink-0 mt-1">
+                <i class="fas fa-check text-sm"></i>
+              </div>
+              <div>
+                <div class="font-semibold text-[var(--text-dark)] text-lg">Language &amp; Literacy</div>
+                <div class="text-sm text-[var(--text-mid)] mt-1">Reading, writing, and communication skills</div>
+              </div>
+            </div>
+            <div class="flex items-start gap-4 pb-6 border-b border-[var(--gold)]/20">
+              <div class="w-10 h-10 rounded-full bg-[var(--green-deep)]/10 flex items-center justify-center text-[var(--green-deep)] flex-shrink-0 mt-1">
+                <i class="fas fa-check text-sm"></i>
+              </div>
+              <div>
+                <div class="font-semibold text-[var(--text-dark)] text-lg">Mathematics</div>
+                <div class="text-sm text-[var(--text-mid)] mt-1">Foundational numeracy and problem-solving</div>
+              </div>
+            </div>
+            <div class="flex items-start gap-4 pb-6 border-b border-[var(--gold)]/20">
+              <div class="w-10 h-10 rounded-full bg-[var(--green-deep)]/10 flex items-center justify-center text-[var(--green-deep)] flex-shrink-0 mt-1">
+                <i class="fas fa-check text-sm"></i>
+              </div>
+              <div>
+                <div class="font-semibold text-[var(--text-dark)] text-lg">Science &amp; Discovery</div>
+                <div class="text-sm text-[var(--text-mid)] mt-1">Hands-on, inquiry-based learning</div>
+              </div>
+            </div>
+            <div class="flex items-start gap-4">
+              <div class="w-10 h-10 rounded-full bg-[var(--green-deep)]/10 flex items-center justify-center text-[var(--green-deep)] flex-shrink-0 mt-1">
+                <i class="fas fa-check text-sm"></i>
+              </div>
+              <div>
+                <div class="font-semibold text-[var(--text-dark)] text-lg">Arts &amp; Physical Education</div>
+                <div class="text-sm text-[var(--text-mid)] mt-1">Creative expression and healthy habits</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="tab-middle" class="tab-content hidden">
+      <div class="grid lg:grid-cols-2 gap-16 items-center">
+        <div class="relative">
+          <div class="aspect-square bg-gradient-to-br from-[var(--navy)] to-[var(--navy-deep)] rounded-sm relative overflow-hidden">
+            <div class="absolute inset-0 geo-pattern" style="opacity: 0.15;"></div>
+            <div class="absolute inset-0 flex items-center justify-center">
+              <i class="fas fa-book-open text-[var(--gold-light)] text-[10rem] opacity-90"></i>
+            </div>
+            <div class="absolute top-8 left-8 text-[var(--gold-light)] font-display text-3xl italic">Ages 12 — 15</div>
+            <div class="absolute bottom-8 right-8 text-[var(--gold-light)] font-display text-3xl italic">Grades 6 — 8</div>
+          </div>
+        </div>
+        <div>
+          <h3 class="font-display text-5xl font-semibold text-[var(--text-dark)] mb-8">Middle Level</h3>
+          <p class="text-lg text-[var(--text-mid)] leading-relaxed mb-10">
+            The middle years are when character is tested and convictions are formed. We challenge our students with rigorous academics, deeper critical thinking, and meaningful leadership opportunities — preparing them for high school and beyond.
+          </p>
+          <div class="space-y-6">
+            <div class="flex items-start gap-4 pb-6 border-b border-[var(--gold)]/20">
+              <div class="w-10 h-10 rounded-full bg-[var(--navy)]/10 flex items-center justify-center text-[var(--navy)] flex-shrink-0 mt-1">
+                <i class="fas fa-check text-sm"></i>
+              </div>
+              <div>
+                <div class="font-semibold text-[var(--text-dark)] text-lg">Advanced Mathematics</div>
+                <div class="text-sm text-[var(--text-mid)] mt-1">Pre-algebra, algebra, and geometry</div>
+              </div>
+            </div>
+            <div class="flex items-start gap-4 pb-6 border-b border-[var(--gold)]/20">
+              <div class="w-10 h-10 rounded-full bg-[var(--navy)]/10 flex items-center justify-center text-[var(--navy)] flex-shrink-0 mt-1">
+                <i class="fas fa-check text-sm"></i>
+              </div>
+              <div>
+                <div class="font-semibold text-[var(--text-dark)] text-lg">STEM Excellence</div>
+                <div class="text-sm text-[var(--text-mid)] mt-1">Robotics, coding, and lab sciences</div>
+              </div>
+            </div>
+            <div class="flex items-start gap-4 pb-6 border-b border-[var(--gold)]/20">
+              <div class="w-10 h-10 rounded-full bg-[var(--navy)]/10 flex items-center justify-center text-[var(--navy)] flex-shrink-0 mt-1">
+                <i class="fas fa-check text-sm"></i>
+              </div>
+              <div>
+                <div class="font-semibold text-[var(--text-dark)] text-lg">Humanities &amp; Literature</div>
+                <div class="text-sm text-[var(--text-mid)] mt-1">Critical reading and persuasive writing</div>
+              </div>
+            </div>
+            <div class="flex items-start gap-4">
+              <div class="w-10 h-10 rounded-full bg-[var(--navy)]/10 flex items-center justify-center text-[var(--navy)] flex-shrink-0 mt-1">
+                <i class="fas fa-check text-sm"></i>
+              </div>
+              <div>
+                <div class="font-semibold text-[var(--text-dark)] text-lg">Leadership &amp; Service</div>
+                <div class="text-sm text-[var(--text-mid)] mt-1">Mentorship and community projects</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ FACULTY ============ -->
+<section class="py-40 paper-texture relative">
+  <div class="max-w-1440 px-6 lg:px-12">
+    <div class="text-center mb-24 reveal">
+      <div class="section-label mb-6">— Mentors &amp; Guides</div>
+      <h2 class="font-display text-6xl lg:text-8xl font-medium text-[var(--text-dark)] mb-6">Meet Our Teachers</h2>
+      <div class="ornament"><i class="fas fa-star text-xs"></i></div>
+    </div>
+
+    <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-8">
+      <div class="faculty-card p-10 text-center reveal">
+        <div class="faculty-avatar">A.J</div>
+        <div class="text-[11px] tracking-[0.25em] uppercase text-[var(--gold-deep)] mb-2">Headmistress</div>
+        <h4 class="font-display text-3xl font-semibold text-[var(--text-dark)] mb-2">Mrs. Anne Johnson</h4>
+        <div class="text-base text-[var(--text-mid)] mb-4">Literature &amp; Language Arts</div>
+        <div class="text-xs text-[var(--text-light)] italic">M.Ed., 20 years of teaching</div>
+      </div>
+      <div class="faculty-card p-10 text-center reveal" style="transition-delay: 0.1s;">
+        <div class="faculty-avatar">Y.M</div>
+        <div class="text-[11px] tracking-[0.25em] uppercase text-[var(--gold-deep)] mb-2">Principal</div>
+        <h4 class="font-display text-3xl font-semibold text-[var(--text-dark)] mb-2">Mr. Yusuf Mensah</h4>
+        <div class="text-base text-[var(--text-mid)] mb-4">Mathematics &amp; Sciences</div>
+        <div class="text-xs text-[var(--text-light)] italic">M.Sc., 18 years of teaching</div>
+      </div>
+      <div class="faculty-card p-10 text-center reveal" style="transition-delay: 0.2s;">
+        <div class="faculty-avatar">F.R</div>
+        <div class="text-[11px] tracking-[0.25em] uppercase text-[var(--gold-deep)] mb-2">Lead Teacher</div>
+        <h4 class="font-display text-3xl font-semibold text-[var(--text-dark)] mb-2">Ms. Fatima Rahman</h4>
+        <div class="text-base text-[var(--text-mid)] mb-4">Social Studies &amp; Arts</div>
+        <div class="text-xs text-[var(--text-light)] italic">B.A., 12 years of teaching</div>
+      </div>
+      <div class="faculty-card p-10 text-center reveal" style="transition-delay: 0.3s;">
+        <div class="faculty-avatar">I.K</div>
+        <div class="text-[11px] tracking-[0.25em] uppercase text-[var(--gold-deep)] mb-2">Teacher</div>
+        <h4 class="font-display text-3xl font-semibold text-[var(--text-dark)] mb-2">Mr. Ibrahim Kamara</h4>
+        <div class="text-base text-[var(--text-mid)] mb-4">Science &amp; Physical Education</div>
+        <div class="text-xs text-[var(--text-light)] italic">B.Sc., 10 years of teaching</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ TESTIMONIAL ============ -->
+<section class="py-40 bg-[var(--bg-warm)] relative">
+  <div class="max-w-5xl mx-auto px-6 lg:px-12">
+    <div class="text-center mb-20 reveal">
+      <div class="section-label mb-6">— Voices of Our Family</div>
+      <h2 class="font-display text-6xl lg:text-7xl font-medium text-[var(--text-dark)]">Parent Testimonials</h2>
+    </div>
+
+    <div class="quote-card p-12 lg:p-20 reveal relative">
+      <i class="fas fa-quote-left text-[var(--gold)] text-5xl absolute top-10 left-10 opacity-30"></i>
+      <i class="fas fa-quote-right text-[var(--gold)] text-5xl absolute bottom-10 right-10 opacity-30"></i>
+
+      <div id="testimonialCarousel" class="relative min-h-[200px]">
+        <div class="testimonial active text-center">
+          <p class="font-display text-3xl lg:text-4xl italic text-[var(--text-dark)] leading-relaxed mb-8">
+            "My son arrived at Hamza shy and uncertain. Three years later, he's confident, curious, and loves going to school every day. This school gave him not just knowledge, but a sense of who he is."
+          </p>
+          <div class="flex items-center justify-center gap-1 mb-4">
+            <i class="fas fa-star star text-sm"></i>
+            <i class="fas fa-star star text-sm"></i>
+            <i class="fas fa-star star text-sm"></i>
+            <i class="fas fa-star star text-sm"></i>
+            <i class="fas fa-star star text-sm"></i>
+          </div>
+          <div class="font-semibold text-[var(--text-dark)] text-lg">Sarah M.</div>
+          <div class="text-sm text-[var(--text-mid)]">Parent of Grade 4 student</div>
+        </div>
+      </div>
+
+      <!-- Dots -->
+      <div class="flex justify-center gap-2 mt-10">
+        <button class="testi-dot w-2 h-2 rounded-full bg-[var(--gold)] transition-all" data-index="0"></button>
+        <button class="testi-dot w-2 h-2 rounded-full bg-[var(--gold)]/30 transition-all" data-index="1"></button>
+        <button class="testi-dot w-2 h-2 rounded-full bg-[var(--gold)]/30 transition-all" data-index="2"></button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ CONTACT / ENROLL ============ -->
+<section id="contact" class="py-40 paper-texture relative">
+  <div class="max-w-1440 px-6 lg:px-12">
+    <div class="grid lg:grid-cols-2 gap-20">
+      <!-- Left: Info -->
+      <div class="reveal">
+        <div class="section-label mb-6">— Begin the Journey</div>
+        <h2 class="font-display text-6xl lg:text-7xl font-medium leading-tight text-[var(--text-dark)] mb-8">
+          Enroll Your Child at Hamza School
+        </h2>
+        <p class="text-lg text-[var(--text-mid)] leading-relaxed mb-12">
+          We welcome families who share our vision of education rooted in character, faith, and excellence. Submit the inquiry below, and our admissions team will reach out within two business days.
+        </p>
+
+        <div class="space-y-8">
+          <div class="flex items-start gap-5">
+            <div class="w-14 h-14 rounded-full bg-[var(--green-deep)]/10 flex items-center justify-center text-[var(--green-deep)] flex-shrink-0">
+              <i class="fas fa-map-marker-alt text-xl"></i>
+            </div>
+            <div>
+              <div class="text-xs tracking-wider uppercase text-[var(--text-light)] mb-1">Campus Address</div>
+              <div class="text-[var(--text-dark)] text-lg">123 Garden Road, Education Quarter</div>
+              <div class="text-[var(--text-mid)] text-sm">City Center, 00000</div>
+            </div>
+          </div>
+          <div class="flex items-start gap-5">
+            <div class="w-14 h-14 rounded-full bg-[var(--green-deep)]/10 flex items-center justify-center text-[var(--green-deep)] flex-shrink-0">
+              <i class="fas fa-phone text-xl"></i>
+            </div>
+            <div>
+              <div class="text-xs tracking-wider uppercase text-[var(--text-light)] mb-1">Admissions Office</div>
+              <div class="text-[var(--text-dark)] text-lg">+1 (555) 123-4567</div>
+              <div class="text-[var(--text-mid)] text-sm">Mon – Fri, 8:00 AM – 4:00 PM</div>
+            </div>
+          </div>
+          <div class="flex items-start gap-5">
+            <div class="w-14 h-14 rounded-full bg-[var(--green-deep)]/10 flex items-center justify-center text-[var(--green-deep)] flex-shrink-0">
+              <i class="fas fa-envelope text-xl"></i>
+            </div>
+            <div>
+              <div class="text-xs tracking-wider uppercase text-[var(--text-light)] mb-1">Email</div>
+              <div class="text-[var(--text-dark)] text-lg">admissions@hamzaschool.edu</div>
+              <div class="text-[var(--text-mid)] text-sm">info@hamzaschool.edu</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Social -->
+        <div class="flex gap-3 mt-12">
+          <a href="#" class="w-12 h-12 rounded-full border border-[var(--green-deep)]/30 flex items-center justify-center text-[var(--green-deep)] hover:bg-[var(--green-deep)] hover:text-[var(--cream)] transition-all">
+            <i class="fab fa-facebook-f text-sm"></i>
+          </a>
+          <a href="#" class="w-12 h-12 rounded-full border border-[var(--green-deep)]/30 flex items-center justify-center text-[var(--green-deep)] hover:bg-[var(--green-deep)] hover:text-[var(--cream)] transition-all">
+            <i class="fab fa-instagram text-sm"></i>
+          </a>
+          <a href="#" class="w-12 h-12 rounded-full border border-[var(--green-deep)]/30 flex items-center justify-center text-[var(--green-deep)] hover:bg-[var(--green-deep)] hover:text-[var(--cream)] transition-all">
+            <i class="fab fa-youtube text-sm"></i>
+          </a>
+          <a href="#" class="w-12 h-12 rounded-full border border-[var(--green-deep)]/30 flex items-center justify-center text-[var(--green-deep)] hover:bg-[var(--green-deep)] hover:text-[var(--cream)] transition-all">
+            <i class="fab fa-twitter text-sm"></i>
+          </a>
+        </div>
+      </div>
+
+      <!-- Right: Form -->
+      <div class="reveal">
+        <!--
+          PERN STACK BACKEND:
+          POST /api/inquiries
+          Express + PostgreSQL:
+            CREATE TABLE inquiries (
+              id SERIAL PRIMARY KEY,
+              parent_name VARCHAR(120) NOT NULL,
+              email VARCHAR(160) NOT NULL,
+              phone VARCHAR(40),
+              student_name VARCHAR(120) NOT NULL,
+              grade_level VARCHAR(40) NOT NULL,
+              message TEXT,
+              created_at TIMESTAMP DEFAULT NOW()
+            );
+        -->
+        <form id="enrollForm" class="bg-[var(--paper)] p-10 lg:p-12 border border-[var(--gold)]/25 shadow-xl">
+          <h3 class="font-display text-4xl font-semibold text-[var(--text-dark)] mb-2">Enrollment Inquiry</h3>
+          <p class="text-sm text-[var(--text-mid)] mb-10">All fields marked with * are required.</p>
+
+          <div class="grid sm:grid-cols-2 gap-6 mb-6">
+            <div>
+              <label class="form-label" for="parentName">Parent Name *</label>
+              <input type="text" id="parentName" name="parentName" class="form-input" required placeholder="Your full name" />
+            </div>
+            <div>
+              <label class="form-label" for="email">Email *</label>
+              <input type="email" id="email" name="email" class="form-input" required placeholder="you@example.com" />
+            </div>
+          </div>
+
+          <div class="grid sm:grid-cols-2 gap-6 mb-6">
+            <div>
+              <label class="form-label" for="phone">Phone</label>
+              <input type="tel" id="phone" name="phone" class="form-input" placeholder="+1 (555) 000-0000" />
+            </div>
+            <div>
+              <label class="form-label" for="studentName">Student Name *</label>
+              <input type="text" id="studentName" name="studentName" class="form-input" required placeholder="Child's full name" />
+            </div>
+          </div>
+
+          <div class="mb-6">
+            <label class="form-label" for="gradeLevel">Grade Level of Interest *</label>
+            <select id="gradeLevel" name="gradeLevel" class="form-input" required>
+              <option value="">Select a level</option>
+              <option value="primary-1">Primary — Grade 1</option>
+              <option value="primary-2">Primary — Grade 2</option>
+              <option value="primary-3">Primary — Grade 3</option>
+              <option value="primary-4">Primary — Grade 4</option>
+              <option value="primary-5">Primary — Grade 5</option>
+              <option value="middle-6">Middle — Grade 6</option>
+              <option value="middle-7">Middle — Grade 7</option>
+              <option value="middle-8">Middle — Grade 8</option>
+            </select>
+          </div>
+
+          <div class="mb-8">
+            <label class="form-label" for="message">Message</label>
+            <textarea id="message" name="message" rows="4" class="form-input resize-none" placeholder="Tell us about your child, your hopes, any questions you may have..."></textarea>
+          </div>
+
+          <button type="submit" class="btn-primary w-full justify-center">
+            <span>Submit Inquiry</span>
+            <i class="fas fa-paper-plane text-xs"></i>
+          </button>
+
+          <p class="text-xs text-[var(--text-light)] mt-6 text-center italic">
+            By submitting, you agree to be contacted by our admissions team. We respect your privacy.
+          </p>
+        </form>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ NEWSLETTER ============ -->
+<section class="py-24 bg-[var(--green-deep)] relative overflow-hidden">
+  <div class="absolute inset-0 geo-pattern" style="opacity: 0.1;"></div>
+  <div class="max-w-5xl mx-auto px-6 lg:px-12 relative z-10 text-center">
+    <div class="reveal">
+      <h3 class="font-display text-5xl lg:text-6xl font-medium text-[var(--cream)] mb-6">
+        Stay Connected With Our Community
+      </h3>
+      <p class="text-lg text-[var(--cream)]/70 mb-10 max-w-xl mx-auto">
+        Receive monthly updates, school events, and reflections on education.
+      </p>
+      <form id="newsletterForm" class="flex flex-col sm:flex-row gap-3 max-w-md mx-auto">
+        <input type="email" id="newsletterEmail" placeholder="Your email address" class="form-input flex-1 bg-[var(--cream)]/10 border-[var(--gold)]/30 text-[var(--cream)] placeholder-[var(--cream)]/50" required />
+        <button type="submit" class="btn-primary whitespace-nowrap" style="background: var(--gold-deep);">
+          <span>Subscribe</span>
+        </button>
+      </form>
+    </div>
+  </div>
+</section>
+
+<!-- ============ FOOTER ============ -->
+<footer class="bg-[var(--navy-deep)] text-[var(--cream)] pt-24 pb-10 relative">
+  <div class="absolute inset-0 geo-pattern" style="opacity: 0.05;"></div>
+  <div class="max-w-1440 px-6 lg:px-12 relative">
+    <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-16 mb-16">
+      <!-- Brand -->
+      <div>
+        <div class="flex items-center gap-4 mb-8">
+          <img src="https://z-cdn-media.chatglm.cn/files/2465831c-8358-4f82-b4ce-140eb249f739.png?auth_key=1885006111-25b9eb7c612a48b48aebbeff0fd896c8-0-a8f6efc6c3d22539010b38f3ac7d5bf9" alt="Hamza School Logo" class="logo-img" />
+          <div>
+            <div class="font-display text-2xl font-semibold">Hamza School</div>
+            <div class="text-[11px] tracking-[0.25em] text-[var(--gold)] uppercase mt-1">P/ &amp; M/ Level</div>
+          </div>
+        </div>
+        <p class="text-sm text-[var(--cream)]/60 leading-relaxed mb-6">
+          Guiding hearts and growing minds through quality education and strong character development.
+        </p>
+        <div class="font-display text-lg italic text-[var(--gold-light)]">Knowledge • Faith • Character • Excellence</div>
+      </div>
+
+      <!-- Quick Links -->
+      <div>
+        <h4 class="font-display text-xl font-semibold mb-8 text-[var(--gold-light)]">Quick Links</h4>
+        <ul class="space-y-4 text-base">
+          <li><a href="#home" class="text-[var(--cream)]/70 hover:text-[var(--gold-light)] transition-colors">Home</a></li>
+          <li><a href="#about" class="text-[var(--cream)]/70 hover:text-[var(--gold-light)] transition-colors">About Us</a></li>
+          <li><a href="#values" class="text-[var(--cream)]/70 hover:text-[var(--gold-light)] transition-colors">Faith &amp; Values</a></li>
+          <li><a href="#community" class="text-[var(--cream)]/70 hover:text-[var(--gold-light)] transition-colors">Community</a></li>
+          <li><a href="#programs" class="text-[var(--cream)]/70 hover:text-[var(--gold-light)] transition-colors">Programs</a></li>
+        </ul>
+      </div>
+
+      <!-- Programs -->
+      <div>
+        <h4 class="font-display text-xl font-semibold mb-8 text-[var(--gold-light)]">Academics</h4>
+        <ul class="space-y-4 text-base">
+          <li><a href="#programs" class="text-[var(--cream)]/70 hover:text-[var(--gold-light)] transition-colors">Primary Level</a></li>
+          <li><a href="#programs" class="text-[var(--cream)]/70 hover:text-[var(--gold-light)] transition-colors">Middle Level</a></li>
+          <li><a href="#contact" class="text-[var(--cream)]/70 hover:text-[var(--gold-light)] transition-colors">Admissions</a></li>
+          <li><a href="#contact" class="text-[var(--cream)]/70 hover:text-[var(--gold-light)] transition-colors">Tuition &amp; Fees</a></li>
+          <li><a href="#contact" class="text-[var(--cream)]/70 hover:text-[var(--gold-light)] transition-colors">School Calendar</a></li>
+        </ul>
+      </div>
+
+      <!-- Contact -->
+      <div>
+        <h4 class="font-display text-xl font-semibold mb-8 text-[var(--gold-light)]">Visit Us</h4>
+        <ul class="space-y-5 text-base text-[var(--cream)]/70">
+          <li class="flex gap-4">
+            <i class="fas fa-map-marker-alt text-[var(--gold)] mt-1"></i>
+            <span>123 Garden Road,<br>Education Quarter, City Center</span>
+          </li>
+          <li class="flex gap-4">
+            <i class="fas fa-phone text-[var(--gold)] mt-1"></i>
+            <span>+1 (555) 123-4567</span>
+          </li>
+          <li class="flex gap-4">
+            <i class="fas fa-envelope text-[var(--gold)] mt-1"></i>
+            <span>info@hamzaschool.edu</span>
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Bottom -->
+    <div class="pt-10 border-t border-[var(--cream)]/10 flex flex-col md:flex-row justify-between items-center gap-4">
+      <div class="text-sm text-[var(--cream)]/50">
+        © 2025 Hamza School. All rights reserved.
+      </div>
+      <div class="text-sm text-[var(--cream)]/50 flex items-center gap-2">
+        <span>Guiding Hearts. Growing Minds.</span>
+        <span>·</span>
+        <span>Made with care</span>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script>
+  // ============ NAVBAR SCROLL ============
+  const navbar = document.getElementById('navbar');
+  window.addEventListener('scroll', () => {
+    if (window.scrollY > 60) navbar.classList.add('scrolled');
+    else navbar.classList.remove('scrolled');
+  });
+
+  // ============ MOBILE MENU ============
+  const menuBtn = document.getElementById('menuBtn');
+  const closeMenu = document.getElementById('closeMenu');
+  const mobileMenu = document.getElementById('mobileMenu');
+  menuBtn.addEventListener('click', () => mobileMenu.classList.add('open'));
+  closeMenu.addEventListener('click', () => mobileMenu.classList.remove('open'));
+  document.querySelectorAll('.mobile-link').forEach(link => {
+    link.addEventListener('click', () => mobileMenu.classList.remove('open'));
+  });
+
+  // ============ ACTIVE NAV ON SCROLL ============
+  const sections = document.querySelectorAll('section[id]');
+  const navLinks = document.querySelectorAll('.nav-link');
+  window.addEventListener('scroll', () => {
+    let current = '';
+    sections.forEach(section => {
+      const sectionTop = section.offsetTop - 120;
+      if (window.scrollY >= sectionTop) current = section.getAttribute('id');
+    });
+    navLinks.forEach(link => {
+      link.classList.remove('active');
+      if (link.getAttribute('href') === '#' + current) link.classList.add('active');
+    });
+  });
+
+  // ============ REVEAL ON SCROLL ============
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('active');
+        observer.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.12, rootMargin: '0px 0px -60px 0px' });
+  document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+  // ============ PROGRAMS TABS ============
+  const tabBtns = document.querySelectorAll('.tab-btn');
+  const tabContents = document.querySelectorAll('.tab-content');
+  tabBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      const tab = btn.dataset.tab;
+      tabBtns.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      tabContents.forEach(c => c.classList.add('hidden'));
+      document.getElementById('tab-' + tab).classList.remove('hidden');
+    });
+  });
+
+  // ============ TESTIMONIALS ============
+  const testimonials = [
+    {
+      text: "My son arrived at Hamza shy and uncertain. Three years later, he's confident, curious, and loves going to school every day. This school gave him not just knowledge, but a sense of who he is.",
+      name: "Sarah M.",
+      role: "Parent of Grade 4 student"
+    },
+    {
+      text: "As an educator myself, I am consistently impressed by the depth of thought in Hamza's curriculum. My daughter doesn't just memorize — she understands, questions, and loves what she learns.",
+      name: "David R.",
+      role: "Parent of Grade 7 student"
+    },
+    {
+      text: "The teachers at Hamza see each child as an individual. My twins have very different personalities, yet both feel known, loved, and challenged. We could not ask for a better school.",
+      name: "Mary S.",
+      role: "Parent of Grade 3 students"
+    }
+  ];
+  let currentTesti = 0;
+  const carousel = document.getElementById('testimonialCarousel');
+  const dots = document.querySelectorAll('.testi-dot');
+
+  function renderTesti(idx) {
+    const t = testimonials[idx];
+    carousel.innerHTML = `
+      <div class="testimonial text-center">
+        <p class="font-display text-3xl lg:text-4xl italic text-[var(--text-dark)] leading-relaxed mb-8">${t.text}</p>
+        <div class="flex items-center justify-center gap-1 mb-4">
+          ${'<i class="fas fa-star star text-sm"></i>'.repeat(5)}
+        </div>
+        <div class="font-semibold text-[var(--text-dark)] text-lg">${t.name}</div>
+        <div class="text-sm text-[var(--text-mid)]">${t.role}</div>
+      </div>
+    `;
+    dots.forEach((d, i) => {
+      if (i === idx) {
+        d.classList.remove('bg-[var(--gold)]/30');
+        d.classList.add('bg-[var(--gold)]');
+      } else {
+        d.classList.remove('bg-[var(--gold)]');
+        d.classList.add('bg-[var(--gold)]/30');
+      }
+    });
+  }
+
+  dots.forEach(dot => {
+    dot.addEventListener('click', () => {
+      currentTesti = parseInt(dot.dataset.index);
+      renderTesti(currentTesti);
+    });
+  });
+  setInterval(() => {
+    currentTesti = (currentTesti + 1) % testimonials.length;
+    renderTesti(currentTesti);
+  }, 7000);
+
+  // ============ TOAST ============
+  const toast = document.getElementById('toast');
+  const toastTitle = document.getElementById('toastTitle');
+  const toastMsg = document.getElementById('toastMsg');
+  function showToast(title, msg, isSuccess = true) {
+    toastTitle.textContent = title;
+    toastMsg.textContent = msg;
+    toast.style.background = isSuccess ? 'var(--green-deep)' : 'var(--crimson)';
+    toast.classList.add('show');
+    setTimeout(() => toast.classList.remove('show'), 4000);
+  }
+
+  // ============ ENROLLMENT FORM ============
+  // PERN: POST to /api/inquiries → Express + PostgreSQL INSERT
+  document.getElementById('enrollForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const formData = {
+      parentName: document.getElementById('parentName').value,
+      email: document.getElementById('email').value,
+      phone: document.getElementById('phone').value,
+      studentName: document.getElementById('studentName').value,
+      gradeLevel: document.getElementById('gradeLevel').value,
+      message: document.getElementById('message').value
+    };
+
+    const btn = e.target.querySelector('button[type="submit"]');
+    const originalHTML = btn.innerHTML;
+    btn.innerHTML = '<span>Submitting...</span><i class="fas fa-spinner fa-spin text-xs"></i>';
+    btn.disabled = true;
+
+    try {
+      // Simulated API call — replace with: await fetch('/api/inquiries', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(formData) })
+      await new Promise(r => setTimeout(r, 1200));
+      showToast('Inquiry Received', 'Thank you! We will contact you within 2 business days.', true);
+      e.target.reset();
+    } catch (err) {
+      showToast('Error', 'Something went wrong. Please try again or call us.', false);
+    } finally {
+      btn.innerHTML = originalHTML;
+      btn.disabled = false;
+    }
+  });
+
+  // ============ NEWSLETTER ============
+  document.getElementById('newsletterForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const email = document.getElementById('newsletterEmail').value;
+    const btn = e.target.querySelector('button');
+    const originalHTML = btn.innerHTML;
+    btn.innerHTML = '<span>Subscribing...</span>';
+    btn.disabled = true;
+
+    try {
+      await new Promise(r => setTimeout(r, 800));
+      showToast('Subscribed', 'You have been added to our mailing list.', true);
+      e.target.reset();
+    } catch (err) {
+      showToast('Error', 'Could not subscribe. Please try again.', false);
+    } finally {
+      btn.innerHTML = originalHTML;
+      btn.disabled = false;
+    }
+  });
+</script>
+</body>
+</html>

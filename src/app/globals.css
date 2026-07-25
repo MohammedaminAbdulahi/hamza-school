@@ -7,7 +7,8 @@
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
-  --font-serif: var(--font-playfair);
+  --font-serif: var(--font-cormorant);
+  --font-arabic: var(--font-amiri);
   --font-mono: var(--font-geist-mono);
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
@@ -40,6 +41,16 @@
   --color-card: var(--card);
   --color-cream: var(--cream);
   --color-forest: var(--forest);
+  --color-green-mid: var(--green-mid);
+  --color-gold: var(--gold);
+  --color-gold-deep: var(--gold-deep);
+  --color-gold-light: var(--gold-light);
+  --color-navy: var(--navy);
+  --color-navy-deep: var(--navy-deep);
+  --color-wood-dark: var(--wood-dark);
+  --color-wood-mid: var(--wood-mid);
+  --color-crimson: var(--crimson);
+  --color-paper: var(--paper);
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
@@ -47,77 +58,101 @@
 }
 
 :root {
-  --radius: 0.875rem;
-  /* Hamza School palette: deep forest green + warm cream */
-  --background: oklch(0.985 0.006 85);
-  --foreground: oklch(0.22 0.02 50);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.22 0.02 50);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.22 0.02 50);
-  --primary: oklch(0.32 0.04 160);
-  --primary-foreground: oklch(0.99 0.005 85);
-  --secondary: oklch(0.96 0.008 85);
-  --secondary-foreground: oklch(0.3 0.03 160);
-  --muted: oklch(0.965 0.006 85);
-  --muted-foreground: oklch(0.48 0.015 55);
-  --accent: oklch(0.92 0.03 75);
-  --accent-foreground: oklch(0.36 0.06 60);
-  --destructive: oklch(0.58 0.22 25);
-  --border: oklch(0.9 0.008 85);
-  --input: oklch(0.92 0.008 85);
-  --ring: oklch(0.32 0.04 160);
-  --cream: oklch(0.97 0.01 85);
-  --forest: oklch(0.32 0.04 160);
-  --chart-1: oklch(0.4 0.05 160);
-  --chart-2: oklch(0.68 0.1 60);
-  --chart-3: oklch(0.6 0.08 30);
-  --chart-4: oklch(0.55 0.07 200);
-  --chart-5: oklch(0.5 0.08 300);
-  --sidebar: oklch(0.97 0.008 85);
-  --sidebar-foreground: oklch(0.22 0.02 50);
-  --sidebar-primary: oklch(0.32 0.04 160);
-  --sidebar-primary-foreground: oklch(0.99 0.005 85);
-  --sidebar-accent: oklch(0.93 0.02 85);
-  --sidebar-accent-foreground: oklch(0.3 0.03 160);
-  --sidebar-border: oklch(0.9 0.008 85);
-  --sidebar-ring: oklch(0.32 0.04 160);
+  --radius: 0.375rem;
+  /* Hamza School palette: cream paper + deep green + gold + navy */
+  --background: #F4ECD8;
+  --foreground: #2A2520;
+  --card: #FDFBF3;
+  --card-foreground: #2A2520;
+  --popover: #FDFBF3;
+  --popover-foreground: #2A2520;
+  --primary: #1F3D2F;
+  --primary-foreground: #FBF6E9;
+  --secondary: #EBE0C7;
+  --secondary-foreground: #5C4226;
+  --muted: #EBE0C7;
+  --muted-foreground: #5A5048;
+  --accent: #C9A961;
+  --accent-foreground: #9B7B36;
+  --destructive: #8C3A2E;
+  --border: rgba(155, 123, 54, 0.18);
+  --input: rgba(155, 123, 54, 0.25);
+  --ring: #1F3D2F;
+  --cream: #FBF6E9;
+  --forest: #1F3D2F;
+  --green-mid: #4A7C5A;
+  --gold: #C9A961;
+  --gold-deep: #9B7B36;
+  --gold-light: #E4D4A8;
+  --navy: #1B3A4B;
+  --navy-deep: #0F2530;
+  --wood-dark: #5C4226;
+  --wood-mid: #8B6A43;
+  --crimson: #8C3A2E;
+  --paper: #FDFBF3;
+  --text-dark: #2A2520;
+  --text-mid: #5A5048;
+  --chart-1: #1F3D2F;
+  --chart-2: #C9A961;
+  --chart-3: #8C3A2E;
+  --chart-4: #1B3A4B;
+  --chart-5: #4A7C5A;
+  --sidebar: #FDFBF3;
+  --sidebar-foreground: #2A2520;
+  --sidebar-primary: #1F3D2F;
+  --sidebar-primary-foreground: #FBF6E9;
+  --sidebar-accent: #EBE0C7;
+  --sidebar-accent-foreground: #5C4226;
+  --sidebar-border: rgba(155, 123, 54, 0.18);
+  --sidebar-ring: #1F3D2F;
 }
 
 .dark {
-  --background: oklch(0.16 0.01 160);
-  --foreground: oklch(0.96 0.006 85);
-  --card: oklch(0.21 0.012 160);
-  --card-foreground: oklch(0.96 0.006 85);
-  --popover: oklch(0.21 0.012 160);
-  --popover-foreground: oklch(0.96 0.006 85);
-  --primary: oklch(0.55 0.06 160);
-  --primary-foreground: oklch(0.16 0.01 160);
-  --secondary: oklch(0.26 0.012 160);
-  --secondary-foreground: oklch(0.96 0.006 85);
-  --muted: oklch(0.25 0.012 160);
-  --muted-foreground: oklch(0.7 0.012 85);
-  --accent: oklch(0.3 0.03 60);
-  --accent-foreground: oklch(0.88 0.08 65);
-  --destructive: oklch(0.7 0.19 22);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.55 0.06 160);
-  --cream: oklch(0.2 0.012 160);
-  --forest: oklch(0.55 0.06 160);
-  --chart-1: oklch(0.55 0.07 160);
-  --chart-2: oklch(0.72 0.11 60);
-  --chart-3: oklch(0.65 0.1 30);
-  --chart-4: oklch(0.68 0.09 200);
-  --chart-5: oklch(0.6 0.1 300);
-  --sidebar: oklch(0.19 0.012 160);
-  --sidebar-foreground: oklch(0.96 0.006 85);
-  --sidebar-primary: oklch(0.55 0.06 160);
-  --sidebar-primary-foreground: oklch(0.16 0.01 160);
-  --sidebar-accent: oklch(0.26 0.012 160);
-  --sidebar-accent-foreground: oklch(0.96 0.006 85);
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.55 0.06 160);
+  --background: #0F2530;
+  --foreground: #FBF6E9;
+  --card: #1B3A4B;
+  --card-foreground: #FBF6E9;
+  --popover: #1B3A4B;
+  --popover-foreground: #FBF6E9;
+  --primary: #C9A961;
+  --primary-foreground: #0F2530;
+  --secondary: #1F3D2F;
+  --secondary-foreground: #FBF6E9;
+  --muted: #1F3D2F;
+  --muted-foreground: #E4D4A8;
+  --accent: #C9A961;
+  --accent-foreground: #9B7B36;
+  --destructive: #8C3A2E;
+  --border: rgba(201, 169, 97, 0.2);
+  --input: rgba(201, 169, 97, 0.25);
+  --ring: #C9A961;
+  --cream: #FBF6E9;
+  --forest: #4A7C5A;
+  --green-mid: #4A7C5A;
+  --gold: #C9A961;
+  --gold-deep: #9B7B36;
+  --gold-light: #E4D4A8;
+  --navy: #1B3A4B;
+  --navy-deep: #0F2530;
+  --wood-dark: #5C4226;
+  --wood-mid: #8B6A43;
+  --crimson: #8C3A2E;
+  --paper: #1B3A4B;
+  --text-dark: #FBF6E9;
+  --text-mid: #E4D4A8;
+  --chart-1: #4A7C5A;
+  --chart-2: #C9A961;
+  --chart-3: #8C3A2E;
+  --chart-4: #1B3A4B;
+  --chart-5: #1F3D2F;
+  --sidebar: #1B3A4B;
+  --sidebar-foreground: #FBF6E9;
+  --sidebar-primary: #C9A961;
+  --sidebar-primary-foreground: #0F2530;
+  --sidebar-accent: #1F3D2F;
+  --sidebar-accent-foreground: #FBF6E9;
+  --sidebar-border: rgba(201, 169, 97, 0.2);
+  --sidebar-ring: #C9A961;
 }
 
 @layer base {
@@ -126,17 +161,24 @@
   }
   body {
     @apply bg-background text-foreground;
+    -webkit-font-smoothing: antialiased;
   }
   html {
     scroll-behavior: smooth;
   }
-  h1, h2, h3 {
+  h1, h2, h3, h4 {
     font-family: var(--font-serif);
   }
 }
 
 /* Custom scrollbar */
 @layer utilities {
+  .font-serif {
+    font-family: var(--font-serif);
+  }
+  .font-arabic {
+    font-family: var(--font-arabic);
+  }
   .scrollbar-thin::-webkit-scrollbar {
     width: 6px;
     height: 6px;
@@ -145,42 +187,92 @@
     background: transparent;
   }
   .scrollbar-thin::-webkit-scrollbar-thumb {
-    background: var(--muted-foreground);
+    background: var(--gold-deep);
     border-radius: 9999px;
     opacity: 0.4;
-  }
-  .scrollbar-thin::-webkit-scrollbar-thumb:hover {
-    background: var(--primary);
   }
   .text-balance {
     text-wrap: balance;
   }
-  .font-serif {
+  /* Paper texture */
+  .paper-texture {
+    background-color: var(--paper);
+    background-image:
+      radial-gradient(circle at 15% 20%, rgba(201, 169, 97, 0.06) 0%, transparent 40%),
+      radial-gradient(circle at 85% 80%, rgba(31, 61, 47, 0.05) 0%, transparent 40%);
+  }
+  /* Geometric Islamic pattern */
+  .geo-pattern {
+    background-image:
+      radial-gradient(circle at 50% 50%, transparent 38%, var(--gold) 38%, var(--gold) 40%, transparent 40%),
+      radial-gradient(circle at 0% 0%, transparent 38%, var(--gold) 38%, var(--gold) 40%, transparent 40%),
+      radial-gradient(circle at 100% 0%, transparent 38%, var(--gold) 38%, var(--gold) 40%, transparent 40%),
+      radial-gradient(circle at 0% 100%, transparent 38%, var(--gold) 38%, var(--gold) 40%, transparent 40%),
+      radial-gradient(circle at 100% 100%, transparent 38%, var(--gold) 38%, var(--gold) 40%, transparent 40%);
+    background-size: 80px 80px;
+    opacity: 0.08;
+  }
+  /* Ornamental divider */
+  .ornament {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
+    color: var(--gold);
+  }
+  .ornament::before, .ornament::after {
+    content: '';
+    height: 1px;
+    width: 100px;
+    background: linear-gradient(90deg, transparent, var(--gold), transparent);
+  }
+  /* Section label */
+  .section-label {
     font-family: var(--font-serif);
+    font-style: italic;
+    font-size: 16px;
+    letter-spacing: 0.3em;
+    color: var(--gold-deep);
+    text-transform: uppercase;
   }
-  .bg-grid {
-    background-image: linear-gradient(to right, var(--border) 1px, transparent 1px),
-      linear-gradient(to bottom, var(--border) 1px, transparent 1px);
-    background-size: 40px 40px;
+  /* Floating animation */
+  @keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-14px); }
   }
-  .hero-overlay {
-    background: linear-gradient(
-      135deg,
-      oklch(0.16 0.01 160 / 0.92) 0%,
-      oklch(0.16 0.01 160 / 0.7) 50%,
-      oklch(0.32 0.04 160 / 0.5) 100%
-    );
+  .animate-float {
+    animation: float 6s ease-in-out infinite;
   }
-  .animate-spin-slow {
-    animation: spin 8s linear infinite;
+  /* Value card hover top border */
+  .value-card {
+    position: relative;
+    overflow: hidden;
   }
-  /* Subtle Islamic-style pattern background */
-  .pattern-islamic {
-    background-image: 
-      radial-gradient(circle at 50% 50%, var(--primary) 0.5px, transparent 0.5px),
-      radial-gradient(circle at 0 0, var(--primary) 0.5px, transparent 0.5px);
-    background-size: 20px 20px;
-    background-position: 0 0, 10px 10px;
-    opacity: 0.04;
+  .value-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 3px;
+    background: linear-gradient(90deg, var(--gold), var(--forest));
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.5s ease;
+  }
+  .value-card:hover::before { transform: scaleX(1); }
+  /* Nav link underline */
+  .nav-link-underline {
+    position: relative;
+  }
+  .nav-link-underline::after {
+    content: '';
+    position: absolute;
+    bottom: -6px; left: 50%;
+    width: 0; height: 1.5px;
+    background: var(--gold);
+    transition: all 0.35s ease;
+    transform: translateX(-50%);
+  }
+  .nav-link-underline:hover::after, .nav-link-underline.active::after {
+    width: 100%;
   }
 }

@@ -6,7 +6,8 @@ import {
   Search,
   Sun,
   Moon,
-  Phone,
+  X,
+  ArrowRight,
 } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import { Button } from '@/components/ui/button'
@@ -20,14 +21,13 @@ import {
 import { Logo } from './logo'
 import { useNav, type PageId } from '@/lib/nav-store'
 import { cn } from '@/lib/utils'
-import { SCHOOL } from '@/lib/data/school'
 
 const PAGES: { id: PageId; label: string }[] = [
   { id: 'home', label: 'Home' },
   { id: 'about', label: 'About Us' },
-  { id: 'academics', label: 'Academics' },
-  { id: 'gallery', label: 'Student Life' },
-  { id: 'news', label: 'News' },
+  { id: 'academics', label: 'Values' },
+  { id: 'gallery', label: 'Community' },
+  { id: 'academics', label: 'Programs' },
   { id: 'contact', label: 'Contact' },
 ]
 
@@ -40,66 +40,68 @@ export function Navbar() {
   React.useEffect(() => setMounted(true), [])
 
   React.useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 8)
+    const onScroll = () => setScrolled(window.scrollY > 60)
     onScroll()
     window.addEventListener('scroll', onScroll, { passive: true })
     return () => window.removeEventListener('scroll', onScroll)
   }, [])
 
+  // On home page, navbar is transparent over hero until scrolled
+  const onHome = view === 'home'
+  const transparent = onHome && !scrolled
+
   return (
     <header
       className={cn(
-        'sticky top-0 z-50 w-full transition-all duration-300',
+        'fixed top-0 left-0 right-0 z-50 transition-all duration-400',
         scrolled
-          ? 'border-b border-border/60 bg-background/85 backdrop-blur-xl shadow-sm'
-          : 'bg-background/60 backdrop-blur-md'
+          ? 'bg-cream/97 backdrop-blur-xl shadow-[0_4px_30px_rgba(60,35,10,0.1)] py-3'
+          : 'bg-transparent py-4'
       )}
     >
-      {/* Top utility bar */}
-      <div className="hidden border-b border-border/40 bg-primary/5 lg:block">
-        <div className="mx-auto flex h-9 max-w-7xl items-center justify-between px-4 text-xs text-muted-foreground sm:px-6 lg:px-8">
-          <div className="flex items-center gap-2">
-            <Phone className="size-3.5 text-primary" />
-            <span>{SCHOOL.phone}</span>
-            <span className="mx-2 text-border">|</span>
-            <span>{SCHOOL.hours}</span>
-          </div>
-          <div className="flex items-center gap-4">
-            <span className="font-medium text-primary">{SCHOOL.tagline}</span>
-          </div>
-        </div>
-      </div>
-
-      <div className="mx-auto flex h-16 max-w-7xl items-center justify-between gap-4 px-4 sm:px-6 lg:px-8">
-        <Logo />
+      <div className="mx-auto flex max-w-7xl items-center justify-between px-6 lg:px-12">
+        <Logo
+          variant={transparent ? 'light' : 'default'}
+          size="md"
+        />
 
         {/* Desktop nav */}
-        <nav className="hidden items-center gap-0.5 lg:flex" aria-label="Main navigation">
-          {PAGES.map((p) => (
+        <nav className="hidden items-center gap-10 lg:flex" aria-label="Main navigation">
+          {PAGES.map((p, i) => (
             <button
-              key={p.id}
+              key={`${p.id}-${i}`}
               onClick={() => goPage(p.id)}
               className={cn(
-                'relative rounded-lg px-3 py-2 text-sm font-medium transition-colors hover:text-primary',
-                view === p.id ? 'text-primary' : 'text-foreground/80'
+                'nav-link-underline text-sm font-medium transition-colors',
+                transparent ? 'text-cream hover:text-gold-light' : 'text-foreground hover:text-gold-deep',
+                view === p.id && 'active'
               )}
             >
               {p.label}
-              {view === p.id && (
-                <span className="absolute inset-x-3 -bottom-px h-0.5 rounded-full bg-primary" />
-              )}
             </button>
           ))}
+          <Button
+            onClick={() => goPage('contact')}
+            className={cn(
+              'h-11 gap-2 rounded-sm px-6 text-xs font-medium uppercase tracking-[0.12em] transition-all',
+              transparent
+                ? 'bg-gold-deep text-cream hover:bg-gold'
+                : 'bg-forest text-cream hover:bg-forest/90'
+            )}
+          >
+            Enroll Now
+            <ArrowRight className="size-3.5" />
+          </Button>
         </nav>
 
         {/* Right actions */}
-        <div className="flex items-center gap-1.5">
+        <div className="flex items-center gap-1.5 lg:gap-2">
           <Button
             variant="ghost"
             size="icon"
             onClick={() => setSearchOpen(true)}
             aria-label="Search"
-            className="hidden sm:inline-flex"
+            className={cn('hidden sm:inline-flex', transparent && 'text-cream hover:bg-white/10 hover:text-cream')}
           >
             <Search className="size-4.5" />
           </Button>
@@ -109,6 +111,7 @@ export function Navbar() {
             size="icon"
             onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
             aria-label="Toggle theme"
+            className={cn(transparent && 'text-cream hover:bg-white/10 hover:text-cream')}
           >
             {mounted && theme === 'dark' ? (
               <Sun className="size-4.5" />
@@ -117,54 +120,51 @@ export function Navbar() {
             )}
           </Button>
 
-          <Button
-            onClick={() => goPage('contact')}
-            className="hidden bg-primary shadow-md shadow-primary/20 hover:bg-primary/90 sm:inline-flex"
-          >
-            Contact Us
-          </Button>
-
           {/* Mobile menu */}
           <Sheet open={mobileNavOpen} onOpenChange={setMobileNavOpen}>
             <SheetTrigger asChild>
-              <Button variant="ghost" size="icon" className="lg:hidden" aria-label="Open menu">
+              <Button
+                variant="ghost"
+                size="icon"
+                className={cn('lg:hidden', transparent && 'text-cream hover:bg-white/10 hover:text-cream')}
+                aria-label="Open menu"
+              >
                 <Menu className="size-5" />
               </Button>
             </SheetTrigger>
-            <SheetContent side="right" className="w-[300px] overflow-y-auto sm:w-[360px]">
-              <SheetHeader>
+            <SheetContent side="right" className="w-full border-0 bg-cream p-8 sm:w-96">
+              <SheetHeader className="flex-row items-center justify-between space-y-0">
                 <SheetTitle className="text-left">
-                  <Logo onClick={() => setMobileNavOpen(false)} />
+                  <Logo onClick={() => setMobileNavOpen(false)} size="sm" />
                 </SheetTitle>
+                <Button variant="ghost" size="icon" onClick={() => setMobileNavOpen(false)} aria-label="Close">
+                  <X className="size-5" />
+                </Button>
               </SheetHeader>
-              <div className="mt-6 flex flex-col gap-1">
-                {PAGES.map((p) => (
+              <nav className="mt-12 flex flex-col gap-6" aria-label="Mobile navigation">
+                {PAGES.map((p, i) => (
                   <button
-                    key={p.id}
-                    onClick={() => goPage(p.id)}
-                    className={cn(
-                      'rounded-lg px-3 py-2.5 text-left text-sm font-medium transition-colors hover:bg-accent',
-                      view === p.id
-                        ? 'bg-primary/10 text-primary'
-                        : 'text-foreground'
-                    )}
+                    key={`${p.id}-${i}`}
+                    onClick={() => {
+                      goPage(p.id)
+                      setMobileNavOpen(false)
+                    }}
+                    className="font-serif text-3xl text-foreground transition-colors hover:text-gold-deep"
                   >
                     {p.label}
                   </button>
                 ))}
-              </div>
+              </nav>
               <Button
-                onClick={() => goPage('contact')}
-                className="mt-6 w-full bg-primary shadow-md shadow-primary/20"
+                onClick={() => {
+                  goPage('contact')
+                  setMobileNavOpen(false)
+                }}
+                className="mt-10 h-12 w-full gap-2 rounded-sm bg-forest text-xs font-medium uppercase tracking-[0.12em] text-cream"
               >
-                Contact Us
+                Enroll Now
+                <ArrowRight className="size-3.5" />
               </Button>
-              <div className="mt-6 space-y-1 border-t pt-4 text-sm text-muted-foreground">
-                <p className="flex items-center gap-2">
-                  <Phone className="size-4 text-primary" /> {SCHOOL.phone}
-                </p>
-                <p>{SCHOOL.hours}</p>
-              </div>
             </SheetContent>
           </Sheet>
         </div>

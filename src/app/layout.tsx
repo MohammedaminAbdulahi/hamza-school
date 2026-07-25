@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono, Playfair_Display } from "next/font/google";
+import { Geist, Geist_Mono, Cormorant_Garamond, Amiri } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as SonnerToaster } from "@/components/ui/sonner";
@@ -15,23 +15,29 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-const playfair = Playfair_Display({
-  variable: "--font-playfair",
+const cormorant = Cormorant_Garamond({
+  variable: "--font-cormorant",
   subsets: ["latin"],
-  weight: ["500", "600", "700", "800"],
+  weight: ["400", "500", "600", "700"],
+  style: ["normal", "italic"],
+});
+
+const amiri = Amiri({
+  variable: "--font-amiri",
+  subsets: ["latin", "arabic"],
+  weight: ["400", "700"],
 });
 
 export const metadata: Metadata = {
-  title: "Hamza School | Nurturing Faith, Inspiring Futures — Addis Ababa",
+  title: "Hamza School — Guiding Hearts. Growing Minds.",
   description:
-    "Hamza School is a warm, faith-based school in Addis Ababa serving Grades 1–8. Caring teachers, a real biology lab, and a love for learning rooted in values.",
+    "An institution where knowledge meets character — nurturing faith, excellence, and a lifelong love of learning in every child. Addis Ababa, Ethiopia.",
   keywords: [
     "Hamza School",
     "Islamic school Addis Ababa",
     "Ethiopia school",
     "primary school",
     "junior secondary",
-    "Grades 1 to 8",
     "faith-based school",
   ],
   authors: [{ name: "Hamza School" }],
@@ -39,16 +45,16 @@ export const metadata: Metadata = {
     icon: "/hamza-logo.png",
   },
   openGraph: {
-    title: "Hamza School | Nurturing Faith, Inspiring Futures",
+    title: "Hamza School — Guiding Hearts. Growing Minds.",
     description:
-      "A warm, faith-based school in Addis Ababa serving Grades 1–8.",
+      "An institution where knowledge meets character — nurturing faith, excellence, and a lifelong love of learning.",
     siteName: "Hamza School",
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
     title: "Hamza School",
-    description: "Nurturing Faith, Inspiring Futures.",
+    description: "Guiding Hearts. Growing Minds.",
   },
 };
 
@@ -61,7 +67,7 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <body
         suppressHydrationWarning
-        className={`${geistSans.variable} ${geistMono.variable} ${playfair.variable} antialiased bg-background text-foreground`}
+        className={`${geistSans.variable} ${geistMono.variable} ${cormorant.variable} ${amiri.variable} antialiased bg-background text-foreground`}
       >
         <ThemeProvider
           attribute="class"

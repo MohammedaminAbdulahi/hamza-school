@@ -10,7 +10,11 @@ import {
   Star,
   Quote,
   CheckCircle2,
-  Sparkles,
+  Feather,
+  BookOpen,
+  Users,
+  Trophy,
+  HeartHandshake,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
@@ -24,20 +28,15 @@ import {
   CarouselPrevious,
 } from '@/components/ui/carousel'
 import { Reveal } from '@/components/site/reveal'
-import { SectionHeader } from '@/components/site/section-header'
 import { AnimatedCounter } from '@/components/site/animated-counter'
-import { DynamicIcon } from '@/components/site/dynamic-icon'
-import { SmartImage } from '@/components/site/smart-image'
 import { useNav } from '@/lib/nav-store'
 import {
   STATS,
-  WHY_CHOOSE,
   PROGRAMS,
   EVENTS,
   TESTIMONIALS,
   PRINCIPAL,
   MISSION,
-  SCHOOL,
 } from '@/lib/data/school'
 
 export function HomePage() {
@@ -45,126 +44,167 @@ export function HomePage() {
 
   return (
     <div className="flex flex-col">
-      {/* ===== HERO — full background photo with text overlay (matching design) ===== */}
-      <section className="relative flex min-h-[90vh] items-center overflow-hidden">
-        {/* Background photo — the desk scene with books, notebook, plant */}
+      {/* ===== HERO — full background photo + "Guiding Hearts. Growing Minds." ===== */}
+      <section className="relative flex min-h-screen items-center overflow-hidden pt-24 pb-12">
+        {/* Background photo */}
         <div className="absolute inset-0 -z-10">
           <img
             src="/hero-desk.jpeg"
-            alt="A warm study desk with books labeled Knowledge, Faith, Character, Excellence, an open notebook with a Hadith quote, and a potted plant"
+            alt="A warm study desk with books labeled Knowledge, Faith, Character, Excellence"
             className="h-full w-full object-cover"
           />
-          {/* Dark overlay so text is readable */}
-          <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/65 to-black/35" />
+          <div className="absolute inset-0 bg-gradient-to-br from-navy-deep/85 via-forest/75 to-wood-dark/65" style={{ background: 'linear-gradient(135deg, rgba(15,37,48,0.88) 0%, rgba(31,61,47,0.78) 50%, rgba(92,66,38,0.68) 100%)' }} />
         </div>
 
-        <div className="relative mx-auto w-full max-w-7xl px-5 py-20 sm:px-6 lg:px-8">
-          <div className="max-w-2xl">
-            <motion.span
+        <div className="relative z-10 mx-auto grid w-full max-w-7xl items-center gap-12 px-6 py-12 lg:grid-cols-2 lg:px-12 lg:py-20">
+          {/* Left: text */}
+          <motion.div
+            initial={{ opacity: 0, y: 24 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.7 }}
+            className="text-cream"
+          >
+            {/* Welcome label with line */}
+            <div className="mb-8 flex items-center gap-3">
+              <div className="h-px w-12 bg-gold" />
+              <span className="text-xs uppercase tracking-[0.4em] text-gold-light">
+                Welcome to Hamza School
+              </span>
+            </div>
+
+            {/* Hero title — "Guiding Hearts. Growing Minds." */}
+            <h1 className="font-serif text-6xl font-medium leading-[0.92] tracking-tight sm:text-7xl lg:text-8xl xl:text-9xl">
+              Guiding
+              <br />
+              <em className="font-normal italic text-gold-light">Hearts.</em>
+              <br />
+              Growing
+              <br />
+              <em className="font-normal italic text-gold-light">Minds.</em>
+            </h1>
+
+            <p className="mt-8 max-w-lg text-lg font-light leading-relaxed text-cream/85">
+              An institution where knowledge meets character — nurturing faith,
+              excellence, and a lifelong love of learning in every child.
+            </p>
+
+            {/* Buttons */}
+            <div className="mt-10 flex flex-wrap gap-4">
+              <Button
+                onClick={() => goPage('contact')}
+                className="h-14 gap-2.5 rounded-sm bg-gold-deep px-9 text-xs font-medium uppercase tracking-[0.12em] text-cream transition-all hover:bg-gold"
+              >
+                Begin Enrollment
+                <ArrowRight className="size-3.5" />
+              </Button>
+              <Button
+                onClick={() => goPage('about')}
+                variant="outline"
+                className="h-14 gap-2.5 rounded-sm border border-cream px-8 text-xs font-medium uppercase tracking-[0.12em] text-cream transition-all hover:bg-cream hover:text-forest"
+              >
+                Discover Hamza
+              </Button>
+            </div>
+
+            {/* Prophetic message badge */}
+            <div className="mt-14 inline-flex max-w-xl items-center gap-4 rounded-sm border border-gold/30 bg-cream/10 px-6 py-4 backdrop-blur-md">
+              <Feather className="size-5 shrink-0 text-gold-light" />
+              <span className="font-serif text-sm italic tracking-wide text-cream/90">
+                &ldquo;Seeking knowledge is an obligation upon every individual.&rdquo; — Prophet Muhammad ﷺ
+              </span>
+            </div>
+          </motion.div>
+
+          {/* Right: floating info cards (desktop only) */}
+          <div className="relative hidden h-[600px] lg:block">
+            {/* Card 1: Our Foundation — books reference */}
+            <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5 }}
-              className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-1.5 text-sm font-medium text-white backdrop-blur-md"
+              transition={{ duration: 0.7, delay: 0.3 }}
+              className="animate-float absolute right-0 top-8 w-80 border-l-4 border-forest bg-cream/95 p-8 shadow-2xl backdrop-blur-md"
             >
-              <Sparkles className="size-4 text-amber-300" />
-              Welcome to Hamza School · Addis Ababa
-            </motion.span>
-
-            <motion.h1
-              initial={{ opacity: 0, y: 24 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.1 }}
-              className="mt-6 text-balance font-serif text-4xl font-bold leading-[1.08] tracking-tight text-white sm:text-5xl lg:text-6xl"
-            >
-              Nurturing Faith,{' '}
-              <span className="bg-gradient-to-r from-amber-200 to-amber-400 bg-clip-text text-transparent">
-                Inspiring Futures.
-              </span>
-            </motion.h1>
-
-            <motion.p
-              initial={{ opacity: 0, y: 24 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.2 }}
-              className="mt-6 max-w-lg text-balance text-base text-white/85 sm:text-lg"
-            >
-              A warm, faith-based school in the heart of Addis Ababa. We blend
-              quality education with strong values — helping every child grow in
-              knowledge, character, and faith from Grade 1 to 8.
-            </motion.p>
-
-            <motion.div
-              initial={{ opacity: 0, y: 24 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.3 }}
-              className="mt-8 flex flex-col gap-3 sm:flex-row"
-            >
-              <Button
-                size="lg"
-                onClick={() => goPage('contact')}
-                className="h-12 bg-primary px-7 text-base shadow-xl shadow-primary/30 hover:bg-primary/90"
-              >
-                Enroll Now
-                <ArrowRight className="size-4.5" />
-              </Button>
-              <Button
-                size="lg"
-                variant="outline"
-                onClick={() => goPage('about')}
-                className="h-12 border-white/30 bg-white/10 px-7 text-base text-white backdrop-blur-md hover:bg-white/20 hover:text-white"
-              >
-                Discover More
-              </Button>
+              <div className="mb-4 flex items-center gap-3">
+                <BookOpen className="size-6 text-forest" />
+                <span className="font-serif text-xl font-semibold text-foreground">Our Foundation</span>
+              </div>
+              <div className="flex flex-wrap gap-2">
+                <span className="rounded-sm bg-forest px-4 py-1.5 text-[11px] uppercase tracking-widest text-cream">Knowledge</span>
+                <span className="rounded-sm bg-gold-deep px-4 py-1.5 text-[11px] uppercase tracking-widest text-cream">Faith</span>
+                <span className="rounded-sm bg-navy px-4 py-1.5 text-[11px] uppercase tracking-widest text-cream">Character</span>
+                <span className="rounded-sm bg-crimson px-4 py-1.5 text-[11px] uppercase tracking-widest text-cream">Excellence</span>
+              </div>
             </motion.div>
 
-            {/* Admissions banner */}
+            {/* Card 2: Quote */}
             <motion.div
-              initial={{ opacity: 0, y: 24 }}
+              initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.4 }}
-              className="mt-7 flex items-center gap-3 rounded-xl border border-amber-400/40 bg-amber-500/15 p-3.5 backdrop-blur-md"
+              transition={{ duration: 0.7, delay: 0.6 }}
+              className="animate-float absolute bottom-20 right-16 w-72 border border-gold/30 bg-paper p-8 shadow-2xl"
+              style={{ animationDelay: '1.5s' }}
             >
-              <Calendar className="size-5 shrink-0 text-amber-300" />
-              <p className="text-sm font-medium text-amber-50">
-                Admissions Open for 2025/2026 —{' '}
-                <button onClick={() => goPage('contact')} className="font-bold underline underline-offset-2">
-                  enroll your child today
-                </button>
+              <Quote className="mb-3 block size-6 text-gold" />
+              <p className="font-serif text-base italic leading-relaxed text-foreground">
+                The beautiful thing about learning is that no one can take it away from you.
               </p>
+              <p className="mt-4 text-right text-sm font-medium text-gold-deep">— B.B. King</p>
             </motion.div>
 
-            {/* Trust badges */}
+            {/* Card 3: Stats */}
             <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 0.6, delay: 0.5 }}
-              className="mt-7 flex flex-wrap gap-x-5 gap-y-2 text-xs text-white/75"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.7, delay: 0.45 }}
+              className="animate-float absolute left-0 top-1/2 w-56 bg-forest p-6 shadow-2xl"
+              style={{ animationDelay: '0.8s' }}
             >
-              {['Licensed by MoE', 'Grades 1–8', 'Small Classes', 'Faith-Based'].map((item) => (
-                <span key={item} className="flex items-center gap-1.5">
-                  <CheckCircle2 className="size-3.5 text-amber-300" />
-                  {item}
-                </span>
-              ))}
+              <div className="font-serif text-5xl font-semibold text-gold-light">10+</div>
+              <div className="mt-2 text-sm uppercase tracking-wider text-cream/80">Years of Excellence</div>
             </motion.div>
+          </div>
+        </div>
+
+        {/* Scroll indicator */}
+        <div className="absolute bottom-8 left-1/2 flex -translate-x-1/2 flex-col items-center gap-2 text-cream/60">
+          <span className="text-[10px] uppercase tracking-[0.3em]">Scroll</span>
+          <div className="relative h-12 w-px bg-cream/30">
+            <div className="absolute left-0 top-0 h-3 w-px bg-gold" />
           </div>
         </div>
       </section>
 
-      {/* ===== FEATURES BAR — 4 pillars ===== */}
-      <section className="border-y border-border/60 bg-card py-14">
-        <div className="mx-auto max-w-7xl px-5 sm:px-6 lg:px-8">
-          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-            {WHY_CHOOSE.map((item, i) => (
-              <Reveal key={item.title} delay={i * 0.08}>
-                <div className="flex flex-col items-center text-center sm:items-start sm:text-left">
-                  <div className="flex size-12 items-center justify-center rounded-xl bg-primary/10 text-primary">
-                    <DynamicIcon name={item.icon} className="size-6" />
+      {/* ===== VALUES — 4 pillars (Knowledge, Faith, Character, Excellence) ===== */}
+      <section className="paper-texture relative overflow-hidden py-32">
+        <div className="geo-pattern pointer-events-none absolute inset-0" />
+        <div className="relative mx-auto max-w-7xl px-6 lg:px-12">
+          <Reveal className="mb-16 text-center">
+            <div className="ornament mb-6">
+              <span className="text-gold">✦</span>
+            </div>
+            <p className="section-label">Our Core Values</p>
+            <h2 className="mt-4 font-serif text-5xl font-medium text-foreground lg:text-6xl">
+              The pillars of <em className="italic text-gold-deep">Hamza</em>
+            </h2>
+            <p className="mx-auto mt-6 max-w-2xl text-lg text-muted-foreground">
+              Every lesson, every interaction, and every day at Hamza is built on these four foundations.
+            </p>
+          </Reveal>
+
+          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+            {[
+              { icon: BookOpen, title: 'Knowledge', desc: 'A rigorous academic program that builds strong foundations in literacy, numeracy, and critical thinking.' },
+              { icon: HeartHandshake, title: 'Faith', desc: 'Rooted in Islamic values — nurturing a deep love for Allah and His Messenger in every child.' },
+              { icon: Users, title: 'Character', desc: 'Honesty, kindness, and responsibility — shaping students who are a credit to their families.' },
+              { icon: Trophy, title: 'Excellence', desc: 'A culture of high expectations where every child is challenged to reach their full potential.' },
+            ].map((v, i) => (
+              <Reveal key={v.title} delay={i * 0.1}>
+                <div className="value-card h-full border border-gold/18 bg-paper p-12 transition-all duration-500 hover:-translate-y-2 hover:border-gold hover:shadow-[0_24px_48px_rgba(60,35,10,0.12)]">
+                  <div className="mb-7 flex size-18 items-center justify-center rounded-full bg-gradient-to-br from-forest to-green-mid text-gold-light shadow-lg" style={{ width: '72px', height: '72px' }}>
+                    <v.icon className="size-7" />
                   </div>
-                  <h3 className="mt-4 font-serif text-lg font-semibold">{item.title}</h3>
-                  <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">
-                    {item.description}
-                  </p>
+                  <h3 className="font-serif text-2xl font-semibold text-foreground">{v.title}</h3>
+                  <p className="mt-3 text-sm leading-relaxed text-muted-foreground">{v.desc}</p>
                 </div>
               </Reveal>
             ))}
@@ -172,187 +212,163 @@ export function HomePage() {
         </div>
       </section>
 
-      {/* ===== STATS — clean strip ===== */}
-      <section className="bg-primary py-16 text-primary-foreground">
-        <div className="mx-auto max-w-6xl px-5 sm:px-6">
+      {/* ===== PROPHETIC WISDOM QUOTE ===== */}
+      <section className="relative overflow-hidden py-28" style={{ background: 'linear-gradient(135deg, #0F2530 0%, #1B3A4B 50%, #1F3D2F 100%)' }}>
+        <div className="geo-pattern pointer-events-none absolute inset-0 opacity-20" />
+        <div className="relative mx-auto max-w-4xl px-6 text-center lg:px-12">
+          <Reveal>
+            <div className="ornament mb-8">
+              <span className="text-gold text-2xl">✦</span>
+            </div>
+            <Quote className="mx-auto mb-8 size-12 text-gold/60" />
+            <p className="font-serif text-3xl font-light italic leading-relaxed text-cream sm:text-4xl lg:text-5xl">
+              &ldquo;Seeking knowledge is an obligation upon every Muslim.&rdquo;
+            </p>
+            <div className="mt-8 flex items-center justify-center gap-3">
+              <div className="h-px w-12 bg-gold/50" />
+              <p className="font-serif text-lg text-gold-light">Prophet Muhammad ﷺ</p>
+              <div className="h-px w-12 bg-gold/50" />
+            </div>
+          </Reveal>
+        </div>
+      </section>
+
+      {/* ===== STATS ===== */}
+      <section className="bg-forest py-20 text-cream">
+        <div className="mx-auto max-w-6xl px-6 lg:px-12">
           <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
             {STATS.map((stat, i) => (
-              <Reveal key={stat.label} delay={i * 0.08} className="text-center">
-                <div className="text-4xl font-bold tracking-tight sm:text-5xl">
+              <Reveal key={stat.label} delay={i * 0.1} className="text-center">
+                <div className="font-serif text-5xl font-semibold text-gold-light sm:text-6xl">
                   <AnimatedCounter value={stat.value} suffix={stat.suffix} />
                 </div>
-                <p className="mt-1.5 text-sm text-primary-foreground/80">{stat.label}</p>
+                <div className="mt-2 text-sm uppercase tracking-wider text-cream/80">{stat.label}</div>
               </Reveal>
             ))}
           </div>
         </div>
       </section>
 
-      {/* ===== MISSION — with Hadith quote ===== */}
-      <section className="relative overflow-hidden py-20 sm:py-28">
-        <div className="pattern-islamic absolute inset-0" />
-        <div className="relative mx-auto grid max-w-7xl items-center gap-12 px-5 sm:px-6 lg:grid-cols-2 lg:px-8">
+      {/* ===== ABOUT / MISSION ===== */}
+      <section className="paper-texture relative overflow-hidden py-32">
+        <div className="geo-pattern pointer-events-none absolute inset-0" />
+        <div className="relative mx-auto grid max-w-7xl items-center gap-16 px-6 lg:grid-cols-2 lg:px-12">
           <Reveal>
-            <SmartImage
-              seed="hamza-mission"
-              alt="Students learning together"
-              icon="HeartHandshake"
-              label="Faith & Knowledge"
-              className="aspect-[4/3] w-full shadow-xl"
-            />
-          </Reveal>
-          <Reveal delay={0.15}>
-            <span className="inline-flex items-center gap-2 rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-primary">
-              <span className="size-1.5 rounded-full bg-primary" />
-              {MISSION.eyebrow}
-            </span>
-            <h2 className="mt-4 text-balance font-serif text-3xl font-bold tracking-tight sm:text-4xl">
-              {MISSION.title}
+            <p className="section-label">Our Mission</p>
+            <h2 className="mt-4 font-serif text-5xl font-medium leading-tight text-foreground lg:text-6xl">
+              Guiding Hearts. <em className="italic text-gold-deep">Growing Minds.</em>
             </h2>
-            <p className="mt-5 text-base leading-relaxed text-muted-foreground sm:text-lg">
+            <p className="mt-8 text-lg leading-relaxed text-muted-foreground">
               {MISSION.description}
             </p>
-            <div className="mt-6 rounded-xl border-l-4 border-primary bg-primary/5 p-4">
-              <p className="font-serif text-lg italic text-foreground">
-                “{MISSION.quote}”
-              </p>
-              <p className="mt-2 text-sm font-semibold text-primary">— {MISSION.quoteSource}</p>
-            </div>
-          </Reveal>
-        </div>
-      </section>
-
-      {/* ===== PRINCIPAL'S MESSAGE ===== */}
-      <section className="border-y border-border/60 bg-cream py-20 sm:py-28">
-        <div className="mx-auto grid max-w-7xl items-center gap-12 px-5 sm:px-6 lg:grid-cols-12 lg:px-8">
-          <Reveal className="lg:col-span-5">
-            <div className="relative mx-auto max-w-xs">
-              <SmartImage
-                seed="principal-hamza"
-                alt={PRINCIPAL.name}
-                icon="User"
-                label={PRINCIPAL.name}
-                className="aspect-[4/5] w-full"
-              />
-              <div className="absolute -bottom-4 left-1/2 w-[85%] -translate-x-1/2 rounded-xl border bg-card p-3 text-center shadow-lg">
-                <p className="text-sm font-bold text-primary">{PRINCIPAL.name}</p>
-                <p className="text-xs text-muted-foreground">{PRINCIPAL.title}</p>
+            <div className="mt-8 flex items-start gap-4 rounded-sm border-l-2 border-gold bg-cream/50 p-5">
+              <Feather className="mt-1 size-5 shrink-0 text-gold-deep" />
+              <div>
+                <p className="font-serif text-lg italic text-foreground">&ldquo;{MISSION.quote}&rdquo;</p>
+                <p className="mt-2 text-sm font-semibold text-gold-deep">— {MISSION.quoteSource}</p>
               </div>
             </div>
-          </Reveal>
-          <Reveal delay={0.15} className="lg:col-span-7">
-            <span className="inline-flex items-center gap-2 rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-primary">
-              <Sparkles className="size-3.5" />
-              A Word from Our Founder
-            </span>
-            <Quote className="mt-5 size-10 text-primary/25" />
-            <p className="mt-3 text-balance font-serif text-lg leading-relaxed text-foreground/90 sm:text-xl">
-              {PRINCIPAL.message}
-            </p>
-            <p className="mt-6 font-serif text-xl font-semibold text-primary">
-              {PRINCIPAL.signature}
-            </p>
-            <Button onClick={() => goPage('about')} variant="outline" className="mt-6">
+            <Button
+              onClick={() => goPage('about')}
+              variant="outline"
+              className="mt-8 h-12 gap-2 rounded-sm border-forest px-8 text-xs font-medium uppercase tracking-[0.12em] text-forest hover:bg-forest hover:text-cream"
+            >
               Read Our Full Story
-              <ArrowRight className="size-4" />
+              <ArrowRight className="size-3.5" />
             </Button>
+          </Reveal>
+
+          <Reveal delay={0.15}>
+            <div className="relative">
+              <div className="aspect-[4/5] overflow-hidden rounded-sm shadow-2xl">
+                <img
+                  src="/hero-desk.jpeg"
+                  alt="Hamza School learning environment"
+                  className="h-full w-full object-cover"
+                />
+              </div>
+              {/* Floating stat */}
+              <div className="animate-float absolute -bottom-8 -left-8 bg-forest p-6 shadow-2xl">
+                <div className="font-serif text-4xl font-semibold text-gold-light">96%</div>
+                <div className="mt-1 text-xs uppercase tracking-wider text-cream/80">National Exam Pass Rate</div>
+              </div>
+            </div>
           </Reveal>
         </div>
       </section>
 
       {/* ===== PROGRAMS ===== */}
-      <section className="py-20 sm:py-28">
-        <div className="mx-auto max-w-6xl px-5 sm:px-6">
-          <Reveal>
-            <SectionHeader
-              eyebrow="Academics"
-              title="Programs from Grade 1 to 8"
-              description="A clear path from early literacy to national exam readiness — built around your child at every step."
-            />
+      <section className="bg-cream py-32">
+        <div className="mx-auto max-w-7xl px-6 lg:px-12">
+          <Reveal className="mb-16 text-center">
+            <div className="ornament mb-6">
+              <span className="text-gold">✦</span>
+            </div>
+            <p className="section-label">Academics</p>
+            <h2 className="mt-4 font-serif text-5xl font-medium text-foreground lg:text-6xl">
+              Programs for every <em className="italic text-gold-deep">stage</em>
+            </h2>
           </Reveal>
-          <div className="mt-14 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-            {PROGRAMS.map((program, i) => (
-              <Reveal key={program.title} delay={i * 0.08}>
-                <Card className="group h-full overflow-hidden border-border/60 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg hover:shadow-primary/5">
-                  <div className="relative h-36 overflow-hidden">
-                    <SmartImage
-                      seed={program.title}
-                      alt={program.title}
-                      icon={program.icon}
-                      rounded="rounded-none"
-                      className="h-full w-full transition-transform duration-500 group-hover:scale-105"
-                    />
-                    <Badge className="absolute left-3 top-3 bg-white/90 text-foreground">
-                      {program.level}
-                    </Badge>
-                  </div>
-                  <CardContent className="p-6">
-                    <h3 className="font-serif text-lg font-semibold">{program.title}</h3>
-                    <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-                      {program.description}
-                    </p>
-                  </CardContent>
-                </Card>
+          <div className="grid gap-6 md:grid-cols-3">
+            {PROGRAMS.map((p, i) => (
+              <Reveal key={p.title} delay={i * 0.1}>
+                <div className="value-card h-full border border-gold/18 bg-paper p-10 transition-all duration-500 hover:-translate-y-2 hover:border-gold hover:shadow-[0_24px_48px_rgba(60,35,10,0.12)]">
+                  <span className="inline-block rounded-sm bg-forest px-4 py-1.5 text-[11px] uppercase tracking-widest text-cream">{p.level}</span>
+                  <h3 className="mt-6 font-serif text-3xl font-semibold text-foreground">{p.title}</h3>
+                  <p className="mt-3 text-sm leading-relaxed text-muted-foreground">{p.description}</p>
+                  <button
+                    onClick={() => goPage('academics')}
+                    className="mt-6 inline-flex items-center gap-2 text-xs font-medium uppercase tracking-[0.12em] text-gold-deep transition-colors hover:text-forest"
+                  >
+                    Learn More <ArrowRight className="size-3.5" />
+                  </button>
+                </div>
               </Reveal>
             ))}
           </div>
-          <Reveal className="mt-10 text-center">
-            <Button onClick={() => goPage('academics')} variant="outline" size="lg">
-              Explore Academics
-              <ArrowRight className="size-4" />
-            </Button>
-          </Reveal>
         </div>
       </section>
 
-      {/* ===== UPCOMING EVENTS ===== */}
-      <section className="border-t border-border/60 bg-cream py-20 sm:py-28">
-        <div className="mx-auto max-w-6xl px-5 sm:px-6">
-          <div className="flex flex-col items-start justify-between gap-6 sm:flex-row sm:items-end">
+      {/* ===== EVENTS ===== */}
+      <section className="paper-texture relative overflow-hidden py-32">
+        <div className="geo-pattern pointer-events-none absolute inset-0" />
+        <div className="relative mx-auto max-w-7xl px-6 lg:px-12">
+          <div className="mb-16 flex flex-col items-start justify-between gap-6 sm:flex-row sm:items-end">
             <Reveal>
-              <SectionHeader
-                align="left"
-                eyebrow="What's On"
-                title="Upcoming Events"
-                description="Join us — we'd love to see you."
-              />
+              <p className="section-label">What's On</p>
+              <h2 className="mt-4 font-serif text-5xl font-medium text-foreground lg:text-6xl">
+                Upcoming <em className="italic text-gold-deep">Events</em>
+              </h2>
             </Reveal>
             <Reveal delay={0.1}>
-              <Button onClick={() => goPage('news')} variant="outline">
-                View Calendar
-                <ArrowRight className="size-4" />
+              <Button
+                onClick={() => goPage('news')}
+                variant="outline"
+                className="h-11 gap-2 rounded-sm border-forest px-6 text-xs font-medium uppercase tracking-[0.12em] text-forest hover:bg-forest hover:text-cream"
+              >
+                View Calendar <ArrowRight className="size-3.5" />
               </Button>
             </Reveal>
           </div>
-          <div className="mt-12 grid gap-4 sm:grid-cols-2">
+          <div className="grid gap-4 sm:grid-cols-2">
             {EVENTS.slice(0, 4).map((event, i) => {
               const d = new Date(event.date)
               return (
-                <Reveal key={event.title} delay={i * 0.06}>
-                  <Card className="group h-full transition-all duration-300 hover:-translate-y-0.5 hover:shadow-md">
-                    <CardContent className="flex items-center gap-4 p-5">
-                      <div className="flex h-16 w-16 shrink-0 flex-col items-center justify-center rounded-xl bg-primary/10 text-primary">
-                        <span className="text-[10px] font-semibold uppercase">
-                          {d.toLocaleDateString('en-US', { month: 'short' })}
-                        </span>
-                        <span className="text-2xl font-bold leading-none">{d.getDate()}</span>
+                <Reveal key={event.title} delay={i * 0.07}>
+                  <div className="flex items-center gap-5 border border-gold/18 bg-paper p-6 transition-all duration-300 hover:border-gold hover:shadow-lg">
+                    <div className="flex h-16 w-16 shrink-0 flex-col items-center justify-center bg-forest text-cream">
+                      <span className="text-[10px] font-semibold uppercase">{d.toLocaleDateString('en-US', { month: 'short' })}</span>
+                      <span className="font-serif text-2xl font-bold leading-none">{d.getDate()}</span>
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <span className="rounded-sm bg-gold/15 px-2.5 py-0.5 text-[10px] font-medium uppercase tracking-wider text-gold-deep">{event.category}</span>
+                      <h3 className="mt-1.5 font-serif text-xl font-semibold text-foreground">{event.title}</h3>
+                      <div className="mt-1 flex flex-wrap gap-x-3 gap-y-1 text-xs text-muted-foreground">
+                        <span className="flex items-center gap-1"><Clock className="size-3" /> {event.time}</span>
+                        <span className="flex items-center gap-1"><MapPin className="size-3" /> {event.location}</span>
                       </div>
-                      <div className="min-w-0 flex-1">
-                        <Badge variant="outline" className="mb-1 text-[10px]">
-                          {event.category}
-                        </Badge>
-                        <h3 className="truncate font-serif text-base font-semibold">{event.title}</h3>
-                        <div className="mt-1 flex flex-wrap gap-x-3 gap-y-1 text-xs text-muted-foreground">
-                          <span className="flex items-center gap-1">
-                            <Clock className="size-3" /> {event.time}
-                          </span>
-                          <span className="flex items-center gap-1">
-                            <MapPin className="size-3" /> {event.location}
-                          </span>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
+                    </div>
+                  </div>
                 </Reveal>
               )
             })}
@@ -361,40 +377,42 @@ export function HomePage() {
       </section>
 
       {/* ===== TESTIMONIALS ===== */}
-      <section className="py-20 sm:py-28">
-        <div className="mx-auto max-w-6xl px-5 sm:px-6">
-          <Reveal>
-            <SectionHeader eyebrow="Voices" title="What families say" />
+      <section className="bg-cream py-32">
+        <div className="mx-auto max-w-6xl px-6 lg:px-12">
+          <Reveal className="mb-16 text-center">
+            <div className="ornament mb-6"><span className="text-gold">✦</span></div>
+            <p className="section-label">Voices</p>
+            <h2 className="mt-4 font-serif text-5xl font-medium text-foreground lg:text-6xl">
+              What families <em className="italic text-gold-deep">say</em>
+            </h2>
           </Reveal>
           <Reveal delay={0.1} className="mt-12">
             <Carousel opts={{ align: 'start', loop: true }} className="w-full">
               <CarouselContent>
                 {TESTIMONIALS.map((t) => (
                   <CarouselItem key={t.name} className="md:basis-1/2 lg:basis-1/2">
-                    <Card className="h-full border-border/60">
-                      <CardContent className="flex h-full flex-col p-8">
-                        <Quote className="size-9 text-primary/25" />
-                        <div className="mt-3 flex gap-0.5">
-                          {Array.from({ length: t.rating }).map((_, i) => (
-                            <Star key={i} className="size-4 fill-amber-400 text-amber-400" />
-                          ))}
+                    <div className="h-full border border-gold/18 bg-paper p-10">
+                      <Quote className="size-8 text-gold/50" />
+                      <div className="mt-3 flex gap-0.5">
+                        {Array.from({ length: t.rating }).map((_, i) => (
+                          <Star key={i} className="size-4 fill-gold text-gold" />
+                        ))}
+                      </div>
+                      <p className="mt-5 flex-1 font-serif text-lg italic leading-relaxed text-foreground">
+                        &ldquo;{t.quote}&rdquo;
+                      </p>
+                      <div className="mt-7 flex items-center gap-3">
+                        <Avatar className="size-12 border-2 border-gold/30">
+                          <AvatarFallback className="bg-forest font-serif font-semibold text-gold-light">
+                            {t.name.split(' ').map((n) => n[0]).slice(0, 2).join('')}
+                          </AvatarFallback>
+                        </Avatar>
+                        <div>
+                          <p className="font-serif font-semibold text-foreground">{t.name}</p>
+                          <p className="text-xs text-muted-foreground">{t.role}</p>
                         </div>
-                        <p className="mt-4 flex-1 text-balance text-base leading-relaxed text-foreground/90">
-                          “{t.quote}”
-                        </p>
-                        <div className="mt-6 flex items-center gap-3">
-                          <Avatar className="size-11 border-2 border-primary/20">
-                            <AvatarFallback className="bg-primary/10 font-semibold text-primary">
-                              {t.name.split(' ').map((n) => n[0]).slice(0, 2).join('')}
-                            </AvatarFallback>
-                          </Avatar>
-                          <div>
-                            <p className="text-sm font-semibold">{t.name}</p>
-                            <p className="text-xs text-muted-foreground">{t.role}</p>
-                          </div>
-                        </div>
-                      </CardContent>
-                    </Card>
+                      </div>
+                    </div>
                   </CarouselItem>
                 ))}
               </CarouselContent>
@@ -405,32 +423,60 @@ export function HomePage() {
         </div>
       </section>
 
-      {/* ===== CTA ===== */}
-      <section className="relative overflow-hidden bg-primary py-20 sm:py-28">
-        <div className="pattern-islamic absolute inset-0 opacity-20" />
-        <div className="relative mx-auto max-w-3xl px-5 text-center sm:px-6">
+      {/* ===== PRINCIPAL'S MESSAGE ===== */}
+      <section className="relative overflow-hidden py-32" style={{ background: 'linear-gradient(135deg, #0F2530 0%, #1B3A4B 50%, #1F3D2F 100%)' }}>
+        <div className="geo-pattern pointer-events-none absolute inset-0 opacity-20" />
+        <div className="relative mx-auto grid max-w-7xl items-center gap-12 px-6 lg:grid-cols-12 lg:px-12">
+          <Reveal className="lg:col-span-5">
+            <div className="relative mx-auto max-w-xs">
+              <div className="aspect-[4/5] overflow-hidden rounded-sm border-2 border-gold/30 shadow-2xl">
+                <img
+                  src="/hero-desk.jpeg"
+                  alt={PRINCIPAL.name}
+                  className="h-full w-full object-cover"
+                />
+              </div>
+              <div className="absolute -bottom-5 left-1/2 w-[85%] -translate-x-1/2 border border-gold/30 bg-cream p-4 text-center shadow-xl">
+                <p className="font-serif text-base font-bold text-forest">{PRINCIPAL.name}</p>
+                <p className="text-xs text-muted-foreground">{PRINCIPAL.title}</p>
+              </div>
+            </div>
+          </Reveal>
+          <Reveal delay={0.15} className="lg:col-span-7 text-cream">
+            <p className="section-label text-gold-light">A Word from Our Founder</p>
+            <Quote className="mt-6 size-12 text-gold/40" />
+            <p className="mt-4 font-serif text-2xl font-light italic leading-relaxed text-cream/90 sm:text-3xl">
+              {PRINCIPAL.message}
+            </p>
+            <p className="mt-8 font-serif text-2xl font-semibold text-gold-light">{PRINCIPAL.signature}</p>
+          </Reveal>
+        </div>
+      </section>
+
+      {/* ===== CTA / CONTACT ===== */}
+      <section className="paper-texture relative overflow-hidden py-32">
+        <div className="geo-pattern pointer-events-none absolute inset-0" />
+        <div className="relative mx-auto max-w-3xl px-6 text-center lg:px-12">
           <Reveal>
-            <h2 className="text-balance font-serif text-3xl font-bold tracking-tight text-white sm:text-4xl lg:text-5xl">
-              Come see the Hamza difference
+            <div className="ornament mb-6"><span className="text-gold text-2xl">✦</span></div>
+            <h2 className="font-serif text-5xl font-medium text-foreground lg:text-6xl">
+              Begin your <em className="italic text-gold-deep">journey</em>
             </h2>
-            <p className="mx-auto mt-5 max-w-xl text-balance text-lg text-white/85">
+            <p className="mx-auto mt-6 max-w-xl text-lg text-muted-foreground">
               We'd love to meet you and your child. Book a visit, meet our teachers,
               and feel the warmth of our community.
             </p>
-            <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
+            <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
               <Button
-                size="lg"
                 onClick={() => goPage('contact')}
-                className="h-12 bg-white px-8 text-base text-primary shadow-xl hover:bg-white/90"
+                className="h-14 gap-2.5 rounded-sm bg-forest px-9 text-xs font-medium uppercase tracking-[0.12em] text-cream transition-all hover:bg-gold-deep"
               >
-                Book a Visit
-                <ArrowRight className="size-4.5" />
+                Book a Visit <ArrowRight className="size-3.5" />
               </Button>
               <Button
-                size="lg"
-                variant="outline"
                 onClick={() => goPage('gallery')}
-                className="h-12 border-white/30 bg-transparent px-8 text-base text-white hover:bg-white/10 hover:text-white"
+                variant="outline"
+                className="h-14 gap-2.5 rounded-sm border-forest px-8 text-xs font-medium uppercase tracking-[0.12em] text-forest transition-all hover:bg-forest hover:text-cream"
               >
                 See Photos
               </Button>

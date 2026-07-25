@@ -35,19 +35,19 @@ export function Logo({ className, showText = true, variant = 'default', onClick,
         <span className="flex flex-col items-start leading-none">
           <span
             className={cn(
-              'font-serif text-lg font-bold tracking-tight',
-              variant === 'light' ? 'text-white' : 'text-foreground'
+              'font-serif text-xl font-semibold tracking-tight lg:text-2xl',
+              variant === 'light' ? 'text-cream' : 'text-foreground'
             )}
           >
             Hamza School
           </span>
           <span
             className={cn(
-              'text-[10px] font-medium uppercase tracking-[0.16em]',
-              variant === 'light' ? 'text-white/70' : 'text-muted-foreground'
+              'mt-1 text-[11px] font-medium uppercase tracking-[0.25em]',
+              variant === 'light' ? 'text-gold-light' : 'text-gold-deep'
             )}
           >
-            Nurturing Faith
+            P/ &amp; M/ Level
           </span>
         </span>
       )}
