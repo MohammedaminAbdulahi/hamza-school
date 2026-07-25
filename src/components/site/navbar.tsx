@@ -4,12 +4,9 @@ import * as React from 'react'
 import {
   Menu,
   Search,
-  Sun,
-  Moon,
   X,
   ArrowRight,
 } from 'lucide-react'
-import { useTheme } from 'next-themes'
 import { Button } from '@/components/ui/button'
 import {
   Sheet,
@@ -33,11 +30,7 @@ const PAGES: { id: PageId; label: string }[] = [
 
 export function Navbar() {
   const { view, goPage, mobileNavOpen, setMobileNavOpen, setSearchOpen } = useNav()
-  const { theme, setTheme } = useTheme()
-  const [mounted, setMounted] = React.useState(false)
   const [scrolled, setScrolled] = React.useState(false)
-
-  React.useEffect(() => setMounted(true), [])
 
   React.useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 60)
@@ -104,20 +97,6 @@ export function Navbar() {
             className={cn('hidden sm:inline-flex', transparent && 'text-cream hover:bg-white/10 hover:text-cream')}
           >
             <Search className="size-4.5" />
-          </Button>
-
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-            aria-label="Toggle theme"
-            className={cn(transparent && 'text-cream hover:bg-white/10 hover:text-cream')}
-          >
-            {mounted && theme === 'dark' ? (
-              <Sun className="size-4.5" />
-            ) : (
-              <Moon className="size-4.5" />
-            )}
           </Button>
 
           {/* Mobile menu */}

@@ -73,7 +73,7 @@ export function HomePage() {
             </div>
 
             {/* Hero title — "Guiding Hearts. Growing Minds." */}
-            <h1 className="font-serif text-6xl font-medium leading-[0.92] tracking-tight sm:text-7xl lg:text-8xl xl:text-9xl">
+            <h1 className="font-serif text-6xl font-medium leading-[0.92] tracking-tight drop-shadow-lg sm:text-7xl lg:text-8xl xl:text-9xl">
               Guiding
               <br />
               <em className="font-normal italic text-gold-light">Hearts.</em>
@@ -83,7 +83,10 @@ export function HomePage() {
               <em className="font-normal italic text-gold-light">Minds.</em>
             </h1>
 
-            <p className="mt-8 max-w-lg text-lg font-light leading-relaxed text-cream/85">
+            {/* Gold accent line */}
+            <div className="mt-6 h-px w-24 bg-gradient-to-r from-gold to-transparent" />
+
+            <p className="mt-6 max-w-lg text-lg font-light leading-relaxed text-cream/95 drop-shadow">
               An institution where knowledge meets character — nurturing faith,
               excellence, and a lifelong love of learning in every child.
             </p>
@@ -99,8 +102,7 @@ export function HomePage() {
               </Button>
               <Button
                 onClick={() => goPage('about')}
-                variant="outline"
-                className="h-14 gap-2.5 rounded-sm border border-cream px-8 text-xs font-medium uppercase tracking-[0.12em] text-cream transition-all hover:bg-cream hover:text-forest"
+                className="h-14 gap-2.5 rounded-sm border border-gold/60 bg-cream/95 px-8 text-xs font-medium uppercase tracking-[0.12em] text-forest backdrop-blur-md transition-all hover:bg-cream"
               >
                 Discover Hamza
               </Button>
