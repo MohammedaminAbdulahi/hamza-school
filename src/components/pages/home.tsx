@@ -4,17 +4,11 @@ import * as React from 'react'
 import { motion } from 'framer-motion'
 import {
   ArrowRight,
-  Calendar,
   Clock,
   MapPin,
   Star,
   Quote,
-  CheckCircle2,
   Feather,
-  BookOpen,
-  Users,
-  Trophy,
-  HeartHandshake,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
@@ -29,15 +23,18 @@ import {
 } from '@/components/ui/carousel'
 import { Reveal } from '@/components/site/reveal'
 import { AnimatedCounter } from '@/components/site/animated-counter'
+import { DynamicIcon } from '@/components/site/dynamic-icon'
 import { useNav } from '@/lib/nav-store'
 import {
+  HERO,
   STATS,
+  WHY_CHOOSE,
+  MISSION,
   PROGRAMS,
   EVENTS,
   TESTIMONIALS,
   PRINCIPAL,
-  MISSION,
-} from '@/lib/data/school'
+} from '@/lib/content'
 
 export function HomePage() {
   const { goPage } = useNav()
@@ -58,7 +55,7 @@ export function HomePage() {
             <div className="mb-8 flex items-center gap-3">
               <div className="h-px w-12 bg-gold" />
               <span className="text-xs uppercase tracking-[0.4em] text-gold-deep">
-                Welcome to Hamza School
+                {HERO.eyebrow}
               </span>
             </div>
 
@@ -77,8 +74,7 @@ export function HomePage() {
             <div className="mt-6 h-px w-24 bg-gradient-to-r from-gold to-transparent" />
 
             <p className="mt-6 max-w-lg text-lg font-light leading-relaxed text-foreground/80">
-              An institution where knowledge meets character — nurturing faith,
-              excellence, and a lifelong love of learning in every child.
+              {HERO.description}
             </p>
 
             {/* Buttons */}
@@ -87,14 +83,14 @@ export function HomePage() {
                 onClick={() => goPage('contact')}
                 className="h-14 gap-2.5 rounded-sm bg-forest px-9 text-xs font-medium uppercase tracking-[0.12em] text-cream transition-all hover:bg-gold-deep"
               >
-                Begin Enrollment
+                {HERO.primaryButton}
                 <ArrowRight className="size-3.5" />
               </Button>
               <Button
                 onClick={() => goPage('about')}
                 className="h-14 gap-2.5 rounded-sm border border-forest px-8 text-xs font-medium uppercase tracking-[0.12em] text-forest transition-all hover:bg-forest hover:text-cream"
               >
-                Discover Hamza
+                {HERO.secondaryButton}
               </Button>
             </div>
 
@@ -102,7 +98,7 @@ export function HomePage() {
             <div className="mt-12 inline-flex max-w-xl items-center gap-4 rounded-sm border border-gold/30 bg-paper px-6 py-4">
               <Feather className="size-5 shrink-0 text-gold-deep" />
               <span className="font-serif text-sm italic tracking-wide text-foreground/80">
-                &ldquo;Seeking knowledge is an obligation upon every individual.&rdquo; — Prophet Muhammad ﷺ
+                &ldquo;{HERO.propheticQuote}&rdquo; — {HERO.propheticSource}
               </span>
             </div>
           </motion.div>
@@ -129,14 +125,18 @@ export function HomePage() {
                 className="absolute -bottom-6 -left-4 hidden w-64 border-l-4 border-forest bg-cream p-5 shadow-xl sm:block"
               >
                 <div className="mb-2 flex items-center gap-2">
-                  <BookOpen className="size-5 text-forest" />
+                  <DynamicIcon name="BookOpen" className="size-5 text-forest" />
                   <span className="font-serif text-base font-semibold text-foreground">Our Foundation</span>
                 </div>
                 <div className="flex flex-wrap gap-1.5">
-                  <span className="rounded-sm bg-forest px-2.5 py-1 text-[10px] uppercase tracking-widest text-cream">Knowledge</span>
-                  <span className="rounded-sm bg-gold-deep px-2.5 py-1 text-[10px] uppercase tracking-widest text-cream">Faith</span>
-                  <span className="rounded-sm bg-navy px-2.5 py-1 text-[10px] uppercase tracking-widest text-cream">Character</span>
-                  <span className="rounded-sm bg-crimson px-2.5 py-1 text-[10px] uppercase tracking-widest text-cream">Excellence</span>
+                  {HERO.foundationLabels.map((label, idx) => {
+                    const colors = ['bg-forest', 'bg-gold-deep', 'bg-navy', 'bg-crimson']
+                    return (
+                      <span key={label} className={`rounded-sm px-2.5 py-1 text-[10px] uppercase tracking-widest text-cream ${colors[idx % colors.length]}`}>
+                        {label}
+                      </span>
+                    )
+                  })}
                 </div>
               </motion.div>
             </div>
@@ -162,19 +162,14 @@ export function HomePage() {
           </Reveal>
 
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-            {[
-              { icon: BookOpen, title: 'Knowledge', desc: 'A rigorous academic program that builds strong foundations in literacy, numeracy, and critical thinking.' },
-              { icon: HeartHandshake, title: 'Faith', desc: 'Rooted in Islamic values — nurturing a deep love for Allah and His Messenger in every child.' },
-              { icon: Users, title: 'Character', desc: 'Honesty, kindness, and responsibility — shaping students who are a credit to their families.' },
-              { icon: Trophy, title: 'Excellence', desc: 'A culture of high expectations where every child is challenged to reach their full potential.' },
-            ].map((v, i) => (
+            {WHY_CHOOSE.map((v, i) => (
               <Reveal key={v.title} delay={i * 0.1}>
                 <div className="value-card h-full border border-gold/18 bg-paper p-12 transition-all duration-500 hover:-translate-y-2 hover:border-gold hover:shadow-[0_24px_48px_rgba(60,35,10,0.12)]">
                   <div className="mb-7 flex size-18 items-center justify-center rounded-full bg-gradient-to-br from-forest to-green-mid text-gold-light shadow-lg" style={{ width: '72px', height: '72px' }}>
-                    <v.icon className="size-7" />
+                    <DynamicIcon name={v.icon} className="size-7" />
                   </div>
                   <h3 className="font-serif text-2xl font-semibold text-foreground">{v.title}</h3>
-                  <p className="mt-3 text-sm leading-relaxed text-muted-foreground">{v.desc}</p>
+                  <p className="mt-3 text-sm leading-relaxed text-muted-foreground">{v.description}</p>
                 </div>
               </Reveal>
             ))}

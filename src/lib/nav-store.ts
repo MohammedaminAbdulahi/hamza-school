@@ -9,7 +9,6 @@ export type PageId =
   | 'news'
   | 'gallery'
   | 'contact'
-  | 'admin'
 
 interface NavState {
   view: PageId
@@ -34,7 +33,7 @@ function hashToView(hash: string): PageId {
   const clean = hash.replace(/^#\/?/, '')
   const parts = clean.split('/').filter(Boolean)
   if (parts.length === 0) return HOME
-  const pages: PageId[] = ['home', 'about', 'academics', 'news', 'gallery', 'contact', 'admin']
+  const pages: PageId[] = ['home', 'about', 'academics', 'news', 'gallery', 'contact']
   if (pages.includes(parts[0] as PageId)) {
     return parts[0] as PageId
   }

@@ -16,7 +16,7 @@ import { Logo } from './logo'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { useNav, type PageId } from '@/lib/nav-store'
-import { SCHOOL } from '@/lib/data/school'
+import { SCHOOL, NEWSLETTER_TOPICS } from '@/lib/content'
 import { toast } from 'sonner'
 
 const QUICK_LINKS: { label: string; page: PageId }[] = [
@@ -49,6 +49,9 @@ export function Footer() {
             <h3 className="text-2xl font-bold">Stay Connected with Hamza School</h3>
             <p className="mt-1 text-primary-foreground/80">
               Subscribe for news, events, and school updates.
+            </p>
+            <p className="mt-2 text-xs text-primary-foreground/60">
+              {NEWSLETTER_TOPICS.join(' · ')}
             </p>
           </div>
           <form

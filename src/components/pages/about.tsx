@@ -11,6 +11,8 @@ import { AnimatedCounter } from '@/components/site/animated-counter'
 import { useNav } from '@/lib/nav-store'
 import {
   SCHOOL,
+  STATS,
+  MISSION,
   CORE_VALUES,
   LEADERSHIP,
   TEACHERS,
@@ -19,7 +21,7 @@ import {
   POLICIES,
   HISTORY,
   PRINCIPAL,
-} from '@/lib/data/school'
+} from '@/lib/content'
 import {
   Card,
   CardContent,
@@ -36,13 +38,6 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from '@/components/ui/accordion'
-
-const QUICK_STATS = [
-  { value: 10, suffix: '+', label: 'Years of Excellence' },
-  { value: 850, suffix: '+', label: 'Students Enrolled' },
-  { value: 48, suffix: '+', label: 'Caring Educators' },
-  { value: 96, suffix: '%', label: 'National Exam Pass Rate' },
-]
 
 export function AboutPage() {
   const goPage = useNav((s) => s.goPage)
@@ -62,7 +57,7 @@ export function AboutPage() {
       <section className="border-b border-border/60 bg-muted/30">
         <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
           <div className="grid grid-cols-2 gap-6 md:grid-cols-4">
-            {QUICK_STATS.map((stat, i) => (
+            {STATS.map((stat, i) => (
               <Reveal key={stat.label} delay={i * 0.08}>
                 <div className="text-center">
                   <div className="text-3xl font-bold tracking-tight text-primary sm:text-4xl">
@@ -145,11 +140,7 @@ export function AboutPage() {
                 </CardHeader>
                 <CardContent>
                   <p className="text-sm leading-relaxed text-muted-foreground">
-                    To create a warm, family-like school in Addis Ababa where every
-                    child is seen, valued, and inspired to learn. We build strong
-                    foundations in literacy, numeracy, and character — and we help
-                    each child discover the joy of asking questions, the courage to
-                    try, and the pride of steady progress.
+                    {MISSION.description}
                   </p>
                 </CardContent>
               </Card>

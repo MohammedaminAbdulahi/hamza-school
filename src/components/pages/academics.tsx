@@ -1,19 +1,7 @@
 'use client'
 
 import * as React from 'react'
-import {
-  ArrowRight,
-  BookOpen,
-  Microscope,
-  Library,
-  Languages as LanguagesIcon,
-  Palette,
-  Music,
-  GraduationCap,
-  Leaf,
-  Sun,
-  Sprout,
-} from 'lucide-react'
+import { ArrowRight, BookOpen } from 'lucide-react'
 import { PageHero } from '@/components/site/page-hero'
 import { SectionHeader } from '@/components/site/section-header'
 import { Reveal } from '@/components/site/reveal'
@@ -22,11 +10,16 @@ import { DynamicIcon } from '@/components/site/dynamic-icon'
 import { useNav } from '@/lib/nav-store'
 import {
   PROGRAMS,
+  GRADE_LEVELS,
+  SCIENCE_FEATURES,
+  LANGUAGES,
+  LABS,
+  ARTS_FEATURES,
   DEPARTMENTS,
   SUBJECTS,
   CLUBS,
   SPORTS,
-} from '@/lib/data/school'
+} from '@/lib/content'
 import {
   Card,
   CardContent,
@@ -45,112 +38,6 @@ import {
   TableRow,
 } from '@/components/ui/table'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-
-const GRADE_LEVELS = [
-  {
-    band: 'Lower Primary',
-    grades: 'Grades 1–4',
-    ages: 'Ages 6–9',
-    milestones: 'Foundational literacy, numeracy, and a love for learning',
-  },
-  {
-    band: 'Upper Primary',
-    grades: 'Grades 5–6',
-    ages: 'Ages 10–11',
-    milestones: 'Deeper subject knowledge and focused Grade 6 national exam preparation',
-  },
-  {
-    band: 'Junior Secondary',
-    grades: 'Grades 7–8',
-    ages: 'Ages 12–14',
-    milestones: 'Scientific inquiry in our biology lab and rigorous Grade 8 exam readiness',
-  },
-]
-
-const SCIENCE_FEATURES = [
-  {
-    icon: Microscope,
-    title: 'Biology Laboratory',
-    description:
-      'Our flagship lab gives Grades 7–8 hands-on time with microscopes, plant and animal specimens, and real experiments that bring the textbook to life.',
-  },
-  {
-    icon: Leaf,
-    title: 'Nature & Observation',
-    description:
-      'Students observe local plants, insects, and weather patterns — learning science by studying the world just outside our classroom doors.',
-  },
-  {
-    icon: Sprout,
-    title: 'Environment Club Projects',
-    description:
-      'From composting to a small school garden, our students learn sustainability and the science of caring for our corner of Addis Ababa.',
-  },
-  {
-    icon: Sun,
-    title: 'Science Fair & Discovery',
-    description:
-      'Every year, students choose a question they care about — from clean water to healthy soil — and present their findings at our annual science fair.',
-  },
-]
-
-const LANGUAGES = [
-  {
-    name: 'English',
-    icon: BookOpen,
-    level: 'Primary Language of Instruction',
-    description:
-      'English is used across all subjects from Grade 1, with daily reading, writing, and speaking practice throughout the school.',
-    proficiency: 95,
-  },
-  {
-    name: 'Amharic',
-    icon: LanguagesIcon,
-    level: 'Core Subject (Daily)',
-    description:
-      'Amharic is taught every day as a core subject — covering reading, writing, grammar, and Ethiopian literature and culture.',
-    proficiency: 95,
-  },
-  {
-    name: 'French',
-    icon: LanguagesIcon,
-    level: 'Optional from Grade 5',
-    description:
-      'Students who wish to study a third language can choose French from Grade 5, building conversational skills and cultural awareness.',
-    proficiency: 65,
-  },
-]
-
-const LABS = [
-  {
-    name: 'Biology Laboratory',
-    iconName: 'Microscope',
-    description:
-      'Our only dedicated science lab — equipped with compound and stereo microscopes, slides, preserved specimens, and simple experiment kits. Every Grade 7–8 student uses it weekly.',
-    equipment: ['Microscopes ×15', 'Prepared slides', 'Plant & animal specimens', 'Simple experiment kits'],
-  },
-]
-
-const ARTS_FEATURES = [
-  {
-    icon: Music,
-    title: 'Music & Singing',
-    description:
-      'Our music club learns traditional Ethiopian songs alongside simple recorder and keyboard — performing at school assemblies and holiday events.',
-  },
-  {
-    icon: Palette,
-    title: 'Visual Arts',
-    description:
-      'Drawing, painting, and crafts using locally available materials — with a small exhibition at the end of every term.',
-  },
-  {
-    icon: BookOpen,
-    title: 'Drama & Storytelling',
-    description:
-      'Our drama club rehearses short plays and oral storytelling — often drawing on Ethiopian folktales and history.',
-  },
-]
 
 export function AcademicsPage() {
   const goPage = useNav((s) => s.goPage)
@@ -333,7 +220,7 @@ export function AcademicsPage() {
                   {SCIENCE_FEATURES.map((feature) => (
                     <div key={feature.title} className="flex gap-3">
                       <div className="flex size-10 shrink-0 items-center justify-center rounded-full bg-forest text-gold-light">
-                        <feature.icon className="size-5" />
+                        <DynamicIcon name={feature.icon} className="size-5" />
                       </div>
                       <div>
                         <div className="font-serif text-sm font-semibold text-foreground">{feature.title}</div>
@@ -375,7 +262,7 @@ export function AcademicsPage() {
                 <Card className="group h-full transition-all hover:-translate-y-1 hover:shadow-lg">
                   <CardHeader>
                     <div className="flex size-12 items-center justify-center rounded-xl bg-amber-500/10 text-amber-600 dark:text-amber-400 transition-colors group-hover:bg-amber-500 group-hover:text-white">
-                      <lang.icon className="size-6" />
+                      <DynamicIcon name={lang.icon} className="size-6" />
                     </div>
                     <CardTitle className="mt-3 text-lg">{lang.name}</CardTitle>
                     <CardDescription className="text-xs font-semibold uppercase tracking-wider text-primary">
@@ -593,7 +480,7 @@ export function AcademicsPage() {
                         <Card key={feat.title} className="transition-all hover:shadow-md">
                           <CardContent className="flex gap-4 pt-6">
                             <div className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
-                              <feat.icon className="size-5" />
+                              <DynamicIcon name={feat.icon} className="size-5" />
                             </div>
                             <div>
                               <div className="font-semibold">{feat.title}</div>

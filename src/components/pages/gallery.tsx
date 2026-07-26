@@ -7,7 +7,7 @@ import { SectionHeader } from '@/components/site/section-header'
 import { Reveal } from '@/components/site/reveal'
 import { SmartImage } from '@/components/site/smart-image'
 import { useNav } from '@/lib/nav-store'
-import { GALLERY, GALLERY_CATEGORIES } from '@/lib/data/school'
+import { GALLERY, GALLERY_CATEGORIES } from '@/lib/content'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -24,22 +24,6 @@ interface GalleryItem {
   category: string
   image: string
 }
-
-// Varying row spans for a masonry-like layout
-const SPAN_PATTERNS = [
-  'row-span-2',
-  'row-span-1',
-  'row-span-1',
-  'row-span-2',
-  'row-span-1',
-  'row-span-2',
-  'row-span-1',
-  'row-span-1',
-  'row-span-2',
-  'row-span-1',
-  'row-span-2',
-  'row-span-1',
-]
 
 function getCategoryBadgeClass(category: string) {
   switch (category) {

@@ -4,26 +4,22 @@ import * as React from 'react'
 import { toast } from 'sonner'
 import {
   MapPin,
-  Phone,
-  Mail,
-  Clock,
   Send,
-  Facebook,
-  Twitter,
-  Instagram,
-  Youtube,
   ArrowRight,
   MessageSquare,
-  Building2,
-  GraduationCap,
-  Calculator,
-  Bus,
 } from 'lucide-react'
 import { PageHero } from '@/components/site/page-hero'
 import { SectionHeader } from '@/components/site/section-header'
 import { Reveal } from '@/components/site/reveal'
+import { DynamicIcon } from '@/components/site/dynamic-icon'
 import { useNav } from '@/lib/nav-store'
-import { SCHOOL } from '@/lib/data/school'
+import {
+  SCHOOL,
+  CONTACT_INFO,
+  SOCIAL_LINKS,
+  DEPARTMENTS_CONTACT,
+  CONTACT_SUBJECTS,
+} from '@/lib/content'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -46,75 +42,23 @@ import {
   TableRow,
 } from '@/components/ui/table'
 
-const CONTACT_INFO = [
-  {
-    icon: MapPin,
-    title: 'Visit Us',
-    lines: [SCHOOL.address],
+// Action/href helpers keyed by CONTACT_INFO label — keep the visual
+// action link (e.g. "Get Directions", "Call Now", "Send Email") on each card.
+const CONTACT_ACTIONS: Record<string, { action: string; href: string }> = {
+  Address: {
     action: 'Get Directions',
-    href: 'https://www.google.com/maps?q=Riverside%20CA',
+    href: `https://www.google.com/maps?q=${encodeURIComponent(SCHOOL.address)}`,
   },
-  {
-    icon: Phone,
-    title: 'Call Us',
-    lines: [SCHOOL.phone, SCHOOL.altPhone],
+  Phone: {
     action: 'Call Now',
     href: `tel:${SCHOOL.phone.replace(/[^+\d]/g, '')}`,
   },
-  {
-    icon: Mail,
-    title: 'Email Us',
-    lines: [SCHOOL.email, SCHOOL.admissionsEmail],
+  Email: {
     action: 'Send Email',
     href: `mailto:${SCHOOL.email}`,
   },
-  {
-    icon: Clock,
-    title: 'Office Hours',
-    lines: [SCHOOL.hours, 'Sat – Sun: Closed'],
-    action: '',
-    href: '',
-  },
-]
-
-const SOCIAL_LINKS = [
-  { name: 'Facebook', icon: Facebook, url: SCHOOL.social.facebook, color: 'hover:bg-blue-600 hover:border-blue-600' },
-  { name: 'Twitter', icon: Twitter, url: SCHOOL.social.twitter, color: 'hover:bg-sky-500 hover:border-sky-500' },
-  { name: 'Instagram', icon: Instagram, url: SCHOOL.social.instagram, color: 'hover:bg-rose-500 hover:border-rose-500' },
-  { name: 'YouTube', icon: Youtube, url: SCHOOL.social.youtube, color: 'hover:bg-red-600 hover:border-red-600' },
-  { name: 'Telegram', icon: Send, url: SCHOOL.social.telegram, color: 'hover:bg-emerald-700 hover:border-emerald-700' },
-]
-
-const DEPARTMENTS = [
-  {
-    name: 'Admissions Office',
-    icon: GraduationCap,
-    email: SCHOOL.admissionsEmail,
-    phone: '+1 (555) 248-1992',
-    hours: 'Mon–Fri, 8 AM – 4 PM',
-  },
-  {
-    name: 'Academic Office',
-    icon: Building2,
-    email: 'academics@hamzaschool.edu',
-    phone: '+1 (555) 248-1993',
-    hours: 'Mon–Fri, 7:30 AM – 4 PM',
-  },
-  {
-    name: 'Accounts & Finance',
-    icon: Calculator,
-    email: 'accounts@hamzaschool.edu',
-    phone: '+1 (555) 248-1994',
-    hours: 'Mon–Fri, 9 AM – 3 PM',
-  },
-  {
-    name: 'Transport Office',
-    icon: Bus,
-    email: 'transport@hamzaschool.edu',
-    phone: '+1 (555) 248-1995',
-    hours: 'Mon–Fri, 6:30 AM – 5 PM',
-  },
-]
+  'Office Hours': { action: '', href: '' },
+}
 
 interface ContactForm {
   name: string
@@ -178,15 +122,17 @@ export function ContactPage() {
             />
           </Reveal>
           <div className="mt-14 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-            {CONTACT_INFO.map((info, i) => (
-              <Reveal key={info.title} delay={i * 0.08}>
+            {CONTACT_INFO.map((info, i) => {
+              const action = CONTACT_ACTIONS[info.label]
+              return (
+              <Reveal key={info.label} delay={i * 0.08}>
                 <Card className="group h-full border-primary/10 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-primary/5">
                   <CardContent className="flex h-full flex-col p-6">
                     <div className="flex size-12 items-center justify-center rounded-xl bg-primary/10 text-primary transition-colors group-hover:bg-primary group-hover:text-primary-foreground">
-                      <info.icon className="size-6" />
+                      <DynamicIcon name={info.icon} className="size-6" />
                     </div>
                     <h3 className="mt-5 text-base font-semibold">
-                      {info.title}
+                      {info.label}
                     </h3>
                     <div className="mt-2 flex-1 space-y-1">
                       {info.lines.map((line) => (
@@ -198,29 +144,30 @@ export function ContactPage() {
                         </p>
                       ))}
                     </div>
-                    {info.action && info.href && (
+                    {action && action.action && action.href && (
                       <a
-                        href={info.href}
+                        href={action.href}
                         target={
-                          info.href.startsWith('http')
+                          action.href.startsWith('http')
                             ? '_blank'
                             : undefined
                         }
                         rel={
-                          info.href.startsWith('http')
+                          action.href.startsWith('http')
                             ? 'noopener noreferrer'
                             : undefined
                         }
                         className="mt-4 inline-flex items-center gap-1.5 text-sm font-medium text-primary transition-colors hover:text-primary/80"
                       >
-                        {info.action}
+                        {action.action}
                         <ArrowRight className="size-3.5" />
                       </a>
                     )}
                   </CardContent>
                 </Card>
               </Reveal>
-            ))}
+              )
+            })}
           </div>
         </div>
       </section>
@@ -291,14 +238,11 @@ export function ContactPage() {
                           <SelectValue placeholder="Choose a topic" />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="General Inquiry">
-                            General Inquiry
-                          </SelectItem>
-                          <SelectItem value="Admissions">
-                            Admissions
-                          </SelectItem>
-                          <SelectItem value="Careers">Careers</SelectItem>
-                          <SelectItem value="Feedback">Feedback</SelectItem>
+                          {CONTACT_SUBJECTS.map((subject) => (
+                            <SelectItem key={subject} value={subject}>
+                              {subject}
+                            </SelectItem>
+                          ))}
                         </SelectContent>
                       </Select>
                     </div>
@@ -383,7 +327,7 @@ export function ContactPage() {
                           aria-label={s.name}
                           className={`flex size-12 items-center justify-center rounded-xl border bg-card text-foreground transition-all hover:text-white ${s.color}`}
                         >
-                          <s.icon className="size-5" />
+                          <DynamicIcon name={s.icon} className="size-5" />
                         </a>
                       ))}
                     </div>
@@ -416,21 +360,18 @@ export function ContactPage() {
                     <TableHead className="text-sm font-semibold uppercase tracking-wider text-primary">
                       Email
                     </TableHead>
-                    <TableHead className="text-sm font-semibold uppercase tracking-wider text-primary">
+                    <TableHead className="pr-6 text-sm font-semibold uppercase tracking-wider text-primary">
                       Phone
-                    </TableHead>
-                    <TableHead className="hidden pr-6 text-sm font-semibold uppercase tracking-wider text-primary md:table-cell">
-                      Hours
                     </TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {DEPARTMENTS.map((d) => (
+                  {DEPARTMENTS_CONTACT.map((d) => (
                     <TableRow key={d.name} className="text-sm sm:text-base">
                       <TableCell className="pl-6 py-4">
                         <div className="flex items-center gap-3">
                           <div className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
-                            <d.icon className="size-4.5" />
+                            <DynamicIcon name={d.icon} className="size-4.5" />
                           </div>
                           <span className="font-medium">{d.name}</span>
                         </div>
@@ -443,16 +384,13 @@ export function ContactPage() {
                           {d.email}
                         </a>
                       </TableCell>
-                      <TableCell className="py-4 text-muted-foreground">
+                      <TableCell className="pr-6 py-4 text-muted-foreground">
                         <a
                           href={`tel:${d.phone.replace(/[^+\d]/g, '')}`}
                           className="hover:text-primary hover:underline"
                         >
                           {d.phone}
                         </a>
-                      </TableCell>
-                      <TableCell className="hidden pr-6 py-4 text-muted-foreground md:table-cell">
-                        {d.hours}
                       </TableCell>
                     </TableRow>
                   ))}

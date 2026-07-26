@@ -21,8 +21,7 @@ import { Reveal } from '@/components/site/reveal'
 import { SmartImage } from '@/components/site/smart-image'
 import { DynamicIcon } from '@/components/site/dynamic-icon'
 import { useNav } from '@/lib/nav-store'
-import { NEWS, EVENTS } from '@/lib/data/school'
-import { api, type NewsArticle } from '@/lib/api'
+import { NEWS, EVENTS, NEWS_CATEGORIES, ANNOUNCEMENTS } from '@/lib/content'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -42,47 +41,7 @@ import {
 } from '@/components/ui/pagination'
 import { cn } from '@/lib/utils'
 
-const NEWS_CATEGORIES = [
-  'All',
-  'Campus',
-  'Achievement',
-  'Community',
-  'Academics',
-  'Arts',
-]
-
 const PAGE_SIZE = 3
-
-const ANNOUNCEMENTS = [
-  {
-    title: 'Spring Break Notice',
-    date: 'March 24 – 28, 2025',
-    body: 'School will be closed for Spring Break. Classes resume Monday, March 31. The front office will operate with reduced hours from 9 AM – 1 PM.',
-    tone: 'amber',
-    icon: 'SunMedium',
-  },
-  {
-    title: 'Parent-Teacher Conferences',
-    date: 'Thursday, March 13, 2025',
-    body: 'Spring conferences run from 4:00 PM to 7:30 PM. Book your slots via the parent portal starting Monday. Translators available on request.',
-    tone: 'emerald',
-    icon: 'Users',
-  },
-  {
-    title: 'Term 2 Report Cards Released',
-    date: 'Friday, March 21, 2025',
-    body: 'Report cards will be available in the parent portal at 4:00 PM. Hard copies mailed home for families without portal access.',
-    tone: 'teal',
-    icon: 'FileText',
-  },
-  {
-    title: 'Annual Book Fair Week',
-    date: 'March 17 – 21, 2025',
-    body: 'The Learning Resource Center hosts its annual Book Fair. Family shopping night Wednesday 5–8 PM. All proceeds fund new library acquisitions.',
-    tone: 'rose',
-    icon: 'BookOpen',
-  },
-]
 
 function formatDate(iso: string) {
   return new Date(iso).toLocaleDateString('en-US', {
@@ -138,31 +97,14 @@ export function NewsPage() {
   const [activeCategory, setActiveCategory] = React.useState('All')
   const [page, setPage] = React.useState(1)
 
-  // ─── Fetch news from the real database (Express API) ───
-  // Falls back to mock data if the API is unavailable (e.g. on Vercel)
-  const [news, setNews] = React.useState<NewsArticle[]>([])
-  const [loading, setLoading] = React.useState(true)
-
-  React.useEffect(() => {
-    setLoading(true)
-    api.getNews()
-      .then((data) => {
-        setNews(data as NewsArticle[])
-      })
-      .catch(() => {
-        // API not available — fall back to local data so the page still works
-        setNews(NEWS as unknown as NewsArticle[])
-      })
-      .finally(() => setLoading(false))
-  }, [])
-
+  // News comes directly from the single content file (src/lib/content.ts)
   const filtered = React.useMemo(() => {
     const list =
       activeCategory === 'All'
-        ? news
-        : news.filter((n) => n.category === activeCategory)
+        ? NEWS
+        : NEWS.filter((n) => n.category === activeCategory)
     return list
-  }, [activeCategory, news])
+  }, [activeCategory])
 
   React.useEffect(() => {
     setPage(1)
@@ -229,11 +171,7 @@ export function NewsPage() {
           </Reveal>
 
           {/* News grid */}
-          {loading ? (
-            <div className="mt-10 flex min-h-[300px] items-center justify-center">
-              <div className="size-10 animate-spin rounded-full border-2 border-primary/20 border-t-primary" />
-            </div>
-          ) : pageItems.length === 0 ? (
+          {pageItems.length === 0 ? (
             <div className="mt-10 flex min-h-[300px] items-center justify-center text-muted-foreground">
               No articles found in this category.
             </div>
@@ -609,7 +547,9 @@ export function NewsPage() {
                     a.tone === 'teal' &&
                       'border-l-teal-500 hover:shadow-teal-500/10',
                     a.tone === 'rose' &&
-                      'border-l-rose-400 hover:shadow-rose-500/10'
+                      'border-l-rose-400 hover:shadow-rose-500/10',
+                    a.tone === 'navy' &&
+                      'border-l-foreground hover:shadow-foreground/10'
                   )}
                 >
                   <CardContent className="flex h-full gap-4 p-6">
@@ -622,7 +562,9 @@ export function NewsPage() {
                         a.tone === 'teal' &&
                           'bg-teal-100 text-teal-700',
                         a.tone === 'rose' &&
-                          'bg-rose-100 text-rose-700'
+                          'bg-rose-100 text-rose-700',
+                        a.tone === 'navy' &&
+                          'bg-foreground/10 text-foreground'
                       )}
                     >
                       <DynamicIcon name={a.icon} className="size-5" />

@@ -32,10 +32,6 @@ const ContactPage = dynamic(() => import('@/components/pages/contact').then((m) 
   ssr: false,
   loading: () => <PageLoader />,
 })
-const AdminPage = dynamic(() => import('@/components/pages/admin').then((m) => m.AdminPage), {
-  ssr: false,
-  loading: () => <PageLoader />,
-})
 
 function PageLoader() {
   return (
@@ -52,16 +48,6 @@ export default function Home() {
   React.useEffect(() => {
     initFromHash()
   }, [])
-
-  // Admin page has no navbar/footer — it's a standalone tool
-  if (view === 'admin') {
-    return (
-      <>
-        <AdminPage />
-        <BackToTop />
-      </>
-    )
-  }
 
   return (
     <div className="flex min-h-screen flex-col">
