@@ -54,15 +54,15 @@ function formatDate(iso: string) {
 function getCategoryBadgeClass(category: string) {
   switch (category) {
     case 'Campus':
-      return 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300'
+      return 'bg-emerald-100 text-emerald-700'
     case 'Achievement':
-      return 'bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300'
+      return 'bg-amber-100 text-amber-700'
     case 'Community':
-      return 'bg-teal-100 text-teal-700 dark:bg-teal-900/40 dark:text-teal-300'
+      return 'bg-teal-100 text-teal-700'
     case 'Academics':
-      return 'bg-rose-100 text-rose-700 dark:bg-rose-900/40 dark:text-rose-300'
+      return 'bg-rose-100 text-rose-700'
     case 'Arts':
-      return 'bg-orange-100 text-orange-700 dark:bg-orange-900/40 dark:text-orange-300'
+      return 'bg-orange-100 text-orange-700'
     default:
       return 'bg-muted text-muted-foreground'
   }

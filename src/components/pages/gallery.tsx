@@ -28,17 +28,17 @@ interface GalleryItem {
 function getCategoryBadgeClass(category: string) {
   switch (category) {
     case 'Campus':
-      return 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300'
+      return 'bg-emerald-100 text-emerald-700'
     case 'Events':
-      return 'bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300'
+      return 'bg-amber-100 text-amber-700'
     case 'Sports':
-      return 'bg-teal-100 text-teal-700 dark:bg-teal-900/40 dark:text-teal-300'
+      return 'bg-teal-100 text-teal-700'
     case 'Arts':
-      return 'bg-rose-100 text-rose-700 dark:bg-rose-900/40 dark:text-rose-300'
+      return 'bg-rose-100 text-rose-700'
     case 'Culture':
-      return 'bg-orange-100 text-orange-700 dark:bg-orange-900/40 dark:text-orange-300'
+      return 'bg-orange-100 text-orange-700'
     case 'Graduation':
-      return 'bg-amber-200 text-amber-800 dark:bg-amber-900/50 dark:text-amber-200'
+      return 'bg-amber-200 text-amber-800'
     default:
       return 'bg-muted text-muted-foreground'
   }

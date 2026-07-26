@@ -158,7 +158,7 @@ export function AboutPage() {
                 </div>
                 <CardHeader>
                   <div className="flex items-center gap-2">
-                    <div className="flex size-9 items-center justify-center rounded-lg bg-amber-500/10 text-amber-600 dark:text-amber-400">
+                    <div className="flex size-9 items-center justify-center rounded-lg bg-amber-500/10 text-amber-600">
                       <Eye className="size-5" />
                     </div>
                     <CardTitle className="text-xl">Our Vision</CardTitle>
@@ -307,7 +307,7 @@ export function AboutPage() {
                 <Card className="h-full text-center transition-all hover:-translate-y-1 hover:shadow-lg">
                   <CardContent className="flex flex-col items-center pt-6">
                     <Avatar className="size-16 border-2 border-amber-500/20">
-                      <AvatarFallback className="bg-amber-500/10 text-lg font-semibold text-amber-600 dark:text-amber-400">
+                      <AvatarFallback className="bg-amber-500/10 text-lg font-semibold text-amber-600">
                         {teacher.initials}
                       </AvatarFallback>
                     </Avatar>
@@ -380,7 +380,7 @@ export function AboutPage() {
               <Reveal key={item} delay={i * 0.06}>
                 <Card className="h-full">
                   <CardContent className="flex h-full flex-col items-start gap-4 pt-6">
-                    <div className="flex size-11 items-center justify-center rounded-xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">
+                    <div className="flex size-11 items-center justify-center rounded-xl bg-emerald-500/10 text-emerald-600">
                       <ShieldCheck className="size-6" />
                     </div>
                     <div>

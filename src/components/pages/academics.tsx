@@ -261,7 +261,7 @@ export function AcademicsPage() {
               <Reveal key={lang.name} delay={i * 0.06}>
                 <Card className="group h-full transition-all hover:-translate-y-1 hover:shadow-lg">
                   <CardHeader>
-                    <div className="flex size-12 items-center justify-center rounded-xl bg-amber-500/10 text-amber-600 dark:text-amber-400 transition-colors group-hover:bg-amber-500 group-hover:text-white">
+                    <div className="flex size-12 items-center justify-center rounded-xl bg-amber-500/10 text-amber-600 transition-colors group-hover:bg-amber-500 group-hover:text-white">
                       <DynamicIcon name={lang.icon} className="size-6" />
                     </div>
                     <CardTitle className="mt-3 text-lg">{lang.name}</CardTitle>
@@ -444,7 +444,7 @@ export function AcademicsPage() {
                     <Reveal key={sport.name} delay={i * 0.05}>
                       <Card className="group h-full transition-all hover:-translate-y-1 hover:shadow-lg">
                         <CardContent className="flex items-center gap-4 pt-6">
-                          <div className="flex size-12 items-center justify-center rounded-xl bg-amber-500/10 text-amber-600 transition-colors group-hover:bg-amber-500 group-hover:text-white dark:text-amber-400">
+                          <div className="flex size-12 items-center justify-center rounded-xl bg-amber-500/10 text-amber-600 transition-colors group-hover:bg-amber-500 group-hover:text-white">
                             <DynamicIcon name={sport.icon} className="size-6" />
                           </div>
                           <div className="flex-1">

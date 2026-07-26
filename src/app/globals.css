@@ -1,8 +1,6 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 
-@custom-variant dark (&:is(.dark *));
-
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
@@ -105,54 +103,6 @@
   --sidebar-accent-foreground: #5C4226;
   --sidebar-border: rgba(155, 123, 54, 0.18);
   --sidebar-ring: #1F3D2F;
-}
-
-.dark {
-  --background: #0F2530;
-  --foreground: #FBF6E9;
-  --card: #1B3A4B;
-  --card-foreground: #FBF6E9;
-  --popover: #1B3A4B;
-  --popover-foreground: #FBF6E9;
-  --primary: #C9A961;
-  --primary-foreground: #0F2530;
-  --secondary: #1F3D2F;
-  --secondary-foreground: #FBF6E9;
-  --muted: #1F3D2F;
-  --muted-foreground: #E4D4A8;
-  --accent: #C9A961;
-  --accent-foreground: #9B7B36;
-  --destructive: #8C3A2E;
-  --border: rgba(201, 169, 97, 0.2);
-  --input: rgba(201, 169, 97, 0.25);
-  --ring: #C9A961;
-  --cream: #FBF6E9;
-  --forest: #4A7C5A;
-  --green-mid: #4A7C5A;
-  --gold: #C9A961;
-  --gold-deep: #9B7B36;
-  --gold-light: #E4D4A8;
-  --navy: #1B3A4B;
-  --navy-deep: #0F2530;
-  --wood-dark: #5C4226;
-  --wood-mid: #8B6A43;
-  --crimson: #8C3A2E;
-  --paper: #1B3A4B;
-  --text-dark: #FBF6E9;
-  --text-mid: #E4D4A8;
-  --chart-1: #4A7C5A;
-  --chart-2: #C9A961;
-  --chart-3: #8C3A2E;
-  --chart-4: #1B3A4B;
-  --chart-5: #1F3D2F;
-  --sidebar: #1B3A4B;
-  --sidebar-foreground: #FBF6E9;
-  --sidebar-primary: #C9A961;
-  --sidebar-primary-foreground: #0F2530;
-  --sidebar-accent: #1F3D2F;
-  --sidebar-accent-foreground: #FBF6E9;
-  --sidebar-border: rgba(201, 169, 97, 0.2);
-  --sidebar-ring: #C9A961;
 }
 
 @layer base {
