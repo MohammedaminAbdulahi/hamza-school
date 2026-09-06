@@ -1,0 +1,16 @@
+{
+  "name": "Hamza School — Guiding Hearts. Growing Minds.",
+  "short_name": "Hamza School",
+  "description": "A warm, faith-based school in Addis Ababa serving Grades 1–8.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#F4ECD8",
+  "theme_color": "#1F3D2F",
+  "icons": [
+    {
+      "src": "/hamza-logo.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

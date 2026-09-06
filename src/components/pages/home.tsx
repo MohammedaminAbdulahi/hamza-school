@@ -87,8 +87,9 @@ export function HomePage() {
                 <ArrowRight className="size-3.5" />
               </Button>
               <Button
+                variant="outline"
                 onClick={() => goPage('about')}
-                className="h-14 gap-2.5 rounded-sm border border-forest px-8 text-xs font-medium uppercase tracking-[0.12em] text-forest transition-all hover:bg-forest hover:text-cream"
+                className="h-14 gap-2.5 rounded-sm border-forest bg-paper px-8 text-xs font-medium uppercase tracking-[0.12em] text-forest transition-all hover:bg-forest hover:text-cream"
               >
                 {HERO.secondaryButton}
               </Button>
