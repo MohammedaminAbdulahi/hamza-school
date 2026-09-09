@@ -536,3 +536,55 @@ Stage Summary:
 - Files created: src/lib/image-upload.ts.
 - Files modified: src/lib/db.ts, src/app/api/admin/route.ts, src/app/api/content/route.ts, src/app/admin/page.tsx, src/components/pages/home.tsx, src/components/pages/about.tsx, src/components/pages/gallery.tsx, src/components/pages/news.tsx.
 - Admin password: `HamzaAdmin2025!`. Visit `/admin` → School Info tab to upload principal/vice director photos and fill the vice director fields.
+
+---
+Task ID: 12
+Agent: full-stack-developer
+Task: Add Facilities tab to admin panel + show facility photos on About page
+
+Work Log:
+- Read worklog.md (Tasks 1–11) and current src/app/api/admin/route.ts, src/app/api/content/route.ts, src/lib/db.ts, src/app/admin/page.tsx (~2,650 lines), src/components/pages/about.tsx, src/components/pages/academics.tsx, src/lib/content.ts, src/lib/image-upload.ts, src/components/site/smart-image.tsx, src/components/site/dynamic-icon.tsx to understand existing patterns. Confirmed that the `facilities` table + API actions (`add_facility`, `update_facility`, `delete_facility`) were already implemented in Task 11; my job was just to wire the UI + About page to use them.
+
+- Updated `src/app/admin/page.tsx`:
+  * Added a `Facility` type `{ id?, name, description, icon, photo }` and added `facilities: Facility[]` to the `AllData` snapshot type so the admin state tracks facilities alongside the other 6 content types.
+  * Imported `Building` from `lucide-react` (the existing `Building2` was already in use for the School Info tab; using `Building` for Facilities keeps them visually distinct).
+  * Imported `DynamicIcon` from `@/components/site/dynamic-icon` so the Facilities list/form can render Lucide icons by string name (facilities store icon names like "FlaskConical", "Library", "Wifi" — same pattern as CORE_VALUES, etc. on the public site).
+  * Added a 7th tab trigger `<TabsTrigger value="facilities">` with the `Building` icon and "Facilities" label, matching the existing styling (`data-[state=active]:bg-forest data-[state=active]:text-cream`).
+  * Updated the dashboard description text from "Edit school info, gallery, teachers, leadership, news, and events." → "Edit school info, gallery, teachers, leadership, news, events, and facilities."
+  * Added a `<TabsContent value="facilities">` block wired to a new `<FacilitiesTab>` component, with `onAdd`/`onUpdate`/`onDelete` handlers that POST to `/api/admin` with actions `add_facility` / `update_facility` / `delete_facility`, then `setData(json)` + sonner toast. Uses `data.facilities ?? []` so a missing array never crashes the UI.
+  * Added a `FacilitiesTab` component — exact same shape as `GalleryTab` / `EventsTab`: `CrudHeader` at the top (with "Add Facility" button), an empty-state message, a `sm:grid-cols-2 lg:grid-cols-3` grid of `ItemRow` cards. Each card shows a 4:3 thumbnail area (real `<img>` if `photo` is a data URL, otherwise a centered `<DynamicIcon name={icon || 'Building'}>` with a small "Icon: <name>" label), then a row with the facility icon + name + 3-line clamped description, then `<ItemActions>` (Edit + Delete). Edit opens the form dialog seeded with the clicked item; Delete opens an `AlertDialog` confirmation that says "Delete facility?" and posts `delete_facility` on confirm.
+  * Added a `FacilityFormDialog` component — same shell as `GalleryFormDialog` / `EventFormDialog` (`FormDialogShell` + `FormActions`). Form fields:
+      - Name (text input, required)
+      - Description (Textarea, 3 rows)
+      - Icon (text input for the Lucide icon name string) — ABOVE the input is a clickable palette of 20 suggested icons (`FACILITY_ICONS` array: FlaskConical, Library, Users, Sun, Coffee, Wifi, BookOpen, Microscope, Palette, Music, Dumbbell, GraduationCap, School, Building, Building2, TreePalm, Trees, Lightbulb, Laptop, Baby). Clicking one sets the icon. The currently-selected one is highlighted with `border-forest bg-forest text-cream`. A help line explains "Click a suggested icon, or type any Lucide icon name. Used as the fallback when no photo is uploaded."
+      - Photo upload (reuses the existing `ImageUpload` component with `aspect="aspect-[4/3]"` and `maxSize="size-32"`)
+    Validation: requires a non-empty Name (shows sonner toast if missing). On submit, calls `onSubmit({ id: initial?.id, name, description, icon: icon || 'Building', photo })`.
+  * Defined `FACILITY_ICONS` as a top-level const array of 20 Lucide icon-name strings, used by the palette in the form.
+
+- Updated `src/components/pages/about.tsx`:
+  * Added a new `DbFacility` type `{ id?, name, description, icon, photo? }`.
+  * Added `const [facilities, setFacilities] = React.useState<typeof FACILITIES>(FACILITIES)` so the section is initialized from the content.ts defaults (Biology Lab, Reading Corner, etc.) and remains populated even if the DB is unreachable.
+  * Extended the `/api/content` fetch handler to accept `facilities?: DbFacility[]`. If the response has a non-empty facilities array, hydrate state by mapping each DB row to `{ icon, name, description, photo }` (falling back to the matching content.ts default icon when the DB icon is empty, then to 'Building' as a last resort).
+  * Updated the Facilities section JSX to iterate over the state-backed `facilities` array (was hardcoded `FACILITIES.map(...)` before). For each facility, reads `const photo = (facility as { photo?: string }).photo` and renders an `<img>` if `isDataUrl(photo)` is true, otherwise falls back to the existing `<SmartImage seed={...} icon={facility.icon} label={facility.name} />` placeholder. The rest of the card layout (DynamicIcon + name in CardHeader, description in CardContent, hover effect) is preserved exactly.
+  * The Academics page was inspected but NOT modified — it uses the `LABS` array (a single "Biology Laboratory" entry with its own equipment list) and an inline "Reading Corner" feature, neither of which references the `FACILITIES` data. Per the task instructions ("If it shows facilities, update it to use DB data too. If not, skip."), I skipped it.
+
+Verification:
+- `bun run lint` → 0 errors, 0 warnings (clean).
+- `bunx tsc --noEmit` → 0 errors in `src/` (only the pre-existing unrelated error in `skills/stock-analysis-skill/src/analyzer.ts`, which is outside my scope).
+- `curl http://localhost:3000/admin` → 200, login screen renders ("Hamza Admin", "Sign In", "Enter your password"). The Facilities tab is only rendered after login (client-side), as expected.
+- `curl http://localhost:3000/api/content` → 200, response includes `facilities: [{id, name, description, icon, photo}]` with 6 seeded facilities.
+- End-to-end CRUD test (Python script via curl):
+  * `add_facility` with a tiny PNG data URL → 200, new facility created (id 7), photo stored (118 chars), icon saved ✓
+  * `update_facility` with same id, new name/description/icon, empty photo → 200, all fields updated, photo cleared ✓
+  * `delete_facility` → 200, facility removed, count back to 6 ✓
+  * Wrong password → 401 ✓
+- Dev server log (`/home/z/my-project/.next/dev/logs/next-development.log`) shows clean `✓ Compiled` entries after my code changes; no new errors.
+
+Stage Summary:
+- The admin panel now has a 7th "Facilities" tab (between Events and the bottom Refresh button) with full CRUD: list view (photo thumbnail or icon fallback + name + description + Edit/Delete), Add/Edit dialog (Name, Description, Icon picker with 20 suggested Lucide icons + free-text input, Photo upload via the existing ImageUpload component), and AlertDialog delete confirmation.
+- The About page's "Our Campus" / Facilities section now hydrates from `/api/content` on mount, with safe fallback to `content.ts` defaults. When an admin uploads a photo for a facility, the About page shows the real `<img>`; otherwise it falls back to the existing `<SmartImage>` placeholder keyed by the facility's Lucide icon.
+- All design conventions preserved: cream/forest/gold palette, paper-texture backgrounds, serif headings, sonner toasts for every mutation, AlertDialog for destructive deletes, 800px client-side image resize before POST, 5MB image payload cap on the API.
+- Backward compatible: existing seeded facilities (no photos) render exactly as before (icon-based SmartImage placeholder); newly uploaded photos render as `<img>` on both the admin list thumbnail and the public About page.
+- Files modified: src/app/admin/page.tsx, src/components/pages/about.tsx.
+- Files NOT modified (correctly): src/app/api/admin/route.ts (already had add/update/delete_facility from Task 11), src/app/api/content/route.ts (already returned facilities from Task 11), src/lib/db.ts (already had facilities table + seeding from Task 11), src/components/pages/academics.tsx (doesn't use the FACILITIES array — uses LABS array + inline Reading Corner feature instead).
+- Admin password: `HamzaAdmin2025!`. Visit `/admin` → Facilities tab to add/edit/delete facilities with photo uploads.

@@ -5,7 +5,9 @@ import { Cookie, X } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 
-const STORAGE_KEY = 'hamza-cookie-consent'
+const STORAGE_KEY = 'hamza-cookie-consent-v2'
+// Remember the choice for 1 year
+const EXPIRY_DAYS = 365
 
 export function CookieConsent() {
   const [visible, setVisible] = React.useState(false)
@@ -13,18 +15,28 @@ export function CookieConsent() {
   React.useEffect(() => {
     try {
       const stored = localStorage.getItem(STORAGE_KEY)
-      if (!stored) {
-        const t = setTimeout(() => setVisible(true), 1200)
-        return () => clearTimeout(t)
+      if (stored) {
+        // Check if it's expired
+        const data = JSON.parse(stored)
+        const now = new Date().getTime()
+        if (data.expiry && now < data.expiry) {
+          return // still valid, don't show
+        }
       }
+      // Not stored or expired — show after a short delay
+      const t = setTimeout(() => setVisible(true), 1500)
+      return () => clearTimeout(t)
     } catch {
-      // ignore
+      // localStorage might be blocked — don't show repeatedly
+      const t = setTimeout(() => setVisible(true), 1500)
+      return () => clearTimeout(t)
     }
   }, [])
 
   const dismiss = (choice: 'accept' | 'decline') => {
     try {
-      localStorage.setItem(STORAGE_KEY, choice)
+      const expiry = new Date().getTime() + EXPIRY_DAYS * 24 * 60 * 60 * 1000
+      localStorage.setItem(STORAGE_KEY, JSON.stringify({ choice, expiry }))
     } catch {
       // ignore
     }
@@ -49,8 +61,8 @@ export function CookieConsent() {
         <div className="flex-1 text-sm">
           <p className="font-semibold">We value your privacy</p>
           <p className="text-muted-foreground">
-            Hamza School uses cookies to enhance your browsing experience and analyze
-            site traffic. See our Privacy Policy for details.
+            Hamza School uses cookies to enhance your browsing experience. See our
+            Privacy Policy for details.
           </p>
         </div>
         <div className="flex shrink-0 gap-2">

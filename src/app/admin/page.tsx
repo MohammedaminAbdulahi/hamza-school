@@ -48,6 +48,7 @@ import {
   X,
   LogOut,
   Building2,
+  Building,
   Images,
   Users,
   GraduationCap,
@@ -60,8 +61,18 @@ import {
   ImageIcon,
 } from 'lucide-react'
 import { fileToResizedBase64, isDataUrl } from '@/lib/image-upload'
+import { DynamicIcon } from '@/components/site/dynamic-icon'
+import { STATS } from '@/lib/content'
 
 // ─── Types ───
+type StatRow = { key: string; label: string; value: number; suffix: string }
+const DEFAULT_STATS: StatRow[] = [
+  { key: 'years', ...STATS[0] },
+  { key: 'students', ...STATS[1] },
+  { key: 'educators', ...STATS[2] },
+  { key: 'passRate', ...STATS[3] },
+]
+
 type School = {
   name: string
   tagline: string
@@ -106,6 +117,7 @@ type School = {
     quote: string
     quoteSource: string
   }
+  stats: StatRow[]
 }
 
 type GalleryItem = {
@@ -147,6 +159,13 @@ type EventItem = {
   category: string
   description: string
 }
+type Facility = {
+  id?: number
+  name: string
+  description: string
+  icon: string
+  photo: string
+}
 
 type AllData = {
   school: School | null
@@ -155,6 +174,7 @@ type AllData = {
   leadership: Leader[]
   news: NewsItem[]
   events: EventItem[]
+  facilities: Facility[]
 }
 
 const GALLERY_CATEGORIES = [
@@ -419,8 +439,8 @@ export default function AdminPage() {
             Manage your <em className="italic text-gold-deep">content</em>
           </h1>
           <p className="max-w-2xl text-sm text-muted-foreground">
-            Edit school info, gallery, teachers, leadership, news, and events.
-            Changes appear live on the public site within seconds.
+            Edit school info, gallery, teachers, leadership, news, events, and
+            facilities. Changes appear live on the public site within seconds.
           </p>
         </div>
 
@@ -472,6 +492,13 @@ export default function AdminPage() {
               >
                 <CalendarDays className="size-3.5" />
                 Events
+              </TabsTrigger>
+              <TabsTrigger
+                value="facilities"
+                className="flex items-center gap-2 rounded-sm px-4 py-2 text-xs font-medium uppercase tracking-wider data-[state=active]:bg-forest data-[state=active]:text-cream"
+              >
+                <Building className="size-3.5" />
+                Facilities
               </TabsTrigger>
             </TabsList>
 
@@ -663,6 +690,39 @@ export default function AdminPage() {
                 }}
               />
             </TabsContent>
+
+            <TabsContent value="facilities" className="mt-0">
+              <FacilitiesTab
+                items={data.facilities ?? []}
+                onAdd={async (item) => {
+                  try {
+                    const json = await callAdmin({ action: 'add_facility', ...item })
+                    setData(json)
+                    toast.success('Facility added.')
+                  } catch (e) {
+                    toast.error(e instanceof Error ? e.message : 'Add failed')
+                  }
+                }}
+                onUpdate={async (item) => {
+                  try {
+                    const json = await callAdmin({ action: 'update_facility', ...item })
+                    setData(json)
+                    toast.success('Facility updated.')
+                  } catch (e) {
+                    toast.error(e instanceof Error ? e.message : 'Update failed')
+                  }
+                }}
+                onDelete={async (id) => {
+                  try {
+                    const json = await callAdmin({ action: 'delete_facility', id })
+                    setData(json)
+                    toast.success('Facility deleted.')
+                  } catch (e) {
+                    toast.error(e instanceof Error ? e.message : 'Delete failed')
+                  }
+                }}
+              />
+            </TabsContent>
           </Tabs>
         ) : null}
 
@@ -831,12 +891,35 @@ function SchoolTab({
   school: School
   onSave: (s: School) => Promise<void>
 }) {
-  const [form, setForm] = React.useState<School>(school)
+  // Make sure `stats` always has 4 entries (fall back to DEFAULT_STATS if the
+  // API response was missing/empty for any reason — e.g. an older snapshot).
+  const initialSchool: School = {
+    ...school,
+    stats:
+      Array.isArray(school.stats) && school.stats.length === 4
+        ? school.stats
+        : DEFAULT_STATS.map((d, i) =>
+            school.stats && school.stats[i]
+              ? { ...d, ...school.stats[i] }
+              : d
+          ),
+  }
+  const [form, setForm] = React.useState<School>(initialSchool)
   const [saving, setSaving] = React.useState(false)
 
   // Re-sync when prop changes
   React.useEffect(() => {
-    setForm(school)
+    setForm({
+      ...school,
+      stats:
+        Array.isArray(school.stats) && school.stats.length === 4
+          ? school.stats
+          : DEFAULT_STATS.map((d, i) =>
+              school.stats && school.stats[i]
+                ? { ...d, ...school.stats[i] }
+                : d
+            ),
+    })
   }, [school])
 
   function update<K extends keyof School>(key: K, value: School[K]) {
@@ -856,6 +939,14 @@ function SchoolTab({
   }
   function updateMission(key: keyof School['mission'], value: string) {
     setForm((f) => ({ ...f, mission: { ...f.mission, [key]: value } }))
+  }
+  function updateStat(index: number, field: keyof StatRow, value: string | number) {
+    setForm((f) => {
+      const next = [...(f.stats ?? DEFAULT_STATS)]
+      const current = next[index] ?? DEFAULT_STATS[index]
+      next[index] = { ...current, [field]: value }
+      return { ...f, stats: next }
+    })
   }
 
   async function handleSave() {
@@ -1202,6 +1293,57 @@ function SchoolTab({
         </div>
       </SectionCard>
 
+      <SectionCard
+        title="Statistics"
+        description="The four stats shown in the dark green strip on the homepage and on the About page. Edit the label, number, and suffix for each."
+      >
+        <div className="space-y-4">
+          {(form.stats ?? DEFAULT_STATS).map((stat, i) => (
+            <div
+              key={stat.key}
+              className="grid gap-3 rounded-sm border border-gold/15 bg-cream/60 p-4 sm:grid-cols-[1fr_140px_100px]"
+            >
+              <div className="space-y-1.5">
+                <FieldLabel>Label</FieldLabel>
+                <Input
+                  value={stat.label}
+                  onChange={(e) => updateStat(i, 'label', e.target.value)}
+                  className="rounded-sm border-gold/30 bg-paper"
+                  placeholder="e.g. Years of Excellence"
+                />
+              </div>
+              <div className="space-y-1.5">
+                <FieldLabel>Value</FieldLabel>
+                <Input
+                  type="number"
+                  value={stat.value}
+                  onChange={(e) =>
+                    updateStat(i, 'value', Number(e.target.value))
+                  }
+                  className="rounded-sm border-gold/30 bg-paper"
+                  placeholder="e.g. 10"
+                />
+              </div>
+              <div className="space-y-1.5">
+                <FieldLabel>Suffix</FieldLabel>
+                <Input
+                  value={stat.suffix}
+                  onChange={(e) => updateStat(i, 'suffix', e.target.value)}
+                  className="rounded-sm border-gold/30 bg-paper"
+                  placeholder="+"
+                  maxLength={8}
+                />
+              </div>
+            </div>
+          ))}
+          <p className="text-xs text-muted-foreground">
+            Tip: leave the suffix blank for no symbol (e.g. a plain count).
+            Common suffixes are <code className="rounded bg-muted px-1">+</code>{' '}
+            or <code className="rounded bg-muted px-1">%</code>.
+          </p>
+        </div>
+      </SectionCard>
+
       {/* Sticky save bar */}
       <div className="sticky bottom-4 z-20 flex items-center justify-between gap-4 rounded-sm border border-gold/30 bg-forest px-5 py-4 text-cream shadow-xl">
         <div className="flex items-center gap-3">
@@ -1209,7 +1351,7 @@ function SchoolTab({
           <div>
             <div className="font-serif text-base font-semibold">Save changes</div>
             <div className="text-xs text-cream/70">
-              Updates school info, hero, principal, and mission across the site.
+              Updates school info, hero, principal, mission, and stats across the site.
             </div>
           </div>
         </div>
@@ -2479,6 +2621,275 @@ function EventFormDialog({
             placeholder="A short description of the event."
           />
         </div>
+        <FormActions saving={saving} onCancel={() => onOpenChange(false)} />
+      </form>
+    </FormDialogShell>
+  )
+}
+
+// ─── Facilities Tab ───
+const FACILITY_ICONS = [
+  'FlaskConical',
+  'Library',
+  'Users',
+  'Sun',
+  'Coffee',
+  'Wifi',
+  'BookOpen',
+  'Microscope',
+  'Palette',
+  'Music',
+  'Dumbbell',
+  'GraduationCap',
+  'School',
+  'Building',
+  'Building2',
+  'TreePalm',
+  'Trees',
+  'Lightbulb',
+  'Laptop',
+  'Baby',
+]
+
+function FacilitiesTab({
+  items,
+  onAdd,
+  onUpdate,
+  onDelete,
+}: {
+  items: Facility[]
+  onAdd: (item: Facility) => Promise<void>
+  onUpdate: (item: Facility) => Promise<void>
+  onDelete: (id: number) => Promise<void>
+}) {
+  const [editing, setEditing] = React.useState<Facility | null>(null)
+  const [adding, setAdding] = React.useState(false)
+  const [confirmDelete, setConfirmDelete] = React.useState<Facility | null>(null)
+
+  return (
+    <div>
+      <CrudHeader
+        title="Facilities"
+        count={items.length}
+        onAdd={() => setAdding(true)}
+        addLabel="Add Facility"
+      />
+
+      {items.length === 0 ? (
+        <div className="rounded-sm border border-dashed border-gold/30 bg-cream/50 p-12 text-center text-muted-foreground">
+          No facilities yet. Click &ldquo;Add Facility&rdquo; to create one.
+        </div>
+      ) : (
+        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          {items.map((f) => (
+            <ItemRow key={f.id}>
+              <div className="flex h-full flex-col gap-3">
+                <div className="aspect-[4/3] overflow-hidden rounded-sm border border-gold/20 bg-cream/60">
+                  {isDataUrl(f.photo) ? (
+                    <img
+                      src={f.photo}
+                      alt={f.name}
+                      className="h-full w-full object-cover"
+                    />
+                  ) : (
+                    <div className="flex h-full w-full flex-col items-center justify-center gap-1 text-gold-deep/50">
+                      <DynamicIcon
+                        name={f.icon || 'Building'}
+                        className="size-7"
+                      />
+                      <span className="text-[10px] uppercase tracking-wider">
+                        {f.icon ? `Icon: ${f.icon}` : 'No icon'}
+                      </span>
+                    </div>
+                  )}
+                </div>
+                <div className="flex items-start gap-2">
+                  <DynamicIcon
+                    name={f.icon || 'Building'}
+                    className="size-4 shrink-0 translate-y-0.5 text-forest"
+                  />
+                  <div className="min-w-0">
+                    <div className="font-serif text-base font-semibold text-forest">
+                      {f.name}
+                    </div>
+                    <p className="mt-1 line-clamp-3 text-xs text-muted-foreground">
+                      {f.description}
+                    </p>
+                  </div>
+                </div>
+                <div className="mt-auto pt-2">
+                  <ItemActions
+                    onEdit={() => setEditing(f)}
+                    onDelete={() => setConfirmDelete(f)}
+                  />
+                </div>
+              </div>
+            </ItemRow>
+          ))}
+        </div>
+      )}
+
+      <FacilityFormDialog
+        open={adding}
+        onOpenChange={setAdding}
+        title="Add Facility"
+        onSubmit={async (item) => {
+          await onAdd(item)
+          setAdding(false)
+        }}
+      />
+      <FacilityFormDialog
+        open={!!editing}
+        onOpenChange={(o) => !o && setEditing(null)}
+        title="Edit Facility"
+        initial={editing ?? undefined}
+        onSubmit={async (item) => {
+          await onUpdate(item)
+          setEditing(null)
+        }}
+      />
+
+      <AlertDialog
+        open={!!confirmDelete}
+        onOpenChange={(o) => !o && setConfirmDelete(null)}
+      >
+        <AlertDialogContent className="rounded-sm border-gold/30">
+          <AlertDialogHeader>
+            <AlertDialogTitle className="font-serif text-2xl text-forest">
+              Delete facility?
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              {confirmDelete
+                ? `“${confirmDelete.name}” will be permanently removed. This cannot be undone.`
+                : ''}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel className="rounded-sm">Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              className="rounded-sm bg-crimson text-cream hover:bg-crimson/80"
+              onClick={() => {
+                if (confirmDelete?.id) void onDelete(confirmDelete.id)
+                setConfirmDelete(null)
+              }}
+            >
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </div>
+  )
+}
+
+function FacilityFormDialog({
+  open,
+  onOpenChange,
+  title,
+  initial,
+  onSubmit,
+}: {
+  open: boolean
+  onOpenChange: (o: boolean) => void
+  title: string
+  initial?: Facility
+  onSubmit: (item: Facility) => Promise<void>
+}) {
+  const [name, setName] = React.useState('')
+  const [description, setDescription] = React.useState('')
+  const [icon, setIcon] = React.useState('Building')
+  const [photo, setPhoto] = React.useState('')
+  const [saving, setSaving] = React.useState(false)
+
+  React.useEffect(() => {
+    if (open) {
+      setName(initial?.name ?? '')
+      setDescription(initial?.description ?? '')
+      setIcon(initial?.icon || 'Building')
+      setPhoto(initial?.photo ?? '')
+    }
+  }, [open, initial])
+
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault()
+    if (!name.trim()) {
+      toast.error('Name is required.')
+      return
+    }
+    setSaving(true)
+    try {
+      await onSubmit({
+        id: initial?.id,
+        name: name.trim(),
+        description: description.trim(),
+        icon: icon.trim() || 'Building',
+        photo: photo.trim(),
+      })
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  return (
+    <FormDialogShell open={open} onOpenChange={onOpenChange} title={title}>
+      <form onSubmit={handleSubmit} className="space-y-4">
+        <div className="space-y-2">
+          <FieldLabel>Facility Name</FieldLabel>
+          <Input
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            className="rounded-sm border-gold/30 bg-cream"
+            placeholder="e.g. Biology Laboratory"
+          />
+        </div>
+        <div className="space-y-2">
+          <FieldLabel>Description</FieldLabel>
+          <Textarea
+            rows={3}
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+            className="rounded-sm border-gold/30 bg-cream"
+            placeholder="A short description of the facility."
+          />
+        </div>
+        <div className="space-y-2">
+          <FieldLabel>Icon (Lucide icon name)</FieldLabel>
+          <Input
+            value={icon}
+            onChange={(e) => setIcon(e.target.value)}
+            className="rounded-sm border-gold/30 bg-cream"
+            placeholder="e.g. FlaskConical, Library, Users"
+          />
+          <div className="flex flex-wrap items-center gap-1.5 pt-1">
+            {FACILITY_ICONS.map((ic) => (
+              <button
+                key={ic}
+                type="button"
+                onClick={() => setIcon(ic)}
+                className={`flex size-8 items-center justify-center rounded-sm border transition-colors ${
+                  icon === ic
+                    ? 'border-forest bg-forest text-cream'
+                    : 'border-gold/30 bg-cream text-forest hover:border-gold/60'
+                }`}
+                title={ic}
+                aria-label={`Use icon ${ic}`}
+              >
+                <DynamicIcon name={ic} className="size-4" />
+              </button>
+            ))}
+          </div>
+          <p className="text-xs text-muted-foreground">
+            Click a suggested icon, or type any Lucide icon name. Used as the
+            fallback when no photo is uploaded.
+          </p>
+        </div>
+        <ImageUpload
+          label="Photo (optional)"
+          value={photo}
+          onChange={setPhoto}
+          aspect="aspect-[4/3]"
+          maxSize="size-32"
+        />
         <FormActions saving={saving} onCancel={() => onOpenChange(false)} />
       </form>
     </FormDialogShell>

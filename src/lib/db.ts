@@ -151,6 +151,19 @@ export async function initDb() {
       ['vice_principal_title', 'TEXT'],
       ['vice_principal_message', 'TEXT'],
       ['vice_principal_photo', 'TEXT'],
+      // Homepage stats (added in Task 11) — 4 stats × (value INT + suffix TEXT + label TEXT)
+      ['stat_years', 'INTEGER'],
+      ['stat_years_suffix', 'TEXT'],
+      ['stat_years_label', 'TEXT'],
+      ['stat_students', 'INTEGER'],
+      ['stat_students_suffix', 'TEXT'],
+      ['stat_students_label', 'TEXT'],
+      ['stat_educators', 'INTEGER'],
+      ['stat_educators_suffix', 'TEXT'],
+      ['stat_educators_label', 'TEXT'],
+      ['stat_pass_rate', 'INTEGER'],
+      ['stat_pass_rate_suffix', 'TEXT'],
+      ['stat_pass_rate_label', 'TEXT'],
       ['updated_at', 'TIMESTAMP DEFAULT NOW()'],
     ]
     for (const [col, type] of schoolCols) {
@@ -220,6 +233,17 @@ export async function initDb() {
         updated_at TIMESTAMP DEFAULT NOW()
       )
     `)
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS facilities (
+        id SERIAL PRIMARY KEY,
+        name TEXT NOT NULL,
+        description TEXT,
+        icon TEXT,
+        photo TEXT,
+        sort_order INTEGER DEFAULT 0,
+        updated_at TIMESTAMP DEFAULT NOW()
+      )
+    `)
   } finally {
     client.release()
   }
@@ -230,8 +254,8 @@ export async function initDb() {
 // row in school_info but empty gallery) still gets the rest of the data.
 export async function seedIfEmpty() {
   const {
-    SCHOOL, HERO, PRINCIPAL, MISSION,
-    GALLERY, TEACHERS, LEADERSHIP, NEWS, EVENTS,
+    SCHOOL, HERO, PRINCIPAL, MISSION, STATS,
+    GALLERY, TEACHERS, LEADERSHIP, NEWS, EVENTS, FACILITIES,
   } = await import('@/lib/content')
 
   const client = await pool.connect()
@@ -239,7 +263,7 @@ export async function seedIfEmpty() {
     // school_info: seed if missing or if the existing row looks partial
     // (no hero/principal/mission data).
     const schoolRow = await client.query(
-      'SELECT id, hero_eyebrow, principal_name, mission_title FROM school_info WHERE id = 1'
+      'SELECT id, hero_eyebrow, principal_name, mission_title, stat_years FROM school_info WHERE id = 1'
     )
     if (schoolRow.rows.length === 0) {
       await client.query(
@@ -247,8 +271,12 @@ export async function seedIfEmpty() {
           facebook, twitter, instagram, youtube, telegram,
           hero_eyebrow, hero_title, hero_description, hero_primary_button, hero_secondary_button,
           principal_name, principal_title, principal_message, principal_signature,
-          mission_eyebrow, mission_title, mission_description, mission_quote, mission_quote_source)
-         VALUES (1, $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22, $23, $24, $25, $26, $27, $28)`,
+          mission_eyebrow, mission_title, mission_description, mission_quote, mission_quote_source,
+          stat_years, stat_years_suffix, stat_years_label,
+          stat_students, stat_students_suffix, stat_students_label,
+          stat_educators, stat_educators_suffix, stat_educators_label,
+          stat_pass_rate, stat_pass_rate_suffix, stat_pass_rate_label)
+         VALUES (1, $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22, $23, $24, $25, $26, $27, $28, $29, $30, $31, $32, $33, $34, $35, $36, $37, $38, $39, $40)`,
         [
           SCHOOL.name, SCHOOL.tagline, SCHOOL.subtitle, SCHOOL.established,
           SCHOOL.email, SCHOOL.phone, SCHOOL.altPhone, SCHOOL.address, SCHOOL.hours,
@@ -256,6 +284,11 @@ export async function seedIfEmpty() {
           HERO.eyebrow, HERO.title, HERO.description, HERO.primaryButton, HERO.secondaryButton,
           PRINCIPAL.name, PRINCIPAL.title, PRINCIPAL.message, PRINCIPAL.signature,
           MISSION.eyebrow, MISSION.title, MISSION.description, MISSION.quote, MISSION.quoteSource,
+          // Stats defaults (from STATS array — order: years, students, educators, passRate)
+          STATS[0].value, STATS[0].suffix, STATS[0].label,
+          STATS[1].value, STATS[1].suffix, STATS[1].label,
+          STATS[2].value, STATS[2].suffix, STATS[2].label,
+          STATS[3].value, STATS[3].suffix, STATS[3].label,
         ]
       )
     } else {
@@ -281,6 +314,25 @@ export async function seedIfEmpty() {
             HERO.eyebrow, HERO.title, HERO.description, HERO.primaryButton, HERO.secondaryButton,
             PRINCIPAL.name, PRINCIPAL.title, PRINCIPAL.message, PRINCIPAL.signature,
             MISSION.eyebrow, MISSION.title, MISSION.description, MISSION.quote, MISSION.quoteSource,
+          ]
+        )
+      }
+      // If the row exists but stats were never seeded (stat_years IS NULL),
+      // backfill just the stats columns without overwriting the rest.
+      const statsMissing = r.stat_years === null || r.stat_years === undefined
+      if (statsMissing) {
+        await client.query(
+          `UPDATE school_info SET
+            stat_years = $1, stat_years_suffix = $2, stat_years_label = $3,
+            stat_students = $4, stat_students_suffix = $5, stat_students_label = $6,
+            stat_educators = $7, stat_educators_suffix = $8, stat_educators_label = $9,
+            stat_pass_rate = $10, stat_pass_rate_suffix = $11, stat_pass_rate_label = $12
+           WHERE id = 1`,
+          [
+            STATS[0].value, STATS[0].suffix, STATS[0].label,
+            STATS[1].value, STATS[1].suffix, STATS[1].label,
+            STATS[2].value, STATS[2].suffix, STATS[2].label,
+            STATS[3].value, STATS[3].suffix, STATS[3].label,
           ]
         )
       }
@@ -316,6 +368,12 @@ export async function seedIfEmpty() {
       'events',
       () => EVENTS.map((e) => [e.title, e.date, e.time, e.location, e.category, e.description]),
       'INSERT INTO events (title, date, time, location, category, description) VALUES ($1, $2, $3, $4, $5, $6)'
+    )
+    await seedTableIfEmpty(
+      client,
+      'facilities',
+      () => FACILITIES.map((f) => [f.name, f.description, f.icon]),
+      'INSERT INTO facilities (name, description, icon) VALUES ($1, $2, $3)'
     )
     return true
   } finally {

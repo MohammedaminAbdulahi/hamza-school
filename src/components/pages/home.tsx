@@ -38,6 +38,7 @@ import {
 import { isDataUrl } from '@/lib/image-upload'
 
 // DB content shape (subset of what /api/content returns)
+type DbStat = { key: string; label: string; value: number; suffix: string }
 type DbSchool = {
   hero?: Partial<typeof HERO>
   mission?: Partial<typeof MISSION>
@@ -48,6 +49,7 @@ type DbSchool = {
     message?: string
     photo?: string
   }
+  stats?: DbStat[]
 }
 type DbEvent = {
   id?: number
@@ -76,6 +78,7 @@ export function HomePage() {
     photo: string
   }>({ name: '', title: '', message: '', photo: '' })
   const [events, setEvents] = React.useState<typeof EVENTS>(EVENTS)
+  const [stats, setStats] = React.useState<typeof STATS>(STATS)
 
   React.useEffect(() => {
     fetch('/api/content')
@@ -97,6 +100,17 @@ export function HomePage() {
               message: d.school.vicePrincipal.message ?? '',
               photo: d.school.vicePrincipal.photo ?? '',
             })
+          // Merge fetched stats over the content.ts defaults so partial DB
+          // responses (e.g. only some columns set) stay safe.
+          if (Array.isArray(d.school.stats) && d.school.stats.length === 4) {
+            setStats(
+              d.school.stats.map((s, i) => ({
+                label: s.label ?? STATS[i]?.label ?? '',
+                value: Number(s.value) || 0,
+                suffix: s.suffix ?? STATS[i]?.suffix ?? '',
+              })) as typeof STATS
+            )
+          }
         }
         if (Array.isArray(d.events) && d.events.length > 0) {
           setEvents(d.events as unknown as typeof EVENTS)
@@ -269,8 +283,8 @@ export function HomePage() {
       <section className="bg-forest py-20 text-cream">
         <div className="mx-auto max-w-6xl px-6 lg:px-12">
           <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
-            {STATS.map((stat, i) => (
-              <Reveal key={stat.label} delay={i * 0.1} className="text-center">
+            {stats.map((stat, i) => (
+              <Reveal key={stat.label + i} delay={i * 0.1} className="text-center">
                 <div className="font-serif text-5xl font-semibold text-gold-light sm:text-6xl">
                   <AnimatedCounter value={stat.value} suffix={stat.suffix} />
                 </div>
@@ -318,11 +332,6 @@ export function HomePage() {
                   alt="Hamza School learning environment"
                   className="h-full w-full object-cover"
                 />
-              </div>
-              {/* Floating stat */}
-              <div className="animate-float absolute -bottom-8 -left-8 bg-forest p-6 shadow-2xl">
-                <div className="font-serif text-4xl font-semibold text-gold-light">96%</div>
-                <div className="mt-1 text-xs uppercase tracking-wider text-cream/80">National Exam Pass Rate</div>
               </div>
             </div>
           </Reveal>
@@ -405,53 +414,6 @@ export function HomePage() {
               )
             })}
           </div>
-        </div>
-      </section>
-
-      {/* ===== TESTIMONIALS ===== */}
-      <section className="bg-cream py-32">
-        <div className="mx-auto max-w-6xl px-6 lg:px-12">
-          <Reveal className="mb-16 text-center">
-            <div className="ornament mb-6"><span className="text-gold">✦</span></div>
-            <p className="section-label">Voices</p>
-            <h2 className="mt-4 font-serif text-5xl font-medium text-foreground lg:text-6xl">
-              What families <em className="italic text-gold-deep">say</em>
-            </h2>
-          </Reveal>
-          <Reveal delay={0.1} className="mt-12">
-            <Carousel opts={{ align: 'start', loop: true }} className="w-full">
-              <CarouselContent>
-                {TESTIMONIALS.map((t) => (
-                  <CarouselItem key={t.name} className="md:basis-1/2 lg:basis-1/2">
-                    <div className="h-full border border-gold/18 bg-paper p-10">
-                      <Quote className="size-8 text-gold/50" />
-                      <div className="mt-3 flex gap-0.5">
-                        {Array.from({ length: t.rating }).map((_, i) => (
-                          <Star key={i} className="size-4 fill-gold text-gold" />
-                        ))}
-                      </div>
-                      <p className="mt-5 flex-1 font-serif text-lg italic leading-relaxed text-foreground">
-                        &ldquo;{t.quote}&rdquo;
-                      </p>
-                      <div className="mt-7 flex items-center gap-3">
-                        <Avatar className="size-12 border-2 border-gold/30">
-                          <AvatarFallback className="bg-forest font-serif font-semibold text-gold-light">
-                            {t.name.split(' ').map((n) => n[0]).slice(0, 2).join('')}
-                          </AvatarFallback>
-                        </Avatar>
-                        <div>
-                          <p className="font-serif font-semibold text-foreground">{t.name}</p>
-                          <p className="text-xs text-muted-foreground">{t.role}</p>
-                        </div>
-                      </div>
-                    </div>
-                  </CarouselItem>
-                ))}
-              </CarouselContent>
-              <CarouselPrevious className="left-2" />
-              <CarouselNext className="right-2" />
-            </Carousel>
-          </Reveal>
         </div>
       </section>
 
@@ -547,6 +509,54 @@ export function HomePage() {
           </div>
         </section>
       )}
+
+      {/* ===== TESTIMONIALS ===== */}
+      <section className="bg-cream py-32">
+        <div className="mx-auto max-w-6xl px-6 lg:px-12">
+          <Reveal className="mb-16 text-center">
+            <div className="ornament mb-6"><span className="text-gold">✦</span></div>
+            <p className="section-label">Voices</p>
+            <h2 className="mt-4 font-serif text-5xl font-medium text-foreground lg:text-6xl">
+              What families <em className="italic text-gold-deep">say</em>
+            </h2>
+          </Reveal>
+          <Reveal delay={0.1} className="mt-12">
+            <Carousel opts={{ align: 'start', loop: true }} className="w-full">
+              <CarouselContent>
+                {TESTIMONIALS.map((t) => (
+                  <CarouselItem key={t.name} className="md:basis-1/2 lg:basis-1/2">
+                    <div className="h-full border border-gold/18 bg-paper p-10">
+                      <Quote className="size-8 text-gold/50" />
+                      <div className="mt-3 flex gap-0.5">
+                        {Array.from({ length: t.rating }).map((_, i) => (
+                          <Star key={i} className="size-4 fill-gold text-gold" />
+                        ))}
+                      </div>
+                      <p className="mt-5 flex-1 font-serif text-lg italic leading-relaxed text-foreground">
+                        &ldquo;{t.quote}&rdquo;
+                      </p>
+                      <div className="mt-7 flex items-center gap-3">
+                        <Avatar className="size-12 border-2 border-gold/30">
+                          <AvatarFallback className="bg-forest font-serif font-semibold text-gold-light">
+                            {t.name.split(' ').map((n) => n[0]).slice(0, 2).join('')}
+                          </AvatarFallback>
+                        </Avatar>
+                        <div>
+                          <p className="font-serif font-semibold text-foreground">{t.name}</p>
+                          <p className="text-xs text-muted-foreground">{t.role}</p>
+                        </div>
+                      </div>
+                    </div>
+                  </CarouselItem>
+                ))}
+              </CarouselContent>
+              <CarouselPrevious className="left-2" />
+              <CarouselNext className="right-2" />
+            </Carousel>
+          </Reveal>
+        </div>
+      </section>
+
 
       {/* ===== CTA / CONTACT ===== */}
       <section className="paper-texture relative overflow-hidden py-32">

@@ -27,9 +27,30 @@ const QUICK_LINKS: { label: string; page: PageId }[] = [
   { label: 'Contact', page: 'contact' },
 ]
 
+type DbSchool = Partial<typeof SCHOOL>
+
 export function Footer() {
   const goPage = useNav((s) => s.goPage)
   const [email, setEmail] = React.useState('')
+  // Hydrate school info from the DB so the established year + contact details
+  // stay in sync with what the admin edited. Falls back to content.ts defaults.
+  const [school, setSchool] = React.useState<typeof SCHOOL>(SCHOOL)
+
+  React.useEffect(() => {
+    fetch('/api/content')
+      .then((r) => r.json())
+      .then((d: { school?: DbSchool }) => {
+        if (d.school) {
+          setSchool({
+            ...SCHOOL,
+            ...d.school,
+            // Preserve nested defaults if the API didn't return social.
+            social: { ...SCHOOL.social, ...(d.school.social ?? {}) },
+          })
+        }
+      })
+      .catch(() => { /* keep defaults on error */ })
+  }, [])
 
   const subscribe = (e: React.FormEvent) => {
     e.preventDefault()
@@ -83,16 +104,16 @@ export function Footer() {
         <div className="space-y-4">
           <Logo variant="default" />
           <p className="text-sm text-muted-foreground">
-            {SCHOOL.tagline} A premier learning community nurturing curious minds and
-            courageous hearts since {SCHOOL.established}.
+            {school.tagline} A premier learning community nurturing curious minds and
+            courageous hearts since {school.established}.
           </p>
           <div className="flex gap-2">
             {[
-              { icon: Facebook, href: SCHOOL.social.facebook, label: 'Facebook' },
-              { icon: Twitter, href: SCHOOL.social.twitter, label: 'Twitter' },
-              { icon: Instagram, href: SCHOOL.social.instagram, label: 'Instagram' },
-              { icon: Youtube, href: SCHOOL.social.youtube, label: 'YouTube' },
-              { icon: Send, href: SCHOOL.social.telegram, label: 'Telegram' },
+              { icon: Facebook, href: school.social?.facebook ?? SCHOOL.social.facebook, label: 'Facebook' },
+              { icon: Twitter, href: school.social?.twitter ?? SCHOOL.social.twitter, label: 'Twitter' },
+              { icon: Instagram, href: school.social?.instagram ?? SCHOOL.social.instagram, label: 'Instagram' },
+              { icon: Youtube, href: school.social?.youtube ?? SCHOOL.social.youtube, label: 'YouTube' },
+              { icon: Send, href: school.social?.telegram ?? SCHOOL.social.telegram, label: 'Telegram' },
             ].map((s) => (
               <a
                 key={s.label}
@@ -159,19 +180,19 @@ export function Footer() {
           <ul className="space-y-3 text-sm text-muted-foreground">
             <li className="flex items-start gap-2.5">
               <MapPin className="mt-0.5 size-4 shrink-0 text-primary" />
-              <span>{SCHOOL.address}</span>
+              <span>{school.address}</span>
             </li>
             <li className="flex items-center gap-2.5">
               <Phone className="size-4 shrink-0 text-primary" />
-              <span>{SCHOOL.phone}</span>
+              <span>{school.phone}</span>
             </li>
             <li className="flex items-center gap-2.5">
               <Mail className="size-4 shrink-0 text-primary" />
-              <span>{SCHOOL.email}</span>
+              <span>{school.email}</span>
             </li>
             <li className="flex items-start gap-2.5">
               <Clock className="mt-0.5 size-4 shrink-0 text-primary" />
-              <span>{SCHOOL.hours}</span>
+              <span>{school.hours}</span>
             </li>
           </ul>
         </div>
@@ -180,7 +201,7 @@ export function Footer() {
       <div className="border-t border-border/60">
         <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-3 px-4 py-6 text-xs text-muted-foreground sm:flex-row sm:px-6 lg:px-8">
           <p>
-            © {new Date().getFullYear()} {SCHOOL.name}. All rights reserved.
+            © {new Date().getFullYear()} {school.name}. All rights reserved.
           </p>
           <div className="flex items-center gap-4">
             <button className="hover:text-primary">Privacy Policy</button>

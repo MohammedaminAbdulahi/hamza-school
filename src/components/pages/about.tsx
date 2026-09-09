@@ -42,12 +42,15 @@ import {
 
 type DbLeader = { id?: number; name: string; role: string; bio: string; initials: string; photo?: string }
 type DbTeacher = { id?: number; name: string; subject: string; years: number; initials: string }
+type DbStat = { key: string; label: string; value: number; suffix: string }
+type DbFacility = { id?: number; name: string; description: string; icon: string; photo?: string }
 type DbSchool = {
   name?: string
   established?: number
   hero?: Partial<typeof MISSION>
   mission?: Partial<typeof MISSION>
   principal?: Partial<typeof PRINCIPAL> & { photo?: string }
+  stats?: DbStat[]
 }
 
 export function AboutPage() {
@@ -58,21 +61,51 @@ export function AboutPage() {
   const [principal, setPrincipal] = React.useState(PRINCIPAL)
   const [leadership, setLeadership] = React.useState(LEADERSHIP)
   const [teachers, setTeachers] = React.useState(TEACHERS)
+  const [stats, setStats] = React.useState<typeof STATS>(STATS)
+  const [facilities, setFacilities] = React.useState<typeof FACILITIES>(FACILITIES)
 
   React.useEffect(() => {
     fetch('/api/content')
       .then((r) => r.json())
-      .then((d: { school?: DbSchool; leadership?: DbLeader[]; teachers?: DbTeacher[] }) => {
+      .then((d: {
+        school?: DbSchool
+        leadership?: DbLeader[]
+        teachers?: DbTeacher[]
+        facilities?: DbFacility[]
+      }) => {
         if (d.school) {
           setSchool({ ...SCHOOL, ...d.school, social: SCHOOL.social })
           if (d.school.mission) setMission({ ...MISSION, ...d.school.mission })
           if (d.school.principal) setPrincipal({ ...PRINCIPAL, ...d.school.principal })
+          // Merge fetched stats over the content.ts defaults so partial DB
+          // responses stay safe.
+          if (Array.isArray(d.school.stats) && d.school.stats.length === 4) {
+            setStats(
+              d.school.stats.map((s, i) => ({
+                label: s.label ?? STATS[i]?.label ?? '',
+                value: Number(s.value) || 0,
+                suffix: s.suffix ?? STATS[i]?.suffix ?? '',
+              })) as typeof STATS
+            )
+          }
         }
         if (Array.isArray(d.leadership) && d.leadership.length > 0) {
           setLeadership(d.leadership as unknown as typeof LEADERSHIP)
         }
         if (Array.isArray(d.teachers) && d.teachers.length > 0) {
           setTeachers(d.teachers as unknown as typeof TEACHERS)
+        }
+        // Hydrate facilities from the DB, falling back to content.ts defaults
+        // so the section is always populated even if the DB is unreachable.
+        if (Array.isArray(d.facilities) && d.facilities.length > 0) {
+          setFacilities(
+            d.facilities.map((f, i) => ({
+              icon: f.icon || FACILITIES[i]?.icon || 'Building',
+              name: f.name,
+              description: f.description,
+              photo: f.photo,
+            })) as typeof FACILITIES
+          )
         }
       })
       .catch(() => { /* keep defaults on error */ })
@@ -93,8 +126,8 @@ export function AboutPage() {
       <section className="border-b border-border/60 bg-muted/30">
         <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
           <div className="grid grid-cols-2 gap-6 md:grid-cols-4">
-            {STATS.map((stat, i) => (
-              <Reveal key={stat.label} delay={i * 0.08}>
+            {stats.map((stat, i) => (
+              <Reveal key={stat.label + i} delay={i * 0.08}>
                 <div className="text-center">
                   <div className="text-3xl font-bold tracking-tight text-primary sm:text-4xl">
                     <AnimatedCounter value={stat.value} suffix={stat.suffix} />
@@ -275,7 +308,7 @@ export function AboutPage() {
                     <Award className="size-5 text-amber-500" />
                     <div>
                       <div className="text-xs text-muted-foreground">Leading since</div>
-                      <div className="text-sm font-semibold">2015</div>
+                      <div className="text-sm font-semibold">{school.established}</div>
                     </div>
                   </div>
                 </div>
@@ -394,30 +427,41 @@ export function AboutPage() {
             />
           </Reveal>
           <div className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-            {FACILITIES.map((facility, i) => (
-              <Reveal key={facility.name} delay={i * 0.06}>
-                <Card className="group h-full overflow-hidden py-0 transition-all hover:-translate-y-1 hover:shadow-lg">
-                  <div className="relative">
-                    <SmartImage
-                      seed={`about-facility-${facility.name}`}
-                      alt={facility.name}
-                      icon={facility.icon}
-                      label={facility.name}
-                      className="aspect-[16/9] w-full"
-                    />
-                  </div>
-                  <CardHeader>
-                    <div className="flex items-center gap-2">
-                      <DynamicIcon name={facility.icon} className="size-5 text-primary" />
-                      <CardTitle className="text-base">{facility.name}</CardTitle>
+            {facilities.map((facility, i) => {
+              const photo = (facility as { photo?: string }).photo
+              return (
+                <Reveal key={facility.name} delay={i * 0.06}>
+                  <Card className="group h-full overflow-hidden py-0 transition-all hover:-translate-y-1 hover:shadow-lg">
+                    <div className="relative">
+                      {isDataUrl(photo) ? (
+                        <img
+                          src={photo}
+                          alt={facility.name}
+                          className="aspect-[16/9] w-full object-cover"
+                        />
+                      ) : (
+                        <SmartImage
+                          seed={`about-facility-${facility.name}`}
+                          alt={facility.name}
+                          icon={facility.icon}
+                          label={facility.name}
+                          className="aspect-[16/9] w-full"
+                        />
+                      )}
                     </div>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-sm text-muted-foreground">{facility.description}</p>
-                  </CardContent>
-                </Card>
-              </Reveal>
-            ))}
+                    <CardHeader>
+                      <div className="flex items-center gap-2">
+                        <DynamicIcon name={facility.icon} className="size-5 text-primary" />
+                        <CardTitle className="text-base">{facility.name}</CardTitle>
+                      </div>
+                    </CardHeader>
+                    <CardContent>
+                      <p className="text-sm text-muted-foreground">{facility.description}</p>
+                    </CardContent>
+                  </Card>
+                </Reveal>
+              )
+            })}
           </div>
         </div>
       </section>

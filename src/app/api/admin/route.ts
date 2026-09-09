@@ -43,6 +43,52 @@ function num(v: unknown): number {
   return Number.isFinite(n) ? n : 0
 }
 
+// ─── Stats helpers ───
+// The DB stores 4 stats as flat columns (stat_years, stat_years_suffix, …).
+// The API shape exposes them as a `stats` array of 4 objects:
+//   { key, label, value, suffix }
+// Order is fixed: years, students, educators, passRate.
+type StatRow = { key: string; label: string; value: number; suffix: string }
+const STAT_KEYS = ['years', 'students', 'educators', 'passRate'] as const
+const STAT_COLS: Record<(typeof STAT_KEYS)[number], { value: string; suffix: string; label: string }> = {
+  years: { value: 'stat_years', suffix: 'stat_years_suffix', label: 'stat_years_label' },
+  students: { value: 'stat_students', suffix: 'stat_students_suffix', label: 'stat_students_label' },
+  educators: { value: 'stat_educators', suffix: 'stat_educators_suffix', label: 'stat_educators_label' },
+  passRate: { value: 'stat_pass_rate', suffix: 'stat_pass_rate_suffix', label: 'stat_pass_rate_label' },
+}
+
+function statsFromRow(s: Record<string, unknown>): StatRow[] {
+  return STAT_KEYS.map((key) => {
+    const cols = STAT_COLS[key]
+    const rawValue = s[cols.value]
+    return {
+      key,
+      label: typeof s[cols.label] === 'string' ? (s[cols.label] as string) : '',
+      value: rawValue === null || rawValue === undefined ? 0 : Number(rawValue) || 0,
+      suffix: typeof s[cols.suffix] === 'string' ? (s[cols.suffix] as string) : '',
+    }
+  })
+}
+
+// Pull stats out of the body. Accepts either a `stats` array of 4 objects OR
+// flat legacy fields (ignored if `stats` is present).
+function statsFromBody(body: Record<string, unknown>): StatRow[] {
+  const incoming = body.stats
+  if (Array.isArray(incoming) && incoming.length === 4) {
+    return STAT_KEYS.map((key, i) => {
+      const item = (incoming[i] ?? {}) as Record<string, unknown>
+      return {
+        key,
+        label: str(item.label, 200),
+        value: num(item.value),
+        suffix: str(item.suffix, 20),
+      }
+    })
+  }
+  // Fall back: leave zeros/empties (caller should always pass `stats`)
+  return STAT_KEYS.map((key) => ({ key, label: '', value: 0, suffix: '' }))
+}
+
 // ─── Re-fetch everything for a fresh snapshot ───
 async function getAll() {
   await initDb()
@@ -54,6 +100,7 @@ async function getAll() {
     leadershipRes,
     newsRes,
     eventsRes,
+    facilitiesRes,
   ] = await Promise.all([
     pool.query('SELECT * FROM school_info WHERE id = 1 LIMIT 1'),
     pool.query(
@@ -70,6 +117,9 @@ async function getAll() {
     ),
     pool.query(
       'SELECT id, title, date, time, location, category, description FROM events ORDER BY date ASC, id ASC'
+    ),
+    pool.query(
+      'SELECT id, name, description, icon, photo FROM facilities ORDER BY id ASC'
     ),
   ])
 
@@ -119,6 +169,7 @@ async function getAll() {
           quote: s.mission_quote,
           quoteSource: s.mission_quote_source,
         },
+        stats: statsFromRow(s),
       }
     : null
 
@@ -130,6 +181,7 @@ async function getAll() {
     leadership: leadershipRes.rows,
     news: newsRes.rows,
     events: eventsRes.rows,
+    facilities: facilitiesRes.rows,
   }
 }
 
@@ -140,6 +192,7 @@ async function updateSchool(school: Record<string, unknown>) {
   const principal = (school.principal ?? {}) as Record<string, unknown>
   const vicePrincipal = (school.vicePrincipal ?? {}) as Record<string, unknown>
   const mission = (school.mission ?? {}) as Record<string, unknown>
+  const stats = statsFromBody(school)
 
   await pool.query(
     `INSERT INTO school_info (
@@ -149,8 +202,12 @@ async function updateSchool(school: Record<string, unknown>) {
         principal_name, principal_title, principal_message, principal_signature, principal_photo,
         vice_principal_name, vice_principal_title, vice_principal_message, vice_principal_photo,
         mission_eyebrow, mission_title, mission_description, mission_quote, mission_quote_source,
+        stat_years, stat_years_suffix, stat_years_label,
+        stat_students, stat_students_suffix, stat_students_label,
+        stat_educators, stat_educators_suffix, stat_educators_label,
+        stat_pass_rate, stat_pass_rate_suffix, stat_pass_rate_label,
         updated_at
-      ) VALUES (1, $1,$2,$3,$4,$5,$6,$7,$8,$9, $10,$11,$12,$13,$14, $15,$16,$17,$18,$19, $20,$21,$22,$23,$24, $25,$26,$27,$28, $29,$30,$31,$32,$33, NOW())
+      ) VALUES (1, $1,$2,$3,$4,$5,$6,$7,$8,$9, $10,$11,$12,$13,$14, $15,$16,$17,$18,$19, $20,$21,$22,$23,$24, $25,$26,$27,$28, $29,$30,$31,$32,$33, $34,$35,$36, $37,$38,$39, $40,$41,$42, $43,$44,$45, NOW())
       ON CONFLICT (id) DO UPDATE SET
         name = EXCLUDED.name,
         tagline = EXCLUDED.tagline,
@@ -185,6 +242,18 @@ async function updateSchool(school: Record<string, unknown>) {
         mission_description = EXCLUDED.mission_description,
         mission_quote = EXCLUDED.mission_quote,
         mission_quote_source = EXCLUDED.mission_quote_source,
+        stat_years = EXCLUDED.stat_years,
+        stat_years_suffix = EXCLUDED.stat_years_suffix,
+        stat_years_label = EXCLUDED.stat_years_label,
+        stat_students = EXCLUDED.stat_students,
+        stat_students_suffix = EXCLUDED.stat_students_suffix,
+        stat_students_label = EXCLUDED.stat_students_label,
+        stat_educators = EXCLUDED.stat_educators,
+        stat_educators_suffix = EXCLUDED.stat_educators_suffix,
+        stat_educators_label = EXCLUDED.stat_educators_label,
+        stat_pass_rate = EXCLUDED.stat_pass_rate,
+        stat_pass_rate_suffix = EXCLUDED.stat_pass_rate_suffix,
+        stat_pass_rate_label = EXCLUDED.stat_pass_rate_label,
         updated_at = NOW()
       `,
     [
@@ -221,6 +290,11 @@ async function updateSchool(school: Record<string, unknown>) {
       str(mission.description, 4000),
       str(mission.quote, 500),
       str(mission.quoteSource, 200),
+      // Stats — order: years, students, educators, passRate
+      stats[0].value, stats[0].suffix, stats[0].label,
+      stats[1].value, stats[1].suffix, stats[1].label,
+      stats[2].value, stats[2].suffix, stats[2].label,
+      stats[3].value, stats[3].suffix, stats[3].label,
     ]
   )
 }
@@ -384,6 +458,26 @@ export async function POST(req: NextRequest) {
       }
       case 'delete_event': {
         await pool.query('DELETE FROM events WHERE id=$1', [num(body.id)])
+        return NextResponse.json(await getAll())
+      }
+
+      // ─── Facilities ───
+      case 'add_facility': {
+        await pool.query(
+          'INSERT INTO facilities (name, description, icon, photo) VALUES ($1, $2, $3, $4)',
+          [str(body.name, 200), str(body.description, 1000), str(body.icon, 100), strImg(body.photo)]
+        )
+        return NextResponse.json(await getAll())
+      }
+      case 'update_facility': {
+        await pool.query(
+          'UPDATE facilities SET name=$1, description=$2, icon=$3, photo=$4, updated_at=NOW() WHERE id=$5',
+          [str(body.name, 200), str(body.description, 1000), str(body.icon, 100), strImg(body.photo), num(body.id)]
+        )
+        return NextResponse.json(await getAll())
+      }
+      case 'delete_facility': {
+        await pool.query('DELETE FROM facilities WHERE id=$1', [num(body.id)])
         return NextResponse.json(await getAll())
       }
 

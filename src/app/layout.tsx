@@ -4,6 +4,7 @@ import "./globals.css";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as SonnerToaster } from "@/components/ui/sonner";
 import { ThemeProvider } from "@/components/theme-provider";
+import { pool, initDb } from "@/lib/db";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -111,11 +112,28 @@ export const viewport = {
   initialScale: 1,
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  // Pull the established year from the DB so the JSON-LD structured data
+  // stays in sync with what the admin edited. Falls back to 2015 if the
+  // DB is unreachable or the column is missing.
+  let establishedYear = 2015;
+  try {
+    await initDb();
+    const res = await pool.query(
+      "SELECT established FROM school_info WHERE id = 1 LIMIT 1"
+    );
+    const row = res.rows[0] as { established?: number | null } | undefined;
+    if (row && typeof row.established === "number" && row.established > 0) {
+      establishedYear = row.established;
+    }
+  } catch {
+    // ignore — use the static fallback
+  }
+
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
@@ -140,7 +158,7 @@ export default function RootLayout({
                 addressLocality: "Addis Ababa",
                 addressCountry: "ET",
               },
-              foundingDate: "2015",
+              foundingDate: String(establishedYear),
               slogan: "Guiding Hearts. Growing Minds.",
             }),
           }}
