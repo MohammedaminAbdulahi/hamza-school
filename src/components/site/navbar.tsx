@@ -6,7 +6,6 @@ import {
   Search,
   Sun,
   Moon,
-  X,
   ArrowRight,
 } from 'lucide-react'
 import { useTheme } from 'next-themes'
@@ -133,13 +132,10 @@ export function Navbar() {
               </Button>
             </SheetTrigger>
             <SheetContent side="right" className="w-full border-0 bg-cream p-8 sm:w-96">
-              <SheetHeader className="flex-row items-center justify-between space-y-0">
+              <SheetHeader className="space-y-0">
                 <SheetTitle className="text-left">
                   <Logo onClick={() => setMobileNavOpen(false)} size="sm" />
                 </SheetTitle>
-                <Button variant="ghost" size="icon" onClick={() => setMobileNavOpen(false)} aria-label="Close">
-                  <X className="size-5" />
-                </Button>
               </SheetHeader>
               <nav className="mt-12 flex flex-col gap-6" aria-label="Mobile navigation">
                 {PAGES.map((p, i) => (
