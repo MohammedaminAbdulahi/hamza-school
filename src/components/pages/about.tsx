@@ -39,15 +39,50 @@ import {
   AccordionTrigger,
 } from '@/components/ui/accordion'
 
+type DbLeader = { id?: number; name: string; role: string; bio: string; initials: string }
+type DbTeacher = { id?: number; name: string; subject: string; years: number; initials: string }
+type DbSchool = {
+  name?: string
+  established?: number
+  hero?: Partial<typeof MISSION>
+  mission?: Partial<typeof MISSION>
+  principal?: Partial<typeof PRINCIPAL>
+}
+
 export function AboutPage() {
   const goPage = useNav((s) => s.goPage)
+
+  const [school, setSchool] = React.useState(SCHOOL)
+  const [mission, setMission] = React.useState(MISSION)
+  const [principal, setPrincipal] = React.useState(PRINCIPAL)
+  const [leadership, setLeadership] = React.useState(LEADERSHIP)
+  const [teachers, setTeachers] = React.useState(TEACHERS)
+
+  React.useEffect(() => {
+    fetch('/api/content')
+      .then((r) => r.json())
+      .then((d: { school?: DbSchool; leadership?: DbLeader[]; teachers?: DbTeacher[] }) => {
+        if (d.school) {
+          setSchool({ ...SCHOOL, ...d.school, social: SCHOOL.social })
+          if (d.school.mission) setMission({ ...MISSION, ...d.school.mission })
+          if (d.school.principal) setPrincipal({ ...PRINCIPAL, ...d.school.principal })
+        }
+        if (Array.isArray(d.leadership) && d.leadership.length > 0) {
+          setLeadership(d.leadership as unknown as typeof LEADERSHIP)
+        }
+        if (Array.isArray(d.teachers) && d.teachers.length > 0) {
+          setTeachers(d.teachers as unknown as typeof TEACHERS)
+        }
+      })
+      .catch(() => { /* keep defaults on error */ })
+  }, [])
 
   return (
     <div className="flex flex-col">
       <PageHero
         eyebrow="About Us"
         title="A community where every child is seen, valued, and inspired"
-        description={`Since ${SCHOOL.established}, ${SCHOOL.name} has been a family-like learning home in Addis Ababa — where children grow in confidence, character, and curiosity. Meet the people, places, and principles that make us who we are.`}
+        description={`Since ${school.established}, ${school.name} has been a family-like learning home in Addis Ababa — where children grow in confidence, character, and curiosity. Meet the people, places, and principles that make us who we are.`}
         seed="about-hero"
         icon="School"
         breadcrumb="About Us"
@@ -140,7 +175,7 @@ export function AboutPage() {
                 </CardHeader>
                 <CardContent>
                   <p className="text-sm leading-relaxed text-muted-foreground">
-                    {MISSION.description}
+                    {mission.description}
                   </p>
                 </CardContent>
               </Card>
@@ -217,9 +252,9 @@ export function AboutPage() {
               <div className="relative mx-auto max-w-sm">
                 <SmartImage
                   seed="about-principal"
-                  alt={`Portrait of ${PRINCIPAL.name}`}
+                  alt={`Portrait of ${principal.name}`}
                   icon="UserRound"
-                  label={PRINCIPAL.name}
+                  label={principal.name}
                   className="aspect-[4/5] w-full"
                 />
                 <div className="absolute -bottom-4 -right-4 hidden rounded-xl border bg-background p-4 shadow-lg sm:block">
@@ -241,13 +276,13 @@ export function AboutPage() {
                 </span>
                 <Quote className="mt-5 size-8 text-primary/30" />
                 <blockquote className="mt-3 text-pretty text-lg font-medium leading-relaxed sm:text-xl">
-                  &ldquo;{PRINCIPAL.message}&rdquo;
+                  &ldquo;{principal.message}&rdquo;
                 </blockquote>
                 <div className="mt-6 flex items-center gap-3">
                   <div className="h-px w-10 bg-primary" />
                   <div>
-                    <div className="font-semibold">{PRINCIPAL.signature}</div>
-                    <div className="text-sm text-muted-foreground">{PRINCIPAL.title}</div>
+                    <div className="font-semibold">{principal.signature}</div>
+                    <div className="text-sm text-muted-foreground">{principal.title}</div>
                   </div>
                 </div>
               </div>
@@ -267,7 +302,7 @@ export function AboutPage() {
             />
           </Reveal>
           <div className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-            {LEADERSHIP.map((member, i) => (
+            {leadership.map((member, i) => (
               <Reveal key={member.name} delay={i * 0.06}>
                 <Card className="h-full transition-all hover:-translate-y-1 hover:shadow-lg">
                   <CardContent className="pt-6">
@@ -302,7 +337,7 @@ export function AboutPage() {
             />
           </Reveal>
           <div className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-            {TEACHERS.map((teacher, i) => (
+            {teachers.map((teacher, i) => (
               <Reveal key={teacher.name} delay={i * 0.05}>
                 <Card className="h-full text-center transition-all hover:-translate-y-1 hover:shadow-lg">
                   <CardContent className="flex flex-col items-center pt-6">
@@ -453,7 +488,7 @@ export function AboutPage() {
                   </h2>
                   <p className="mt-3 text-base text-foreground/80 sm:text-lg">
                     Schedule a campus visit, meet our educators, and discover why families
-                    across Addis Ababa choose {SCHOOL.name} for their children's education.
+                    across Addis Ababa choose {school.name} for their children's education.
                   </p>
                 </div>
                 <div className="flex flex-col gap-3 sm:flex-row">

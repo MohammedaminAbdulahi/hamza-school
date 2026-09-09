@@ -390,3 +390,85 @@ Stage Summary:
 - All icons that were Lucide React components inside inline data arrays are now string names rendered through <DynamicIcon name="..." /> (the only Lucide imports left in pages are for icons used directly in JSX, e.g. ArrowRight, Quote, Feather, Target, Eye, Award, ShieldCheck, Sparkles, MapPin, Send, MessageSquare, Calendar, Clock, Tag, Share2, Pin, Bell, Images, Maximize2, X, Camera, Search, Menu).
 - Visual design is preserved: same layouts, colors, hover effects, classes. The only data-driven visible changes are (a) the homepage 4 pillars now display WHY_CHOOSE titles/descriptions ("Quality Education / Faith & Values / Caring Community / Future Leaders") instead of the old hardcoded "Knowledge / Faith / Character / Excellence", (b) the about page mission paragraph uses MISSION.description, (c) contact info cards show the content.ts labels ("Address / Phone / Email / Office Hours") and the department table no longer has an Hours column.
 - Lint and TypeScript checks pass for src/. Dev server compiles cleanly and the home page renders successfully.
+
+---
+Task ID: 9
+Agent: full-stack-developer
+Task: Admin panel — API routes, /admin page, public pages wired to DB
+
+Work Log:
+- Read worklog.md (Tasks 1–8) and current src/lib/db.ts, src/lib/content.ts, src/app/page.tsx, src/app/globals.css, and all 5 public page components to understand the existing structure (hash-based routing via Zustand, cream/forest/gold palette, Cormorant serif, paper-texture utility class, etc.).
+
+- Created `src/app/api/content/route.ts`:
+  * `GET` → calls `initDb()` + `seedIfEmpty()`, then runs 6 parallel SELECTs against school_info / gallery / teachers / leadership / news / events.
+  * Maps the flat DB columns (hero_eyebrow, principal_name, mission_title, facebook, etc.) back into the nested shape the public site expects (school.hero.eyebrow, school.social.facebook, school.principal.name, …).
+  * If the DB is unreachable or school_info has no row, falls back to the defaults from `src/lib/content.ts` (with synthetic ids) so the public site never breaks. Sets `Cache-Control: no-store`.
+
+- Created `src/app/api/admin/route.ts`:
+  * Single `POST` endpoint. Reads `ADMIN_PASSWORD` from `envFromDotenv` (new export from db.ts — see below) so auth works even when system env masks `.env`.
+  * `GET` returns 405 with a hint.
+  * Wrong/missing password → 401 `{ error: "Invalid password" }`.
+  * Implements all 16 actions: `get`, `update_school`, and `add_/update_/delete_` for gallery / teachers / leadership / news / events.
+  * `update_school` uses `INSERT … ON CONFLICT (id) DO UPDATE` so it works whether or not a row already exists.
+  * Every mutation returns the freshly-fetched full snapshot (via `getAll()`) so the admin UI just `setData(json)` after each call.
+  * All string fields are length-capped; numeric fields coerced via a `num()` helper.
+  * Error handler unpacks `AggregateError` (pg pool connect failures) into a readable string and logs the stack to the dev console.
+
+- Created `src/components/ui/alert-dialog.tsx` (shadcn-style wrapper around `@radix-ui/react-alert-dialog`, which was already in package.json) so the admin page can use proper confirm dialogs for destructive deletes.
+
+- Created `src/app/admin/page.tsx` (a REAL Next.js route at `/admin`, not hash-based):
+  * Client component. Auto-restores the password from `localStorage[hamza_admin_pw]` on mount and tries a silent login so the user doesn't have to re-enter every visit.
+  * Login screen: forest-green header card with a Lock icon, password input with show/hide toggle, "Back to website" link, hint about ADMIN_PASSWORD env var.
+  * Dashboard: sticky forest-green top bar (logo + "Hamza Admin" + Back to website + Logout buttons), section-label header, then a 6-tab `Tabs` (School Info / Gallery / Teachers / Leadership / News / Events).
+  * Each tab is its own sub-component (SchoolTab, GalleryTab, TeachersTab, LeadershipTab, NewsTab, EventsTab) with reusable `SectionCard`, `ItemRow`, `ItemActions`, `FormDialogShell`, `FormActions`, `CrudHeader` helpers.
+  * SchoolTab: 5 SectionCards (Identity / Social Links / Hero / Principal / Mission) + a sticky forest-green save bar at the bottom. Single Save button posts `update_school` with the whole nested school object.
+  * Each list tab (Gallery/Teachers/Leadership/News/Events): grid of `ItemRow` cards with Edit/Delete buttons, an Add button that opens a `FormDialogShell`-wrapped form, an Edit dialog seeded from the clicked item, and an `AlertDialog` confirmation before delete.
+  * All dialogs reuse the cream/forest/gold design system (paper-texture background, forest-green headers, gold-deep labels, serif headings via `font-serif`).
+  * Every mutation calls `/api/admin` with the stored password, then `setData(json)` and shows a sonner toast (success green / error red).
+  * Includes a Refresh button at the bottom to re-fetch the snapshot.
+
+- Updated `src/lib/db.ts` to fix three sandbox issues discovered while wiring up the API:
+  1. The dev sandbox exposes a system env `DATABASE_URL=file:/home/z/my-project/db/custom.db` (SQLite) that MASKS the real Neon Postgres URL in `.env`. Next.js's automatic `.env` loader doesn't override existing system env. Fix: parse `.env` directly with a tiny `readEnvFile()` helper and prefer its `DATABASE_URL` over `process.env.DATABASE_URL` when the system value starts with `file:`. Exposed as `envFromDotenv` so routes can do the same for `ADMIN_PASSWORD`.
+  2. The cached `globalForDb.pool` was being reused even after the env changed, so a stale pool pointing at `localhost:5432` survived hot-reloads. Fix: also cache `__dbUrl` alongside the pool, and only reuse the cached pool if its URL matches the current one.
+  3. The Neon database had a `school_info` table from a previous task that pre-dated the hero/principal/mission columns. `CREATE TABLE IF NOT EXISTS` doesn't add missing columns, so `INSERT INTO school_info (… hero_eyebrow …)` failed with `column "hero_eyebrow" does not exist`. Fix: after CREATE TABLE, run `ALTER TABLE school_info ADD COLUMN IF NOT EXISTS <col> <type>` for every column (Postgres 9.6+ / Neon support this idempotently).
+  4. Also rewrote `seedIfEmpty()` to seed each table independently (previously it bailed out entirely as soon as `school_info` had any row, which meant an empty gallery/teachers/news/events stayed empty if school_info was already populated). It now: INSERTs school_info if missing, UPDATEs it with full defaults if it looks partial (no hero/principal/mission columns populated), and seeds gallery/teachers/leadership/news/events via a `seedTableIfEmpty()` helper that only inserts when COUNT(*) = 0.
+
+- Updated `src/components/pages/home.tsx`:
+  * Added `useEffect` that `fetch('/api/content')` on mount and updates local `hero` / `mission` / `principal` / `events` state from the response (merged over the imported defaults so partial DB responses stay safe). `.catch(() => {})` keeps defaults on error.
+  * Replaced `HERO.*`, `MISSION.*`, `PRINCIPAL.*`, `EVENTS` references in JSX with the state-backed `hero.*` / `mission.*` / `principal.*` / `events` so the homepage now reflects DB edits live.
+
+- Updated `src/components/pages/about.tsx`:
+  * Same fetch pattern; updates `school`, `mission`, `principal`, `leadership`, `teachers` state.
+  * PageHero description now uses `${school.established}, ${school.name}`; mission paragraph, principal blockquote/signature/title, leadership grid, teachers grid, and final CTA all read from the state-backed variables.
+
+- Updated `src/components/pages/news.tsx`:
+  * Added `news` and `events` state seeded from `NEWS` / `EVENTS` defaults; updated from `/api/content` on mount.
+  * The category-filtered news list, the events list, the March 2025 calendar grid (with `eventsOnDay` now a closure that closes over `events`), and the event legend all read from the state-backed variables.
+
+- Updated `src/components/pages/gallery.tsx`:
+  * Added `gallery` state seeded from `GALLERY`; updated from `/api/content` on mount.
+  * The filter buttons' per-category counts and the grid both read from the state-backed `gallery`.
+
+- `src/components/pages/academics.tsx` left untouched: the task said "fetch teachers (if shown)" and the Academics page doesn't render teachers (it uses PROGRAMS, GRADE_LEVELS, SCIENCE_FEATURES, LANGUAGES, LABS, ARTS_FEATURES, DEPARTMENTS, SUBJECTS, CLUBS, SPORTS — none of which are DB-backed), so there's nothing to wire up.
+
+Verification:
+- `bun run lint` → 0 errors, 0 warnings.
+- `bunx tsc --noEmit` → 0 errors in `src/` (only unrelated errors in `skills/`).
+- `curl http://localhost:3000/` → 200, `curl http://localhost:3000/admin` → 200 (renders "Hamza Admin" login screen), `curl http://localhost:3000/api/content` → 200 with full DB data (school name, hero eyebrow, principal name, 12 gallery items, 8 teachers, 6 leadership, 6 news, 4 events).
+- Admin POST end-to-end CRUD test (run via curl):
+  * `{}` (no password) → 401 ✓
+  * `{password:"wrong",…}` → 401 ✓
+  * `add_teacher` → 200, teacher added with new id ✓
+  * `update_teacher` → 200, fields updated ✓
+  * `delete_teacher` → 200, teacher removed, list back to original length ✓
+  * `update_school` → 200, all nested objects (hero/principal/mission/social) persisted ✓
+- Dev server log shows no errors after the final fixes; only an SSL-mode warning from the pg library (informational, not an error).
+
+Stage Summary:
+- Real Next.js route at `/admin` with password-protected, tabbed admin dashboard. Password persists in localStorage after first login.
+- All 16 admin actions (school update + add/update/delete for 5 content types) work against the live Neon Postgres database.
+- Public pages (home, about, news, gallery) now hydrate from `/api/content` on mount with safe fallback to `content.ts` defaults — so the site keeps working even if the DB is down.
+- DB connection issue (system env masking .env) and partial-schema issue (missing hero/principal/mission columns in pre-existing school_info table) both fixed inside `src/lib/db.ts` so future agents don't have to deal with them.
+- Files created: src/app/api/content/route.ts, src/app/api/admin/route.ts, src/app/admin/page.tsx, src/components/ui/alert-dialog.tsx.
+- Files modified: src/lib/db.ts, src/components/pages/home.tsx, src/components/pages/about.tsx, src/components/pages/news.tsx, src/components/pages/gallery.tsx.
+- Admin password: `HamzaAdmin2025!` (from .env). Visit `/admin` to log in.

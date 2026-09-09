@@ -51,11 +51,24 @@ export function GalleryPage() {
     null
   )
 
+  const [gallery, setGallery] = React.useState<GalleryItem[]>(GALLERY)
+
+  React.useEffect(() => {
+    fetch('/api/content')
+      .then((r) => r.json())
+      .then((d: { gallery?: GalleryItem[] }) => {
+        if (Array.isArray(d.gallery) && d.gallery.length > 0) {
+          setGallery(d.gallery)
+        }
+      })
+      .catch(() => { /* keep defaults on error */ })
+  }, [])
+
   const filtered: GalleryItem[] = React.useMemo(() => {
     return activeCategory === 'All'
-      ? GALLERY
-      : GALLERY.filter((g) => g.category === activeCategory)
-  }, [activeCategory])
+      ? gallery
+      : gallery.filter((g) => g.category === activeCategory)
+  }, [activeCategory, gallery])
 
   const openLightbox = (index: number) => setLightboxIndex(index)
   const closeLightbox = () => setLightboxIndex(null)
@@ -109,7 +122,7 @@ export function GalleryPage() {
                 className="inline-flex h-9 items-center gap-2 rounded-full bg-primary/10 px-4 text-sm font-semibold text-primary"
               >
                 <Images className="size-4" />
-                {filtered.length} of {GALLERY.length} images
+                {filtered.length} of {gallery.length} images
               </Badge>
             </div>
           </Reveal>
@@ -120,8 +133,8 @@ export function GalleryPage() {
               {GALLERY_CATEGORIES.map((cat) => {
                 const count =
                   cat === 'All'
-                    ? GALLERY.length
-                    : GALLERY.filter((g) => g.category === cat).length
+                    ? gallery.length
+                    : gallery.filter((g) => g.category === cat).length
                 return (
                   <Button
                     key={cat}

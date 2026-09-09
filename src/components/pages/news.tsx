@@ -43,6 +43,9 @@ import { cn } from '@/lib/utils'
 
 const PAGE_SIZE = 3
 
+type DbNews = typeof NEWS[number]
+type DbEvent = typeof EVENTS[number]
+
 function formatDate(iso: string) {
   return new Date(iso).toLocaleDateString('en-US', {
     month: 'short',
@@ -83,28 +86,38 @@ function buildMarchCalendar() {
   return cells
 }
 
-function eventsOnDay(day: number | null) {
-  if (day === null) return []
-  const iso = `${CALENDAR_YEAR}-${String(CALENDAR_MONTH + 1).padStart(
-    2,
-    '0'
-  )}-${String(day).padStart(2, '0')}`
-  return EVENTS.filter((e) => e.date === iso)
-}
-
 export function NewsPage() {
   const goPage = useNav((s) => s.goPage)
   const [activeCategory, setActiveCategory] = React.useState('All')
   const [page, setPage] = React.useState(1)
 
-  // News comes directly from the single content file (src/lib/content.ts)
+  const [news, setNews] = React.useState(NEWS)
+  const [events, setEvents] = React.useState(EVENTS)
+
+  React.useEffect(() => {
+    fetch('/api/content')
+      .then((r) => r.json())
+      .then(
+        (d: { news?: DbNews[]; events?: DbEvent[] }) => {
+          if (Array.isArray(d.news) && d.news.length > 0) {
+            setNews(d.news as unknown as typeof NEWS)
+          }
+          if (Array.isArray(d.events) && d.events.length > 0) {
+            setEvents(d.events as unknown as typeof EVENTS)
+          }
+        }
+      )
+      .catch(() => { /* keep defaults on error */ })
+  }, [])
+
+  // News comes from /api/content (with content.ts fallback)
   const filtered = React.useMemo(() => {
     const list =
       activeCategory === 'All'
-        ? NEWS
-        : NEWS.filter((n) => n.category === activeCategory)
+        ? news
+        : news.filter((n) => n.category === activeCategory)
     return list
-  }, [activeCategory])
+  }, [activeCategory, news])
 
   React.useEffect(() => {
     setPage(1)
@@ -117,6 +130,15 @@ export function NewsPage() {
   )
 
   const calendarCells = React.useMemo(() => buildMarchCalendar(), [])
+
+  function eventsOnDay(day: number | null) {
+    if (day === null) return []
+    const iso = `${CALENDAR_YEAR}-${String(CALENDAR_MONTH + 1).padStart(
+      2,
+      '0'
+    )}-${String(day).padStart(2, '0')}`
+    return events.filter((e) => e.date === iso)
+  }
 
   return (
     <div className="flex flex-col">
@@ -357,7 +379,7 @@ export function NewsPage() {
             />
           </Reveal>
           <div className="mt-14 space-y-4">
-            {EVENTS.map((event, i) => {
+            {events.map((event, i) => {
               const d = new Date(event.date)
               const month = d.toLocaleDateString('en-US', {
                 month: 'short',
@@ -447,7 +469,7 @@ export function NewsPage() {
                     </span>
                   </div>
                   <Badge className="bg-primary/10 text-primary">
-                    {EVENTS.filter((e) => e.date.startsWith('2025-03'))
+                    {events.filter((e) => e.date.startsWith('2025-03'))
                       .length}{' '}
                     events
                   </Badge>
@@ -498,7 +520,7 @@ export function NewsPage() {
                 </div>
                 {/* Event legend */}
                 <div className="mt-6 space-y-2 border-t pt-5">
-                  {EVENTS.filter((e) => e.date.startsWith('2025-03')).map(
+                  {events.filter((e) => e.date.startsWith('2025-03')).map(
                     (e) => (
                       <div
                         key={e.title}

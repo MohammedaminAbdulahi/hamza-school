@@ -36,8 +36,46 @@ import {
   PRINCIPAL,
 } from '@/lib/content'
 
+// DB content shape (subset of what /api/content returns)
+type DbSchool = {
+  hero?: Partial<typeof HERO>
+  mission?: Partial<typeof MISSION>
+  principal?: Partial<typeof PRINCIPAL>
+}
+type DbEvent = {
+  id?: number
+  title: string
+  date: string
+  time: string
+  location: string
+  category: string
+  description?: string
+}
+
 export function HomePage() {
   const { goPage } = useNav()
+
+  // Local state seeded with content.ts defaults; updated from /api/content on mount.
+  const [hero, setHero] = React.useState(HERO)
+  const [mission, setMission] = React.useState(MISSION)
+  const [principal, setPrincipal] = React.useState(PRINCIPAL)
+  const [events, setEvents] = React.useState<typeof EVENTS>(EVENTS)
+
+  React.useEffect(() => {
+    fetch('/api/content')
+      .then((r) => r.json())
+      .then((d: { school?: DbSchool; events?: DbEvent[] }) => {
+        if (d.school) {
+          if (d.school.hero) setHero({ ...HERO, ...d.school.hero })
+          if (d.school.mission) setMission({ ...MISSION, ...d.school.mission })
+          if (d.school.principal) setPrincipal({ ...PRINCIPAL, ...d.school.principal })
+        }
+        if (Array.isArray(d.events) && d.events.length > 0) {
+          setEvents(d.events as unknown as typeof EVENTS)
+        }
+      })
+      .catch(() => { /* keep defaults on error */ })
+  }, [])
 
   return (
     <div className="flex flex-col">
@@ -55,7 +93,7 @@ export function HomePage() {
             <div className="mb-8 flex items-center gap-3">
               <div className="h-px w-12 bg-gold" />
               <span className="text-xs uppercase tracking-[0.4em] text-gold-deep">
-                {HERO.eyebrow}
+                {hero.eyebrow}
               </span>
             </div>
 
@@ -74,7 +112,7 @@ export function HomePage() {
             <div className="mt-6 h-px w-24 bg-gradient-to-r from-gold to-transparent" />
 
             <p className="mt-6 max-w-lg text-lg font-light leading-relaxed text-foreground/80">
-              {HERO.description}
+              {hero.description}
             </p>
 
             {/* Buttons */}
@@ -83,7 +121,7 @@ export function HomePage() {
                 onClick={() => goPage('contact')}
                 className="h-14 gap-2.5 rounded-sm bg-forest px-9 text-xs font-medium uppercase tracking-[0.12em] text-cream transition-all hover:bg-gold-deep"
               >
-                {HERO.primaryButton}
+                {hero.primaryButton}
                 <ArrowRight className="size-3.5" />
               </Button>
               <Button
@@ -91,7 +129,7 @@ export function HomePage() {
                 onClick={() => goPage('about')}
                 className="h-14 gap-2.5 rounded-sm border-forest bg-paper px-8 text-xs font-medium uppercase tracking-[0.12em] text-forest transition-all hover:bg-forest hover:text-cream"
               >
-                {HERO.secondaryButton}
+                {hero.secondaryButton}
               </Button>
             </div>
 
@@ -99,7 +137,7 @@ export function HomePage() {
             <div className="mt-12 inline-flex max-w-xl items-center gap-4 rounded-sm border border-gold/30 bg-paper px-6 py-4">
               <Feather className="size-5 shrink-0 text-gold-deep" />
               <span className="font-serif text-sm italic tracking-wide text-foreground/80">
-                &ldquo;{HERO.propheticQuote}&rdquo; — {HERO.propheticSource}
+                &ldquo;{hero.propheticQuote}&rdquo; — {hero.propheticSource}
               </span>
             </div>
           </motion.div>
@@ -130,7 +168,7 @@ export function HomePage() {
                   <span className="font-serif text-base font-semibold text-foreground">Our Foundation</span>
                 </div>
                 <div className="flex flex-wrap gap-1.5">
-                  {HERO.foundationLabels.map((label, idx) => {
+                  {hero.foundationLabels.map((label, idx) => {
                     const colors = ['bg-forest', 'bg-gold-deep', 'bg-navy', 'bg-crimson']
                     return (
                       <span key={label} className={`rounded-sm px-2.5 py-1 text-[10px] uppercase tracking-widest text-cream ${colors[idx % colors.length]}`}>
@@ -225,13 +263,13 @@ export function HomePage() {
               Guiding Hearts. <em className="italic text-gold-deep">Growing Minds.</em>
             </h2>
             <p className="mt-8 text-lg leading-relaxed text-muted-foreground">
-              {MISSION.description}
+              {mission.description}
             </p>
             <div className="mt-8 flex items-start gap-4 rounded-sm border-l-2 border-gold bg-cream/50 p-5">
               <Feather className="mt-1 size-5 shrink-0 text-gold-deep" />
               <div>
-                <p className="font-serif text-lg italic text-foreground">&ldquo;{MISSION.quote}&rdquo;</p>
-                <p className="mt-2 text-sm font-semibold text-gold-deep">— {MISSION.quoteSource}</p>
+                <p className="font-serif text-lg italic text-foreground">&ldquo;{mission.quote}&rdquo;</p>
+                <p className="mt-2 text-sm font-semibold text-gold-deep">— {mission.quoteSource}</p>
               </div>
             </div>
             <Button
@@ -317,7 +355,7 @@ export function HomePage() {
             </Reveal>
           </div>
           <div className="grid gap-4 sm:grid-cols-2">
-            {EVENTS.slice(0, 4).map((event, i) => {
+            {events.slice(0, 4).map((event, i) => {
               const d = new Date(event.date)
               return (
                 <Reveal key={event.title} delay={i * 0.07}>
@@ -398,13 +436,13 @@ export function HomePage() {
               <div className="aspect-[4/5] overflow-hidden rounded-sm border-2 border-gold/30 shadow-2xl">
                 <img
                   src="/hero-desk.jpeg"
-                  alt={PRINCIPAL.name}
+                  alt={principal.name}
                   className="h-full w-full object-cover"
                 />
               </div>
               <div className="absolute -bottom-5 left-1/2 w-[85%] -translate-x-1/2 border border-gold/30 bg-forest p-4 text-center shadow-xl">
-                <p className="font-serif text-base font-bold text-cream">{PRINCIPAL.name}</p>
-                <p className="text-xs text-gold-light">{PRINCIPAL.title}</p>
+                <p className="font-serif text-base font-bold text-cream">{principal.name}</p>
+                <p className="text-xs text-gold-light">{principal.title}</p>
               </div>
             </div>
           </Reveal>
@@ -412,9 +450,9 @@ export function HomePage() {
             <p className="section-label">A Word from Our Founder</p>
             <Quote className="mt-6 size-12 text-gold/50" />
             <p className="mt-4 font-serif text-2xl font-light italic leading-relaxed text-foreground/80 sm:text-3xl">
-              {PRINCIPAL.message}
+              {principal.message}
             </p>
-            <p className="mt-8 font-serif text-2xl font-semibold text-gold-deep">{PRINCIPAL.signature}</p>
+            <p className="mt-8 font-serif text-2xl font-semibold text-gold-deep">{principal.signature}</p>
           </Reveal>
         </div>
       </section>
