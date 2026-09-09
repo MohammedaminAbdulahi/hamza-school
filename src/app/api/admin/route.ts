@@ -1,24 +1,70 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { pool, initDb, seedIfEmpty, envFromDotenv } from '@/lib/db'
+import { timingSafeEqual } from 'crypto'
 
 export const dynamic = 'force-dynamic'
 export const revalidate = 0
 
 // ─── Auth ───
-// Read ADMIN_PASSWORD from .env (system env can override .env, but in this
-// dev sandbox the system env only sets a SQLite-style DATABASE_URL).
 const ADMIN_PASSWORD =
   envFromDotenv.ADMIN_PASSWORD || process.env.ADMIN_PASSWORD
 
+// Timing-safe password comparison to prevent timing attacks
 function authOk(password: unknown): boolean {
-  return (
-    typeof password === 'string' &&
-    password.length > 0 &&
-    typeof ADMIN_PASSWORD === 'string' &&
-    ADMIN_PASSWORD.length > 0 &&
-    password === ADMIN_PASSWORD
-  )
+  if (typeof password !== 'string' || password.length === 0) return false
+  if (typeof ADMIN_PASSWORD !== 'string' || ADMIN_PASSWORD.length === 0) return false
+  try {
+    const a = Buffer.from(password)
+    const b = Buffer.from(ADMIN_PASSWORD)
+    if (a.length !== b.length) return false
+    return timingSafeEqual(a, b)
+  } catch {
+    return false
+  }
 }
+
+// ─── Rate limiting (in-memory, per-IP) ───
+// Blocks IP after 5 failed attempts for 15 minutes
+const MAX_ATTEMPTS = 5
+const BLOCK_MS = 15 * 60 * 1000
+const attempts = new Map<string, { count: number; firstAt: number }>()
+
+function isRateLimited(ip: string): boolean {
+  const now = Date.now()
+  const entry = attempts.get(ip)
+  if (!entry) return false
+  // Reset after block period
+  if (now - entry.firstAt > BLOCK_MS) {
+    attempts.delete(ip)
+    return false
+  }
+  return entry.count >= MAX_ATTEMPTS
+}
+
+function recordFailedAttempt(ip: string) {
+  const now = Date.now()
+  const entry = attempts.get(ip)
+  if (!entry || now - entry.firstAt > BLOCK_MS) {
+    attempts.set(ip, { count: 1, firstAt: now })
+  } else {
+    entry.count++
+  }
+}
+
+function clearAttempts(ip: string) {
+  attempts.delete(ip)
+}
+
+function getClientIp(req: NextRequest): string {
+  const xf = req.headers.get('x-forwarded-for')
+  if (xf) return xf.split(',')[0].trim()
+  const xr = req.headers.get('x-real-ip')
+  if (xr) return xr.trim()
+  return 'unknown'
+}
+
+// ─── Body size limit (6MB max — enough for base64 photos) ───
+const MAX_BODY = 6 * 1024 * 1024
 
 // ─── Helpers ───
 function bad(msg: string, status = 400) {
@@ -301,19 +347,49 @@ async function updateSchool(school: Record<string, unknown>) {
 
 // ─── POST handler ───
 export async function POST(req: NextRequest) {
+  const ip = getClientIp(req)
+
+  // Rate limit check
+  if (isRateLimited(ip)) {
+    return NextResponse.json(
+      { error: 'Too many failed attempts. Try again in 15 minutes.' },
+      { status: 429 }
+    )
+  }
+
+  // Body size check (before parsing)
+  const contentLength = parseInt(req.headers.get('content-length') || '0', 10)
+  if (contentLength > MAX_BODY) {
+    return NextResponse.json(
+      { error: 'Request body too large' },
+      { status: 413 }
+    )
+  }
+
   let body: Record<string, unknown>
   try {
-    body = (await req.json()) as Record<string, unknown>
+    const text = await req.text()
+    if (text.length > MAX_BODY) {
+      return NextResponse.json(
+        { error: 'Request body too large' },
+        { status: 413 }
+      )
+    }
+    body = JSON.parse(text) as Record<string, unknown>
   } catch {
     return bad('Invalid JSON body')
   }
 
   if (!authOk(body.password)) {
+    recordFailedAttempt(ip)
     return NextResponse.json(
       { error: 'Invalid password' },
       { status: 401 }
     )
   }
+
+  // Successful auth — clear rate limit attempts
+  clearAttempts(ip)
 
   const action = String(body.action ?? '')
   try {
@@ -485,22 +561,12 @@ export async function POST(req: NextRequest) {
         return bad(`Unknown action: ${action}`)
     }
   } catch (e) {
-    // AggregateError (e.g. pg pool connect failures) carries nested errors[]
-    const agg = e as AggregateError
-    let msg: string
-    if (agg && Array.isArray(agg.errors) && agg.errors.length > 0) {
-      msg = agg.errors
-        .map((er) => (er instanceof Error ? er.message : String(er)))
-        .join('; ')
-    } else if (e instanceof Error) {
-      msg = e.message
-    } else if (typeof e === 'string') {
-      msg = e
-    } else {
-      msg = 'Server error'
-    }
-    console.error('[/api/admin] error:', e, 'stack:', (e as Error)?.stack)
-    return NextResponse.json({ error: msg || 'Server error' }, { status: 500 })
+    // Log full error server-side only — never send internal details to client
+    console.error('[/api/admin] error:', e)
+    return NextResponse.json(
+      { error: 'Server error. Please try again.' },
+      { status: 500 }
+    )
   }
 }
 

@@ -200,7 +200,7 @@ const EVENT_CATEGORIES = [
   'Holiday',
 ]
 
-const STORAGE_KEY = 'hamza_admin_pw'
+const STORAGE_KEY = 'hamza_admin_session'
 
 // ─── Admin Page ───
 export default function AdminPage() {
@@ -211,9 +211,9 @@ export default function AdminPage() {
   const [data, setData] = React.useState<AllData | null>(null)
   const [showPw, setShowPw] = React.useState(false)
 
-  // Auto-login from localStorage on mount
+  // Auto-login from sessionStorage on mount
   React.useEffect(() => {
-    const saved = typeof window !== 'undefined' ? localStorage.getItem(STORAGE_KEY) : null
+    const saved = typeof window !== 'undefined' ? sessionStorage.getItem(STORAGE_KEY) : null
     if (saved) {
       setStoredPw(saved)
       void tryLogin(saved)
@@ -234,7 +234,7 @@ export default function AdminPage() {
         setAuthed(true)
         setStoredPw(pw)
         try {
-          localStorage.setItem(STORAGE_KEY, pw)
+          sessionStorage.setItem(STORAGE_KEY, pw)
         } catch {
           /* ignore */
         }
@@ -243,7 +243,7 @@ export default function AdminPage() {
         const j = (await res.json().catch(() => ({}))) as { error?: string }
         toast.error(j.error || 'Login failed')
         try {
-          localStorage.removeItem(STORAGE_KEY)
+          sessionStorage.removeItem(STORAGE_KEY)
         } catch {
           /* ignore */
         }
@@ -271,7 +271,7 @@ export default function AdminPage() {
     setStoredPw(null)
     setData(null)
     try {
-      localStorage.removeItem(STORAGE_KEY)
+      sessionStorage.removeItem(STORAGE_KEY)
     } catch {
       /* ignore */
     }

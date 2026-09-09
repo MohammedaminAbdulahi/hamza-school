@@ -1,18 +1,25 @@
 // Client-side image upload helper.
 //
-// Resizes an uploaded image file to a max width (default 800px) and converts
-// it to a JPEG data URL at the requested quality (default 0.8). The resulting
-// base64 string can be stored in a TEXT column and rendered directly in an
-// <img src="data:image/jpeg;base64,..."> tag.
-//
-// This keeps the payload small enough for a single JSON POST to the admin API
-// while preserving enough detail for a crisp on-screen photo.
+// Validates, resizes, and converts an uploaded image file to a JPEG data URL.
+
+const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/gif']
+const MAX_FILE_SIZE = 10 * 1024 * 1024 // 10MB before resize
 
 export async function fileToResizedBase64(
   file: File,
   maxWidth = 800,
   quality = 0.8
 ): Promise<string> {
+  // Validate file type
+  if (!ALLOWED_TYPES.includes(file.type)) {
+    throw new Error('Invalid file type. Please upload a JPEG, PNG, WebP, or GIF.')
+  }
+
+  // Validate file size
+  if (file.size > MAX_FILE_SIZE) {
+    throw new Error('File too large. Maximum 10MB.')
+  }
+
   // Read the file into a data URL the browser can decode.
   const dataUrl = await new Promise<string>((resolve, reject) => {
     const reader = new FileReader()
@@ -25,7 +32,7 @@ export async function fileToResizedBase64(
   const img = await new Promise<HTMLImageElement>((resolve, reject) => {
     const el = new Image()
     el.onload = () => resolve(el)
-    el.onerror = () => reject(new Error('Could not decode image'))
+    el.onerror = () => reject(new Error('Could not decode image. The file may be corrupted.'))
     el.src = dataUrl
   })
 
@@ -46,7 +53,6 @@ export async function fileToResizedBase64(
   canvas.height = targetH
   const ctx = canvas.getContext('2d')
   if (!ctx) {
-    // If 2D context isn't available, fall back to the original data URL.
     return dataUrl
   }
   // White background so transparent PNGs don't go black when JPEG-ified.
@@ -54,8 +60,7 @@ export async function fileToResizedBase64(
   ctx.fillRect(0, 0, targetW, targetH)
   ctx.drawImage(img, 0, 0, targetW, targetH)
 
-  // Export as JPEG. Some browsers (Safari < 16) don't support a quality arg
-  // for toDataURL('image/jpeg') — fall back to default if it throws.
+  // Export as JPEG.
   try {
     return canvas.toDataURL('image/jpeg', quality)
   } catch {
