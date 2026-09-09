@@ -349,7 +349,7 @@ async function updateSchool(school: Record<string, unknown>) {
 export async function POST(req: NextRequest) {
   const ip = getClientIp(req)
 
-  // Rate limit check
+  // In-memory rate limit (backup for when Arcjet is not configured)
   if (isRateLimited(ip)) {
     return NextResponse.json(
       { error: 'Too many failed attempts. Try again in 15 minutes.' },
@@ -392,6 +392,13 @@ export async function POST(req: NextRequest) {
   clearAttempts(ip)
 
   const action = String(body.action ?? '')
+
+  // Audit log (fire and forget — don't block the response)
+  pool.query(
+    'INSERT INTO admin_log (action, ip) VALUES ($1, $2)',
+    [action, ip]
+  ).catch(() => {})
+
   try {
     await initDb()
     await seedIfEmpty()

@@ -244,6 +244,14 @@ export async function initDb() {
         updated_at TIMESTAMP DEFAULT NOW()
       )
     `)
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS admin_log (
+        id SERIAL PRIMARY KEY,
+        action TEXT NOT NULL,
+        ip TEXT,
+        created_at TIMESTAMP DEFAULT NOW()
+      )
+    `)
   } finally {
     client.release()
   }
