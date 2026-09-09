@@ -145,6 +145,12 @@ export async function initDb() {
       ['mission_description', 'TEXT'],
       ['mission_quote', 'TEXT'],
       ['mission_quote_source', 'TEXT'],
+      // Photo + Vice Director (added in Task 10)
+      ['principal_photo', 'TEXT'],
+      ['vice_principal_name', 'TEXT'],
+      ['vice_principal_title', 'TEXT'],
+      ['vice_principal_message', 'TEXT'],
+      ['vice_principal_photo', 'TEXT'],
       ['updated_at', 'TIMESTAMP DEFAULT NOW()'],
     ]
     for (const [col, type] of schoolCols) {
@@ -184,6 +190,10 @@ export async function initDb() {
         updated_at TIMESTAMP DEFAULT NOW()
       )
     `)
+    // Backfill the photo column for older DBs that pre-date Task 10.
+    await client.query(
+      `ALTER TABLE leadership ADD COLUMN IF NOT EXISTS photo TEXT`
+    )
     await client.query(`
       CREATE TABLE IF NOT EXISTS news (
         id SERIAL PRIMARY KEY,

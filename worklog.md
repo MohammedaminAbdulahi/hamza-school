@@ -472,3 +472,67 @@ Stage Summary:
 - Files created: src/app/api/content/route.ts, src/app/api/admin/route.ts, src/app/admin/page.tsx, src/components/ui/alert-dialog.tsx.
 - Files modified: src/lib/db.ts, src/components/pages/home.tsx, src/components/pages/about.tsx, src/components/pages/news.tsx, src/components/pages/gallery.tsx.
 - Admin password: `HamzaAdmin2025!` (from .env). Visit `/admin` to log in.
+
+---
+Task ID: 10
+Agent: full-stack-developer
+Task: Add photo uploads + Vice Director to the admin panel
+
+Work Log:
+- Read worklog.md (Tasks 1–9) and current src/lib/db.ts, src/app/api/admin/route.ts, src/app/api/content/route.ts, src/app/admin/page.tsx (~2,320 lines), src/components/pages/{home,about,gallery,news}.tsx, and src/lib/content.ts to understand the existing schema, admin tabs, and public-page hydration pattern.
+- Created `src/lib/image-upload.ts` (client-side helper):
+  * `fileToResizedBase64(file, maxWidth=800, quality=0.8)` — reads a File via FileReader, decodes into an Image, scales down preserving aspect ratio (max width 800px), draws onto a canvas with a white background (so transparent PNGs don't go black when JPEG-ified), and exports as a `data:image/jpeg;base64,...` URL. Falls back to the original data URL if the 2D context is unavailable, and to default JPEG quality if `toDataURL('image/jpeg', quality)` throws (older Safari).
+  * `isDataUrl(value)` — type guard that returns true when a string starts with `data:`. Used by both the admin page (to decide whether to show a preview thumbnail) and the public pages (to decide between `<img>` and `<SmartImage>`).
+- Updated `src/lib/db.ts`:
+  * Added 5 new entries to the `schoolCols` ALTER TABLE loop so existing DBs pick them up idempotently: `principal_photo TEXT`, `vice_principal_name TEXT`, `vice_principal_title TEXT`, `vice_principal_message TEXT`, `vice_principal_photo TEXT`.
+  * Added `ALTER TABLE leadership ADD COLUMN IF NOT EXISTS photo TEXT` right after the leadership CREATE TABLE so the leadership table picks up the `photo` column on existing DBs.
+  * (No schema changes to gallery/news — they already have a TEXT `image` column. It now stores either a base64 data URL or a SmartImage seed string.)
+- Updated `src/app/api/admin/route.ts`:
+  * Added a `strImg()` helper (5 MB cap) alongside `str()` and switched every image-bearing field to it: `principal_photo`, `vice_principal_photo`, leadership `photo`, gallery `image`, news `image`. (Previously the `image` field was capped at 500 chars which silently truncated base64 photos.)
+  * `updateSchool()` now accepts and persists `principal.photo` and a new `vicePrincipal` object (name/title/message/photo) via a 33-column INSERT…ON CONFLICT DO UPDATE.
+  * `add_leadership` / `update_leadership` now include `photo` (5th column).
+  * `getAll()` (the snapshot returned by every action) now returns `school.principal.photo`, `school.vicePrincipal { name, title, message, photo }`, and `photo` on each leadership row.
+- Updated `src/app/api/content/route.ts`:
+  * `fetchAll()` now selects `photo` from leadership and returns the same new fields as the admin route. The public site + admin panel both consume the same shape.
+- Updated `src/app/admin/page.tsx`:
+  * Added a reusable `ImageUpload` component: file input (hidden, triggered by a button), 800px client-side resize via `fileToResizedBase64`, thumbnail preview (or "No photo" placeholder), "Upload Photo" / "Change Photo" / "Remove" buttons, "Processing…" spinner, sonner toasts on success/error. Configurable `aspect` (4:5 for portraits, 4:3 for gallery, 16:10 for news) and `maxSize`.
+  * Extended the `School` type with `principal.photo` and a new `vicePrincipal` object; extended `Leader` with `photo`.
+  * `SchoolTab` now has 6 SectionCards (was 5): Identity, Social Links, Hero, **Principal** (with photo upload), **Vice Director** (NEW — photo upload + name/title/message), Mission. The single "Save All" button posts everything in one `update_school` call.
+  * `LeaderFormDialog` now includes an `ImageUpload` field at the top; the leadership list shows a circular photo thumbnail when `photo` is a data URL, falling back to the initials avatar.
+  * `GalleryFormDialog` now uses `ImageUpload` for the photo, with a separate disabled-when-photo-present text input for the SmartImage seed (so existing seed-based items still work and the admin can switch back to a placeholder by removing the photo). The gallery list shows the photo thumbnail or a "Placeholder: <seed>" badge.
+  * `NewsFormDialog` similarly: `ImageUpload` (16:10 aspect) for the article photo + a disabled-when-photo-present seed input. The news list shows a small thumbnail (or an ImageIcon placeholder) next to each article.
+  * Imported `Upload` + `ImageIcon` from lucide-react and `fileToResizedBase64`, `isDataUrl` from `@/lib/image-upload`.
+- Updated `src/components/pages/home.tsx`:
+  * Added `vicePrincipal` state (defaults to empty object) and `principal.photo` to the local state.
+  * The fetch from `/api/content` now merges `school.vicePrincipal` and `school.principal.photo` into state.
+  * The Principal's Message section now renders `<img src={principal.photo}>` if `principal.photo` is a data URL, otherwise falls back to the existing `/hero-desk.jpeg`.
+  * Added a NEW Vice Director's Message section — renders ONLY when `vicePrincipal.name.trim() !== ''`. Uses a mirrored layout (text on left, portrait on right for visual variety vs. the principal section). Shows the photo if available, otherwise a forest-green avatar with the vice director's initials.
+- Updated `src/components/pages/about.tsx`:
+  * The Leadership section now shows each person's real photo (circular, `object-cover`) when `photo` is a data URL, falling back to the initials Avatar. Cast `member as DbLeader` to access `photo` (the LEADERSHIP default from content.ts doesn't have a `photo` field, but the cast makes TS happy and the runtime check guards undefined).
+  * The Principal's Message portrait now also uses the real `principal.photo` when available, falling back to the existing SmartImage placeholder.
+- Updated `src/components/pages/gallery.tsx`:
+  * Each gallery tile now checks `isDataUrl(item.image)`: if true, renders `<img>` with `object-cover` + hover-scale; otherwise renders `<SmartImage seed={item.image || item.title}>` as before.
+  * The lightbox dialog also branches on `isDataUrl(current.image)` to show a real `<img>` or a SmartImage.
+- Updated `src/components/pages/news.tsx`:
+  * Each news card now checks `isDataUrl(article.image)`: real `<img>` for photos, SmartImage for seeds. Backward compatible — existing seed-based news items keep their gradient placeholder look.
+
+Verification:
+- `bun run lint` → 0 errors, 0 warnings (clean).
+- `bunx tsc --noEmit` → 0 errors in `src/` (only pre-existing unrelated errors in `skills/`).
+- `curl http://localhost:3000/api/content` → 200, response includes `school.principal.photo`, `school.vicePrincipal { name, title, message, photo }`, and `photo` on every leadership row.
+- End-to-end admin CRUD test (Python script via curl):
+  * `update_school` with `principal.photo` (tiny PNG data URL) + full `vicePrincipal` object → both saved ✓
+  * `/api/content` reflects the saved vice principal name + principal photo ✓
+  * `update_leadership` with `photo` → photo saved ✓
+  * Reset (empty strings) → all fields cleared, backward-compatible ✓
+  * Wrong password → 401 ✓
+- Dev log shows clean compiles (`✓ Compiled in 248ms` etc.) with no errors after the code changes.
+
+Stage Summary:
+- Image upload pipeline works end-to-end: `<input type="file">` → client-side canvas resize to 800px JPEG @ 80% → base64 data URL → JSON POST to `/api/admin` → stored in Postgres TEXT column → returned by `/api/content` → rendered with `<img>` on the public site.
+- The Vice Director section appears on the home page ONLY when a vice director name is set in the admin (verified by `vicePrincipal.name.trim() !== ''` guard). Empty by default, so existing installs see no change.
+- Backward compatible everywhere: if no photo is set, the public pages fall back to the existing `/hero-desk.jpeg` (principal), initials avatar (leadership), or SmartImage gradient placeholder (gallery/news). The admin can still use text seeds for placeholders on gallery/news items — the upload UI sits next to a disabled-when-photo-present seed input.
+- Image payload size: a 800px-wide JPEG @ 80% quality is typically 50–200 KB → ~70–270 KB base64. The API caps image fields at 5 MB which is plenty. Postgres TEXT columns handle this without issue.
+- Files created: src/lib/image-upload.ts.
+- Files modified: src/lib/db.ts, src/app/api/admin/route.ts, src/app/api/content/route.ts, src/app/admin/page.tsx, src/components/pages/home.tsx, src/components/pages/about.tsx, src/components/pages/gallery.tsx, src/components/pages/news.tsx.
+- Admin password: `HamzaAdmin2025!`. Visit `/admin` → School Info tab to upload principal/vice director photos and fill the vice director fields.

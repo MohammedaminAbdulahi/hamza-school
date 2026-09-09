@@ -56,7 +56,10 @@ import {
   Loader2,
   Eye,
   EyeOff,
+  Upload,
+  ImageIcon,
 } from 'lucide-react'
+import { fileToResizedBase64, isDataUrl } from '@/lib/image-upload'
 
 // ─── Types ───
 type School = {
@@ -88,6 +91,13 @@ type School = {
     title: string
     message: string
     signature: string
+    photo: string
+  }
+  vicePrincipal: {
+    name: string
+    title: string
+    message: string
+    photo: string
   }
   mission: {
     eyebrow: string
@@ -117,6 +127,7 @@ type Leader = {
   role: string
   bio: string
   initials: string
+  photo: string
 }
 type NewsItem = {
   id?: number
@@ -705,6 +716,113 @@ function FieldLabel({ children }: { children: React.ReactNode }) {
   )
 }
 
+// ─── Reusable image upload widget (client-side resize → base64 data URL) ───
+function ImageUpload({
+  value,
+  onChange,
+  label,
+  aspect = 'aspect-square',
+  maxSize = 'size-24',
+}: {
+  value: string
+  onChange: (v: string) => void
+  label: string
+  aspect?: string
+  maxSize?: string
+}) {
+  const fileRef = React.useRef<HTMLInputElement>(null)
+  const [uploading, setUploading] = React.useState(false)
+
+  async function handleFile(file: File) {
+    setUploading(true)
+    try {
+      const base64 = await fileToResizedBase64(file)
+      onChange(base64)
+      toast.success('Photo ready. Save to keep it.')
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : 'Could not read image')
+    } finally {
+      setUploading(false)
+    }
+  }
+
+  const hasPhoto = isDataUrl(value)
+
+  return (
+    <div className="space-y-2">
+      <FieldLabel>{label}</FieldLabel>
+      <div className="flex items-start gap-4">
+        <div
+          className={`${maxSize} ${aspect} shrink-0 overflow-hidden rounded-sm border border-gold/30 bg-cream/70`}
+        >
+          {hasPhoto ? (
+             
+            <img
+              src={value}
+              alt={label}
+              className="h-full w-full object-cover"
+            />
+          ) : (
+            <div className="flex h-full w-full flex-col items-center justify-center gap-1 text-gold-deep/50">
+              <ImageIcon className="size-6" />
+              <span className="text-[10px] uppercase tracking-wider">No photo</span>
+            </div>
+          )}
+        </div>
+        <div className="flex flex-col gap-2">
+          <input
+            ref={fileRef}
+            type="file"
+            accept="image/*"
+            onChange={(e) => {
+              const f = e.target.files?.[0]
+              if (f) void handleFile(f)
+              // reset so picking the same file twice still fires onChange
+              e.target.value = ''
+            }}
+            className="hidden"
+          />
+          <Button
+            type="button"
+            size="sm"
+            variant="outline"
+            onClick={() => fileRef.current?.click()}
+            disabled={uploading}
+            className="h-8 gap-1.5 rounded-sm border-forest/40 text-xs font-medium text-forest hover:bg-forest hover:text-cream"
+          >
+            {uploading ? (
+              <>
+                <Loader2 className="size-3.5 animate-spin" />
+                Processing…
+              </>
+            ) : (
+              <>
+                <Upload className="size-3.5" />
+                {hasPhoto ? 'Change Photo' : 'Upload Photo'}
+              </>
+            )}
+          </Button>
+          {hasPhoto && (
+            <Button
+              type="button"
+              size="sm"
+              variant="ghost"
+              onClick={() => onChange('')}
+              className="h-8 gap-1.5 rounded-sm text-xs font-medium text-crimson hover:bg-crimson/10"
+            >
+              <Trash2 className="size-3.5" />
+              Remove
+            </Button>
+          )}
+        </div>
+      </div>
+      <p className="text-xs text-muted-foreground">
+        JPG or PNG. Image is resized to max 800px wide before saving.
+      </p>
+    </div>
+  )
+}
+
 // ─── School Info Tab ───
 function SchoolTab({
   school,
@@ -732,6 +850,9 @@ function SchoolTab({
   }
   function updatePrincipal(key: keyof School['principal'], value: string) {
     setForm((f) => ({ ...f, principal: { ...f.principal, [key]: value } }))
+  }
+  function updateVicePrincipal(key: keyof School['vicePrincipal'], value: string) {
+    setForm((f) => ({ ...f, vicePrincipal: { ...f.vicePrincipal, [key]: value } }))
   }
   function updateMission(key: keyof School['mission'], value: string) {
     setForm((f) => ({ ...f, mission: { ...f.mission, [key]: value } }))
@@ -942,6 +1063,13 @@ function SchoolTab({
         title="Principal / Founder"
         description="The principal's message on the homepage and About page."
       >
+        <ImageUpload
+          label="Principal Photo"
+          value={form.principal.photo}
+          onChange={(v) => updatePrincipal('photo', v)}
+          aspect="aspect-[4/5]"
+          maxSize="size-28"
+        />
         <div className="grid gap-4 sm:grid-cols-2">
           <div className="space-y-2">
             <FieldLabel>Principal Name</FieldLabel>
@@ -975,6 +1103,49 @@ function SchoolTab({
             value={form.principal.signature}
             onChange={(e) => updatePrincipal('signature', e.target.value)}
             className="rounded-sm border-gold/30 bg-cream"
+          />
+        </div>
+      </SectionCard>
+
+      <SectionCard
+        title="Vice Director"
+        description="Optional. Leave the name blank to hide the Vice Director section on the homepage."
+      >
+        <ImageUpload
+          label="Vice Director Photo"
+          value={form.vicePrincipal.photo}
+          onChange={(v) => updateVicePrincipal('photo', v)}
+          aspect="aspect-[4/5]"
+          maxSize="size-28"
+        />
+        <div className="grid gap-4 sm:grid-cols-2">
+          <div className="space-y-2">
+            <FieldLabel>Vice Director Name</FieldLabel>
+            <Input
+              value={form.vicePrincipal.name}
+              onChange={(e) => updateVicePrincipal('name', e.target.value)}
+              className="rounded-sm border-gold/30 bg-cream"
+              placeholder="e.g. Mrs. Hiwot Tadesse"
+            />
+          </div>
+          <div className="space-y-2">
+            <FieldLabel>Vice Director Title</FieldLabel>
+            <Input
+              value={form.vicePrincipal.title}
+              onChange={(e) => updateVicePrincipal('title', e.target.value)}
+              className="rounded-sm border-gold/30 bg-cream"
+              placeholder="e.g. Vice Principal, Academics"
+            />
+          </div>
+        </div>
+        <div className="space-y-2">
+          <FieldLabel>Vice Director Message</FieldLabel>
+          <Textarea
+            rows={5}
+            value={form.vicePrincipal.message}
+            onChange={(e) => updateVicePrincipal('message', e.target.value)}
+            className="rounded-sm border-gold/30 bg-cream"
+            placeholder="A short message shown on the homepage alongside the principal's."
           />
         </div>
       </SectionCard>
@@ -1166,6 +1337,23 @@ function GalleryTab({
           {items.map((item) => (
             <ItemRow key={item.id}>
               <div className="flex h-full flex-col gap-3">
+                <div className="aspect-[4/3] overflow-hidden rounded-sm border border-gold/20 bg-cream/60">
+                  {isDataUrl(item.image) ? (
+                     
+                    <img
+                      src={item.image}
+                      alt={item.title}
+                      className="h-full w-full object-cover"
+                    />
+                  ) : (
+                    <div className="flex h-full w-full flex-col items-center justify-center gap-1 text-gold-deep/40">
+                      <ImageIcon className="size-7" />
+                      <span className="text-[10px] uppercase tracking-wider">
+                        Placeholder: {item.image || '—'}
+                      </span>
+                    </div>
+                  )}
+                </div>
                 <div className="flex items-start justify-between gap-2">
                   <div>
                     <div className="font-serif text-base font-semibold text-forest">
@@ -1175,10 +1363,6 @@ function GalleryTab({
                       {item.category}
                     </Badge>
                   </div>
-                </div>
-                <div className="rounded-sm border border-gold/20 bg-cream/60 px-3 py-2 text-xs text-muted-foreground">
-                  <span className="font-semibold uppercase tracking-wider text-gold-deep">Image:</span>{' '}
-                  <code>{item.image || '—'}</code>
                 </div>
                 <div className="mt-auto pt-2">
                   <ItemActions
@@ -1317,16 +1501,25 @@ function GalleryFormDialog({
             </SelectContent>
           </Select>
         </div>
+        <ImageUpload
+          label="Photo (or text seed for placeholder)"
+          value={image}
+          onChange={setImage}
+          aspect="aspect-[4/3]"
+          maxSize="size-32"
+        />
         <div className="space-y-2">
-          <FieldLabel>Image Key / Slug</FieldLabel>
+          <FieldLabel>Or enter a text seed for a placeholder</FieldLabel>
           <Input
-            value={image}
+            value={isDataUrl(image) ? '' : image}
             onChange={(e) => setImage(e.target.value)}
             className="rounded-sm border-gold/30 bg-cream"
             placeholder="e.g. graduation, science-fair, campus"
+            disabled={isDataUrl(image)}
           />
           <p className="text-xs text-muted-foreground">
-            Used by the SmartImage component to generate a deterministic placeholder.
+            If no photo is uploaded, this seed generates a deterministic
+            gradient placeholder via SmartImage.
           </p>
         </div>
         <FormActions saving={saving} onCancel={() => onOpenChange(false)} />
@@ -1579,9 +1772,18 @@ function LeadershipTab({
           {items.map((l) => (
             <ItemRow key={l.id}>
               <div className="flex items-start gap-4">
-                <div className="flex size-12 shrink-0 items-center justify-center rounded-full bg-forest font-serif text-lg font-semibold text-gold-light">
-                  {l.initials || l.name.slice(0, 2).toUpperCase()}
-                </div>
+                {isDataUrl(l.photo) ? (
+                   
+                  <img
+                    src={l.photo}
+                    alt={l.name}
+                    className="size-14 shrink-0 rounded-full object-cover border-2 border-gold/30"
+                  />
+                ) : (
+                  <div className="flex size-14 shrink-0 items-center justify-center rounded-full bg-forest font-serif text-lg font-semibold text-gold-light">
+                    {l.initials || l.name.slice(0, 2).toUpperCase()}
+                  </div>
+                )}
                 <div className="min-w-0 flex-1">
                   <div className="font-serif text-base font-semibold text-forest">
                     {l.name}
@@ -1673,6 +1875,7 @@ function LeaderFormDialog({
   const [role, setRole] = React.useState('')
   const [bio, setBio] = React.useState('')
   const [initials, setInitials] = React.useState('')
+  const [photo, setPhoto] = React.useState('')
   const [saving, setSaving] = React.useState(false)
 
   React.useEffect(() => {
@@ -1681,6 +1884,7 @@ function LeaderFormDialog({
       setRole(initial?.role ?? '')
       setBio(initial?.bio ?? '')
       setInitials(initial?.initials ?? '')
+      setPhoto(initial?.photo ?? '')
     }
   }, [open, initial])
 
@@ -1698,6 +1902,7 @@ function LeaderFormDialog({
         role: role.trim(),
         bio: bio.trim(),
         initials: initials.trim().toUpperCase().slice(0, 3),
+        photo,
       })
     } finally {
       setSaving(false)
@@ -1707,6 +1912,13 @@ function LeaderFormDialog({
   return (
     <FormDialogShell open={open} onOpenChange={onOpenChange} title={title}>
       <form onSubmit={handleSubmit} className="space-y-4">
+        <ImageUpload
+          label="Leader Photo"
+          value={photo}
+          onChange={setPhoto}
+          aspect="aspect-square"
+          maxSize="size-28"
+        />
         <div className="grid gap-4 sm:grid-cols-2">
           <div className="space-y-2">
             <FieldLabel>Name</FieldLabel>
@@ -1787,22 +1999,40 @@ function NewsTab({
           {items.map((n) => (
             <ItemRow key={n.id}>
               <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-                <div className="min-w-0 flex-1">
-                  <div className="flex flex-wrap items-center gap-2">
-                    <Badge className="bg-gold/15 text-gold-deep">{n.category}</Badge>
-                    <span className="text-xs text-muted-foreground">
-                      {n.date} · by {n.author || 'Unknown'}
-                    </span>
+                <div className="flex items-start gap-4">
+                  <div className="size-20 shrink-0 overflow-hidden rounded-sm border border-gold/20 bg-cream/60">
+                    {isDataUrl(n.image) ? (
+                       
+                      <img
+                        src={n.image}
+                        alt={n.title}
+                        className="h-full w-full object-cover"
+                      />
+                    ) : (
+                      <div className="flex h-full w-full items-center justify-center text-gold-deep/40">
+                        <ImageIcon className="size-6" />
+                      </div>
+                    )}
                   </div>
-                  <div className="mt-1 font-serif text-lg font-semibold text-forest">
-                    {n.title}
-                  </div>
-                  <p className="mt-1 line-clamp-2 text-sm text-muted-foreground">
-                    {n.excerpt}
-                  </p>
-                  <div className="mt-2 text-xs text-muted-foreground">
-                    <span className="font-semibold uppercase tracking-wider text-gold-deep">Image:</span>{' '}
-                    <code>{n.image || '—'}</code>
+                  <div className="min-w-0 flex-1">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <Badge className="bg-gold/15 text-gold-deep">{n.category}</Badge>
+                      <span className="text-xs text-muted-foreground">
+                        {n.date} · by {n.author || 'Unknown'}
+                      </span>
+                    </div>
+                    <div className="mt-1 font-serif text-lg font-semibold text-forest">
+                      {n.title}
+                    </div>
+                    <p className="mt-1 line-clamp-2 text-sm text-muted-foreground">
+                      {n.excerpt}
+                    </p>
+                    {!isDataUrl(n.image) && (
+                      <div className="mt-2 text-xs text-muted-foreground">
+                        <span className="font-semibold uppercase tracking-wider text-gold-deep">Seed:</span>{' '}
+                        <code>{n.image || '—'}</code>
+                      </div>
+                    )}
                   </div>
                 </div>
                 <ItemActions
@@ -1979,15 +2209,23 @@ function NewsFormDialog({
             />
           </div>
           <div className="space-y-2">
-            <FieldLabel>Image Key</FieldLabel>
+            <FieldLabel>Or enter a text seed for the placeholder</FieldLabel>
             <Input
-              value={image}
+              value={isDataUrl(image) ? '' : image}
               onChange={(e) => setImage(e.target.value)}
               className="rounded-sm border-gold/30 bg-cream"
               placeholder="e.g. science-club, graduation"
+              disabled={isDataUrl(image)}
             />
           </div>
         </div>
+        <ImageUpload
+          label="Article Photo"
+          value={image}
+          onChange={setImage}
+          aspect="aspect-[16/10]"
+          maxSize="size-32"
+        />
         <FormActions saving={saving} onCancel={() => onOpenChange(false)} />
       </form>
     </FormDialogShell>

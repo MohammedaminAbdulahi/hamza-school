@@ -58,7 +58,7 @@ async function fetchAll() {
       'SELECT id, name, subject, years, initials FROM teachers ORDER BY id ASC'
     ),
     pool.query(
-      'SELECT id, name, role, bio, initials FROM leadership ORDER BY id ASC'
+      'SELECT id, name, role, bio, initials, photo FROM leadership ORDER BY id ASC'
     ),
     pool.query(
       'SELECT id, title, excerpt, date, category, author, image FROM news ORDER BY date DESC, id ASC'
@@ -99,6 +99,13 @@ async function fetchAll() {
           title: s.principal_title,
           message: s.principal_message,
           signature: s.principal_signature,
+          photo: s.principal_photo ?? '',
+        },
+        vicePrincipal: {
+          name: s.vice_principal_name ?? '',
+          title: s.vice_principal_title ?? '',
+          message: s.vice_principal_message ?? '',
+          photo: s.vice_principal_photo ?? '',
         },
         mission: {
           eyebrow: s.mission_eyebrow,

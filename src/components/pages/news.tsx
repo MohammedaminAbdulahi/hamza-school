@@ -22,6 +22,7 @@ import { SmartImage } from '@/components/site/smart-image'
 import { DynamicIcon } from '@/components/site/dynamic-icon'
 import { useNav } from '@/lib/nav-store'
 import { NEWS, EVENTS, NEWS_CATEGORIES, ANNOUNCEMENTS } from '@/lib/content'
+import { isDataUrl } from '@/lib/image-upload'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -199,17 +200,28 @@ export function NewsPage() {
             </div>
           ) : (
           <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {pageItems.map((article, i) => (
+            {pageItems.map((article, i) => {
+              const isPhoto = isDataUrl(article.image)
+              return (
               <Reveal key={article.title} delay={i * 0.08}>
                 <Card className="group flex h-full flex-col overflow-hidden border-primary/10 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-primary/5">
                   <div className="relative">
-                    <SmartImage
-                      seed={article.image}
-                      alt={article.title}
-                      label={article.category}
-                      rounded="rounded-none"
-                      className="aspect-[16/10] w-full"
-                    />
+                    {isPhoto ? (
+                       
+                      <img
+                        src={article.image}
+                        alt={article.title}
+                        className="aspect-[16/10] w-full object-cover"
+                      />
+                    ) : (
+                      <SmartImage
+                        seed={article.image || article.title}
+                        alt={article.title}
+                        label={article.category}
+                        rounded="rounded-none"
+                        className="aspect-[16/10] w-full"
+                      />
+                    )}
                     <span
                       className={cn(
                         'absolute left-3 top-3 inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-semibold shadow-sm',
@@ -320,7 +332,8 @@ export function NewsPage() {
                   </CardContent>
                 </Card>
               </Reveal>
-            ))}
+              )
+            })}
           </div>
           )}
 

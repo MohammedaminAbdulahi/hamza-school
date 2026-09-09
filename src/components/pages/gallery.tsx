@@ -8,6 +8,7 @@ import { Reveal } from '@/components/site/reveal'
 import { SmartImage } from '@/components/site/smart-image'
 import { useNav } from '@/lib/nav-store'
 import { GALLERY, GALLERY_CATEGORIES } from '@/lib/content'
+import { isDataUrl } from '@/lib/image-upload'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -170,6 +171,7 @@ export function GalleryPage() {
           {/* Clean grid — big images, easy to see */}
           <div className="mt-10 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
             {filtered.map((item, i) => {
+              const isPhoto = isDataUrl(item.image)
               return (
                 <Reveal
                   key={`${item.title}-${i}`}
@@ -182,13 +184,22 @@ export function GalleryPage() {
                     aria-label={`View ${item.title} larger`}
                   >
                     <div className="relative aspect-[4/3] overflow-hidden">
-                      <SmartImage
-                        seed={item.image}
-                        alt={item.title}
-                        icon="Image"
-                        rounded="rounded-none"
-                        className="size-full transition-transform duration-500 group-hover:scale-105"
-                      />
+                      {isPhoto ? (
+                         
+                        <img
+                          src={item.image}
+                          alt={item.title}
+                          className="size-full object-cover transition-transform duration-500 group-hover:scale-105"
+                        />
+                      ) : (
+                        <SmartImage
+                          seed={item.image || item.title}
+                          alt={item.title}
+                          icon="Image"
+                          rounded="rounded-none"
+                          className="size-full transition-transform duration-500 group-hover:scale-105"
+                        />
+                      )}
                       <span
                         className={cn(
                           'absolute left-3 top-3 inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-semibold backdrop-blur-md',
@@ -282,13 +293,22 @@ export function GalleryPage() {
           {current && (
             <div className="overflow-hidden rounded-2xl bg-card">
               <div className="relative">
-                <SmartImage
-                  seed={current.image}
-                  alt={current.title}
-                  label={current.title}
-                  rounded="rounded-none"
-                  className="aspect-[16/10] w-full"
-                />
+                {isDataUrl(current.image) ? (
+                   
+                  <img
+                    src={current.image}
+                    alt={current.title}
+                    className="aspect-[16/10] w-full object-cover"
+                  />
+                ) : (
+                  <SmartImage
+                    seed={current.image || current.title}
+                    alt={current.title}
+                    label={current.title}
+                    rounded="rounded-none"
+                    className="aspect-[16/10] w-full"
+                  />
+                )}
                 <button
                   onClick={closeLightbox}
                   aria-label="Close"

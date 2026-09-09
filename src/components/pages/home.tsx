@@ -35,12 +35,19 @@ import {
   TESTIMONIALS,
   PRINCIPAL,
 } from '@/lib/content'
+import { isDataUrl } from '@/lib/image-upload'
 
 // DB content shape (subset of what /api/content returns)
 type DbSchool = {
   hero?: Partial<typeof HERO>
   mission?: Partial<typeof MISSION>
-  principal?: Partial<typeof PRINCIPAL>
+  principal?: Partial<typeof PRINCIPAL> & { photo?: string }
+  vicePrincipal?: {
+    name?: string
+    title?: string
+    message?: string
+    photo?: string
+  }
 }
 type DbEvent = {
   id?: number
@@ -58,7 +65,16 @@ export function HomePage() {
   // Local state seeded with content.ts defaults; updated from /api/content on mount.
   const [hero, setHero] = React.useState(HERO)
   const [mission, setMission] = React.useState(MISSION)
-  const [principal, setPrincipal] = React.useState(PRINCIPAL)
+  const [principal, setPrincipal] = React.useState<typeof PRINCIPAL & { photo?: string }>({
+    ...PRINCIPAL,
+    photo: '',
+  })
+  const [vicePrincipal, setVicePrincipal] = React.useState<{
+    name: string
+    title: string
+    message: string
+    photo: string
+  }>({ name: '', title: '', message: '', photo: '' })
   const [events, setEvents] = React.useState<typeof EVENTS>(EVENTS)
 
   React.useEffect(() => {
@@ -68,7 +84,19 @@ export function HomePage() {
         if (d.school) {
           if (d.school.hero) setHero({ ...HERO, ...d.school.hero })
           if (d.school.mission) setMission({ ...MISSION, ...d.school.mission })
-          if (d.school.principal) setPrincipal({ ...PRINCIPAL, ...d.school.principal })
+          if (d.school.principal)
+            setPrincipal((p) => ({
+              ...p,
+              ...d.school!.principal!,
+              photo: (d.school!.principal as { photo?: string }).photo ?? '',
+            }))
+          if (d.school.vicePrincipal)
+            setVicePrincipal({
+              name: d.school.vicePrincipal.name ?? '',
+              title: d.school.vicePrincipal.title ?? '',
+              message: d.school.vicePrincipal.message ?? '',
+              photo: d.school.vicePrincipal.photo ?? '',
+            })
         }
         if (Array.isArray(d.events) && d.events.length > 0) {
           setEvents(d.events as unknown as typeof EVENTS)
@@ -434,11 +462,21 @@ export function HomePage() {
           <Reveal className="lg:col-span-5">
             <div className="relative mx-auto max-w-xs">
               <div className="aspect-[4/5] overflow-hidden rounded-sm border-2 border-gold/30 shadow-2xl">
-                <img
-                  src="/hero-desk.jpeg"
-                  alt={principal.name}
-                  className="h-full w-full object-cover"
-                />
+                {isDataUrl(principal.photo) ? (
+                   
+                  <img
+                    src={principal.photo}
+                    alt={principal.name}
+                    className="h-full w-full object-cover"
+                  />
+                ) : (
+                   
+                  <img
+                    src="/hero-desk.jpeg"
+                    alt={principal.name}
+                    className="h-full w-full object-cover"
+                  />
+                )}
               </div>
               <div className="absolute -bottom-5 left-1/2 w-[85%] -translate-x-1/2 border border-gold/30 bg-forest p-4 text-center shadow-xl">
                 <p className="font-serif text-base font-bold text-cream">{principal.name}</p>
@@ -456,6 +494,59 @@ export function HomePage() {
           </Reveal>
         </div>
       </section>
+
+      {/* ===== VICE DIRECTOR'S MESSAGE (only if a vice director name is set) ===== */}
+      {vicePrincipal.name.trim() !== '' && (
+        <section className="paper-texture relative overflow-hidden py-32 bg-cream/40">
+          <div className="geo-pattern pointer-events-none absolute inset-0" />
+          <div className="relative mx-auto grid max-w-7xl items-center gap-12 px-6 lg:grid-cols-12 lg:px-12">
+            <Reveal delay={0.15} className="order-2 lg:order-1 lg:col-span-7">
+              <p className="section-label">A Word from Our Vice Director</p>
+              <Quote className="mt-6 size-12 text-gold/50" />
+              <p className="mt-4 font-serif text-2xl font-light italic leading-relaxed text-foreground/80 sm:text-3xl">
+                {vicePrincipal.message}
+              </p>
+              <p className="mt-8 font-serif text-2xl font-semibold text-gold-deep">
+                {vicePrincipal.name}
+              </p>
+              <p className="mt-1 text-xs uppercase tracking-wider text-muted-foreground">
+                {vicePrincipal.title}
+              </p>
+            </Reveal>
+            <Reveal className="order-1 lg:order-2 lg:col-span-5">
+              <div className="relative mx-auto max-w-xs">
+                <div className="aspect-[4/5] overflow-hidden rounded-sm border-2 border-gold/30 shadow-2xl">
+                  {isDataUrl(vicePrincipal.photo) ? (
+                     
+                    <img
+                      src={vicePrincipal.photo}
+                      alt={vicePrincipal.name}
+                      className="h-full w-full object-cover"
+                    />
+                  ) : (
+                    <div className="flex h-full w-full items-center justify-center bg-forest text-gold-light">
+                      <span className="font-serif text-6xl font-semibold">
+                        {vicePrincipal.name
+                          .split(' ')
+                          .map((n) => n[0])
+                          .slice(0, 2)
+                          .join('')
+                          .toUpperCase()}
+                      </span>
+                    </div>
+                  )}
+                </div>
+                <div className="absolute -bottom-5 left-1/2 w-[85%] -translate-x-1/2 border border-gold/30 bg-forest p-4 text-center shadow-xl">
+                  <p className="font-serif text-base font-bold text-cream">
+                    {vicePrincipal.name}
+                  </p>
+                  <p className="text-xs text-gold-light">{vicePrincipal.title}</p>
+                </div>
+              </div>
+            </Reveal>
+          </div>
+        </section>
+      )}
 
       {/* ===== CTA / CONTACT ===== */}
       <section className="paper-texture relative overflow-hidden py-32">

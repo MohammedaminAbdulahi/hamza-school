@@ -22,6 +22,7 @@ import {
   HISTORY,
   PRINCIPAL,
 } from '@/lib/content'
+import { isDataUrl } from '@/lib/image-upload'
 import {
   Card,
   CardContent,
@@ -39,14 +40,14 @@ import {
   AccordionTrigger,
 } from '@/components/ui/accordion'
 
-type DbLeader = { id?: number; name: string; role: string; bio: string; initials: string }
+type DbLeader = { id?: number; name: string; role: string; bio: string; initials: string; photo?: string }
 type DbTeacher = { id?: number; name: string; subject: string; years: number; initials: string }
 type DbSchool = {
   name?: string
   established?: number
   hero?: Partial<typeof MISSION>
   mission?: Partial<typeof MISSION>
-  principal?: Partial<typeof PRINCIPAL>
+  principal?: Partial<typeof PRINCIPAL> & { photo?: string }
 }
 
 export function AboutPage() {
@@ -250,13 +251,25 @@ export function AboutPage() {
           <div className="grid items-center gap-10 lg:grid-cols-12">
             <Reveal className="lg:col-span-5" delay={0.05}>
               <div className="relative mx-auto max-w-sm">
-                <SmartImage
-                  seed="about-principal"
-                  alt={`Portrait of ${principal.name}`}
-                  icon="UserRound"
-                  label={principal.name}
-                  className="aspect-[4/5] w-full"
-                />
+                <div className="aspect-[4/5] w-full overflow-hidden rounded-xl border border-primary/20 shadow-sm">
+                  {isDataUrl((principal as { photo?: string }).photo) ? (
+                     
+                    <img
+                      src={(principal as { photo?: string }).photo}
+                      alt={`Portrait of ${principal.name}`}
+                      className="h-full w-full object-cover"
+                    />
+                  ) : (
+                    <SmartImage
+                      seed="about-principal"
+                      alt={`Portrait of ${principal.name}`}
+                      icon="UserRound"
+                      label={principal.name}
+                      rounded="rounded-none"
+                      className="aspect-[4/5] w-full"
+                    />
+                  )}
+                </div>
                 <div className="absolute -bottom-4 -right-4 hidden rounded-xl border bg-background p-4 shadow-lg sm:block">
                   <div className="flex items-center gap-2">
                     <Award className="size-5 text-amber-500" />
@@ -307,11 +320,20 @@ export function AboutPage() {
                 <Card className="h-full transition-all hover:-translate-y-1 hover:shadow-lg">
                   <CardContent className="pt-6">
                     <div className="flex items-center gap-4">
-                      <Avatar className="size-14 border-2 border-primary/20">
-                        <AvatarFallback className="bg-primary/10 text-base font-semibold text-primary">
-                          {member.initials}
-                        </AvatarFallback>
-                      </Avatar>
+                      {isDataUrl((member as DbLeader).photo) ? (
+                         
+                        <img
+                          src={(member as DbLeader).photo}
+                          alt={member.name}
+                          className="size-14 shrink-0 rounded-full border-2 border-primary/20 object-cover"
+                        />
+                      ) : (
+                        <Avatar className="size-14 border-2 border-primary/20">
+                          <AvatarFallback className="bg-primary/10 text-base font-semibold text-primary">
+                            {member.initials}
+                          </AvatarFallback>
+                        </Avatar>
+                      )}
                       <div>
                         <CardTitle className="text-base">{member.name}</CardTitle>
                         <div className="text-sm font-medium text-primary">{member.role}</div>

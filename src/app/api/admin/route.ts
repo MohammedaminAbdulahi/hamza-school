@@ -31,6 +31,13 @@ function str(v: unknown, max = 4096): string {
   return s.length > max ? s.slice(0, max) : s
 }
 
+// Like str(), but allows much larger payloads so we can store base64 photos
+// (a 800px-wide JPEG at 80% quality is typically 50–200KB → ~70–270KB base64).
+const IMAGE_MAX = 5_000_000
+function strImg(v: unknown): string {
+  return str(v, IMAGE_MAX)
+}
+
 function num(v: unknown): number {
   const n = Number(v)
   return Number.isFinite(n) ? n : 0
@@ -56,7 +63,7 @@ async function getAll() {
       'SELECT id, name, subject, years, initials FROM teachers ORDER BY id ASC'
     ),
     pool.query(
-      'SELECT id, name, role, bio, initials FROM leadership ORDER BY id ASC'
+      'SELECT id, name, role, bio, initials, photo FROM leadership ORDER BY id ASC'
     ),
     pool.query(
       'SELECT id, title, excerpt, date, category, author, image FROM news ORDER BY date DESC, id ASC'
@@ -97,6 +104,13 @@ async function getAll() {
           title: s.principal_title,
           message: s.principal_message,
           signature: s.principal_signature,
+          photo: s.principal_photo ?? '',
+        },
+        vicePrincipal: {
+          name: s.vice_principal_name ?? '',
+          title: s.vice_principal_title ?? '',
+          message: s.vice_principal_message ?? '',
+          photo: s.vice_principal_photo ?? '',
         },
         mission: {
           eyebrow: s.mission_eyebrow,
@@ -124,6 +138,7 @@ async function updateSchool(school: Record<string, unknown>) {
   const social = (school.social ?? {}) as Record<string, unknown>
   const hero = (school.hero ?? {}) as Record<string, unknown>
   const principal = (school.principal ?? {}) as Record<string, unknown>
+  const vicePrincipal = (school.vicePrincipal ?? {}) as Record<string, unknown>
   const mission = (school.mission ?? {}) as Record<string, unknown>
 
   await pool.query(
@@ -131,10 +146,11 @@ async function updateSchool(school: Record<string, unknown>) {
         id, name, tagline, subtitle, established, email, phone, alt_phone, address, hours,
         facebook, twitter, instagram, youtube, telegram,
         hero_eyebrow, hero_title, hero_description, hero_primary_button, hero_secondary_button,
-        principal_name, principal_title, principal_message, principal_signature,
+        principal_name, principal_title, principal_message, principal_signature, principal_photo,
+        vice_principal_name, vice_principal_title, vice_principal_message, vice_principal_photo,
         mission_eyebrow, mission_title, mission_description, mission_quote, mission_quote_source,
         updated_at
-      ) VALUES (1, $1,$2,$3,$4,$5,$6,$7,$8,$9, $10,$11,$12,$13,$14, $15,$16,$17,$18,$19, $20,$21,$22,$23, $24,$25,$26,$27,$28, NOW())
+      ) VALUES (1, $1,$2,$3,$4,$5,$6,$7,$8,$9, $10,$11,$12,$13,$14, $15,$16,$17,$18,$19, $20,$21,$22,$23,$24, $25,$26,$27,$28, $29,$30,$31,$32,$33, NOW())
       ON CONFLICT (id) DO UPDATE SET
         name = EXCLUDED.name,
         tagline = EXCLUDED.tagline,
@@ -159,6 +175,11 @@ async function updateSchool(school: Record<string, unknown>) {
         principal_title = EXCLUDED.principal_title,
         principal_message = EXCLUDED.principal_message,
         principal_signature = EXCLUDED.principal_signature,
+        principal_photo = EXCLUDED.principal_photo,
+        vice_principal_name = EXCLUDED.vice_principal_name,
+        vice_principal_title = EXCLUDED.vice_principal_title,
+        vice_principal_message = EXCLUDED.vice_principal_message,
+        vice_principal_photo = EXCLUDED.vice_principal_photo,
         mission_eyebrow = EXCLUDED.mission_eyebrow,
         mission_title = EXCLUDED.mission_title,
         mission_description = EXCLUDED.mission_description,
@@ -190,6 +211,11 @@ async function updateSchool(school: Record<string, unknown>) {
       str(principal.title, 200),
       str(principal.message, 4000),
       str(principal.signature, 200),
+      strImg(principal.photo),
+      str(vicePrincipal.name, 200),
+      str(vicePrincipal.title, 200),
+      str(vicePrincipal.message, 4000),
+      strImg(vicePrincipal.photo),
       str(mission.eyebrow, 100),
       str(mission.title, 300),
       str(mission.description, 4000),
@@ -235,14 +261,14 @@ export async function POST(req: NextRequest) {
       case 'add_gallery': {
         await pool.query(
           'INSERT INTO gallery (title, category, image) VALUES ($1, $2, $3)',
-          [str(body.title, 200), str(body.category, 100), str(body.image, 500)]
+          [str(body.title, 200), str(body.category, 100), strImg(body.image)]
         )
         return NextResponse.json(await getAll())
       }
       case 'update_gallery': {
         await pool.query(
           'UPDATE gallery SET title=$1, category=$2, image=$3, updated_at=NOW() WHERE id=$4',
-          [str(body.title, 200), str(body.category, 100), str(body.image, 500), num(body.id)]
+          [str(body.title, 200), str(body.category, 100), strImg(body.image), num(body.id)]
         )
         return NextResponse.json(await getAll())
       }
@@ -274,15 +300,15 @@ export async function POST(req: NextRequest) {
       // ── Leadership ──
       case 'add_leadership': {
         await pool.query(
-          'INSERT INTO leadership (name, role, bio, initials) VALUES ($1, $2, $3, $4)',
-          [str(body.name, 200), str(body.role, 200), str(body.bio, 1000), str(body.initials, 10)]
+          'INSERT INTO leadership (name, role, bio, initials, photo) VALUES ($1, $2, $3, $4, $5)',
+          [str(body.name, 200), str(body.role, 200), str(body.bio, 1000), str(body.initials, 10), strImg(body.photo)]
         )
         return NextResponse.json(await getAll())
       }
       case 'update_leadership': {
         await pool.query(
-          'UPDATE leadership SET name=$1, role=$2, bio=$3, initials=$4, updated_at=NOW() WHERE id=$5',
-          [str(body.name, 200), str(body.role, 200), str(body.bio, 1000), str(body.initials, 10), num(body.id)]
+          'UPDATE leadership SET name=$1, role=$2, bio=$3, initials=$4, photo=$5, updated_at=NOW() WHERE id=$6',
+          [str(body.name, 200), str(body.role, 200), str(body.bio, 1000), str(body.initials, 10), strImg(body.photo), num(body.id)]
         )
         return NextResponse.json(await getAll())
       }
@@ -301,7 +327,7 @@ export async function POST(req: NextRequest) {
             str(body.date, 20),
             str(body.category, 100),
             str(body.author, 200),
-            str(body.image, 500),
+            strImg(body.image),
           ]
         )
         return NextResponse.json(await getAll())
@@ -315,7 +341,7 @@ export async function POST(req: NextRequest) {
             str(body.date, 20),
             str(body.category, 100),
             str(body.author, 200),
-            str(body.image, 500),
+            strImg(body.image),
             num(body.id),
           ]
         )
