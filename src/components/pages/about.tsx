@@ -39,6 +39,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from '@/components/ui/accordion'
+import { PageLoading } from '@/components/site/page-loading'
 
 type DbLeader = { id?: number; name: string; role: string; bio: string; initials: string; photo?: string }
 type DbTeacher = { id?: number; name: string; subject: string; years: number; initials: string }
@@ -54,6 +55,8 @@ type DbSchool = {
 }
 
 export function AboutPage() {
+  const [loading, setLoading] = React.useState(true)
+
   const goPage = useNav((s) => s.goPage)
 
   const [school, setSchool] = React.useState(SCHOOL)
@@ -109,7 +112,10 @@ export function AboutPage() {
         }
       })
       .catch(() => { /* keep defaults on error */ })
+      .finally(() => setLoading(false))
   }, [])
+
+  if (loading) return <PageLoading />
 
   return (
     <div className="flex flex-col">

@@ -19,6 +19,7 @@ import {
   DialogDescription,
 } from '@/components/ui/dialog'
 import { cn } from '@/lib/utils'
+import { PageLoading } from '@/components/site/page-loading'
 
 interface GalleryItem {
   title: string
@@ -46,6 +47,8 @@ function getCategoryBadgeClass(category: string) {
 }
 
 export function GalleryPage() {
+  const [loading, setLoading] = React.useState(true)
+
   const goPage = useNav((s) => s.goPage)
   const [activeCategory, setActiveCategory] = React.useState('All')
   const [lightboxIndex, setLightboxIndex] = React.useState<number | null>(
@@ -63,6 +66,7 @@ export function GalleryPage() {
         }
       })
       .catch(() => { /* keep defaults on error */ })
+      .finally(() => setLoading(false))
   }, [])
 
   const filtered: GalleryItem[] = React.useMemo(() => {
@@ -95,6 +99,8 @@ export function GalleryPage() {
 
   const current =
     lightboxIndex !== null ? filtered[lightboxIndex] : null
+
+  if (loading) return <PageLoading />
 
   return (
     <div className="flex flex-col">

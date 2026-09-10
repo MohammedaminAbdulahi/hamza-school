@@ -41,6 +41,7 @@ import {
   PaginationPrevious,
 } from '@/components/ui/pagination'
 import { cn } from '@/lib/utils'
+import { PageLoading } from '@/components/site/page-loading'
 
 const PAGE_SIZE = 3
 
@@ -88,6 +89,8 @@ function buildMarchCalendar() {
 }
 
 export function NewsPage() {
+  const [loading, setLoading] = React.useState(true)
+
   const goPage = useNav((s) => s.goPage)
   const [activeCategory, setActiveCategory] = React.useState('All')
   const [page, setPage] = React.useState(1)
@@ -109,6 +112,7 @@ export function NewsPage() {
         }
       )
       .catch(() => { /* keep defaults on error */ })
+      .finally(() => setLoading(false))
   }, [])
 
   // News comes from /api/content (with content.ts fallback)
@@ -140,6 +144,8 @@ export function NewsPage() {
     )}-${String(day).padStart(2, '0')}`
     return events.filter((e) => e.date === iso)
   }
+
+  if (loading) return <PageLoading />
 
   return (
     <div className="flex flex-col">

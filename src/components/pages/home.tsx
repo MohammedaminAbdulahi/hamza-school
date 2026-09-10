@@ -36,6 +36,7 @@ import {
   PRINCIPAL,
 } from '@/lib/content'
 import { isDataUrl } from '@/lib/image-upload'
+import { PageLoading } from '@/components/site/page-loading'
 
 // DB content shape (subset of what /api/content returns)
 type DbStat = { key: string; label: string; value: number; suffix: string }
@@ -63,6 +64,9 @@ type DbEvent = {
 
 export function HomePage() {
   const { goPage } = useNav()
+
+  // Loading state — shows spinner until DB data arrives (prevents flash of defaults)
+  const [loading, setLoading] = React.useState(true)
 
   // Local state seeded with content.ts defaults; updated from /api/content on mount.
   const [hero, setHero] = React.useState(HERO)
@@ -100,8 +104,6 @@ export function HomePage() {
               message: d.school.vicePrincipal.message ?? '',
               photo: d.school.vicePrincipal.photo ?? '',
             })
-          // Merge fetched stats over the content.ts defaults so partial DB
-          // responses (e.g. only some columns set) stay safe.
           if (Array.isArray(d.school.stats) && d.school.stats.length === 4) {
             setStats(
               d.school.stats.map((s, i) => ({
@@ -117,7 +119,10 @@ export function HomePage() {
         }
       })
       .catch(() => { /* keep defaults on error */ })
+      .finally(() => setLoading(false))
   }, [])
+
+  if (loading) return <PageLoading />
 
   return (
     <div className="flex flex-col">
