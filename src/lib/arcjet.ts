@@ -13,18 +13,6 @@ const stubProtect = async (): Promise<Decision> => ({
   reason: { isRateLimit: () => false },
 })
 
-// Only load Arcjet if a key is configured
-let realAj: { protect: (req: unknown) => Promise<Decision> } | null = null
-
-if (process.env.ARCJET_KEY && process.env.ARCJET_KEY !== 'ajtest_dummy_key_for_dev') {
-  // Arcjet is loaded dynamically via import() in the route handlers
-  // when ARCJET_KEY is set. See api/admin/route.ts and api/content/route.ts.
-}
-
-export const aj = {
-  protect: stubProtect,
-}
-
 // Helper to check if Arcjet is configured
 export function isArcjetConfigured(): boolean {
   return !!(
@@ -34,18 +22,17 @@ export function isArcjetConfigured(): boolean {
 }
 
 // Dynamic loader — call this in route handlers
-export async function loadArcjet(): Promise<{
-  protect: (req: unknown) => Promise<Decision>
-} | null> {
+// Returns null if Arcjet isn't configured or the package isn't installed.
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export async function loadArcjet(): Promise<{ protect: (req: any) => Promise<Decision> } | null> {
   if (!isArcjetConfigured()) return null
   try {
-    const mod = await import('@arcjet/next')
-    const { default: arcjet, detectBot, shield, tokenBucket } = mod
+    const { default: arcjet, detectBot, shield, tokenBucket } = await import('@arcjet/next')
     const instance = arcjet({
       key: process.env.ARCJET_KEY!,
       rules: [
         shield({ mode: 'LIVE' }),
-        detectBot({ mode: 'LIVE', block: ['AUTOMATED', 'LIKELY_AUTOMATED'] }),
+        detectBot({ mode: 'LIVE', allow: [] }),
         tokenBucket({
           mode: 'LIVE',
           characteristics: ['ip.src'],
@@ -55,8 +42,14 @@ export async function loadArcjet(): Promise<{
         }),
       ],
     })
-    return { protect: instance.protect.bind(instance) }
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    return { protect: instance.protect.bind(instance) as any }
   } catch {
     return null
   }
+}
+
+// Stub instance for when Arcjet isn't configured
+export const aj = {
+  protect: stubProtect,
 }
