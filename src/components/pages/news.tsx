@@ -41,7 +41,6 @@ import {
   PaginationPrevious,
 } from '@/components/ui/pagination'
 import { cn } from '@/lib/utils'
-import { PageLoading } from '@/components/site/page-loading'
 
 const PAGE_SIZE = 3
 
@@ -89,6 +88,8 @@ function buildMarchCalendar() {
 }
 
 export function NewsPage() {
+  // Loading state is tracked but no longer blocks rendering — content.ts
+  // defaults render immediately and silently update when DB data arrives.
   const [loading, setLoading] = React.useState(true)
 
   const goPage = useNav((s) => s.goPage)
@@ -144,8 +145,6 @@ export function NewsPage() {
     )}-${String(day).padStart(2, '0')}`
     return events.filter((e) => e.date === iso)
   }
-
-  if (loading) return <PageLoading />
 
   return (
     <div className="flex flex-col">

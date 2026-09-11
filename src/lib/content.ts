@@ -107,7 +107,7 @@ export const SCIENCE_FEATURES = [
 export const LANGUAGES = [
   { name: 'English', icon: 'BookOpen', level: 'Primary Language of Instruction', description: 'English is used across all subjects from Grade 1, with daily reading, writing, and speaking practice throughout the school.', proficiency: 95 },
   { name: 'Amharic', icon: 'Languages', level: 'Core Subject (Daily)', description: 'Amharic is taught every day as a core subject — covering reading, writing, grammar, and Ethiopian literature and culture.', proficiency: 95 },
-  { name: 'French', icon: 'Languages', level: 'Optional from Grade 5', description: 'Students who wish to study a third language can choose French from Grade 5, building conversational skills and cultural awareness.', proficiency: 65 },
+  { name: 'Afan Oromoo', icon: 'Languages', level: 'Core Subject', description: 'Afan Oromoo is taught as a core subject — covering reading, writing, grammar, and Oromo culture and literature.', proficiency: 100 },
 ]
 
 // ─── LABORATORIES ───
@@ -124,12 +124,12 @@ export const ARTS_FEATURES = [
 
 // ─── DEPARTMENTS ───
 export const DEPARTMENTS = [
-  { name: 'Mathematics & Computing', head: 'Mrs. Hiwot Tadesse', subjects: 6, icon: 'Calculator' },
-  { name: 'Sciences', head: 'Mr. Dawit Kebede', subjects: 4, icon: 'FlaskConical' },
-  { name: 'Languages', head: 'Mrs. Selamawit Girma', subjects: 5, icon: 'Languages' },
-  { name: 'Social Studies', head: 'Mr. Bereket Mengistu', subjects: 7, icon: 'Landmark' },
-  { name: 'Arts & PE', head: 'Ms. Eden Asefa', subjects: 4, icon: 'Palette' },
-  { name: 'Civics & Ethics', head: 'Mr. Yonas Bekele', subjects: 3, icon: 'Scale' },
+  { name: 'Mathematics & Computing', head: 'Mrs. Hiwot Tadesse', icon: 'Calculator' },
+  { name: 'Sciences', head: 'Mr. Dawit Kebede', icon: 'FlaskConical' },
+  { name: 'Languages', head: 'Mrs. Selamawit Girma', icon: 'Languages' },
+  { name: 'Social Studies', head: 'Mr. Bereket Mengistu', icon: 'Landmark' },
+  { name: 'Arts & PE', head: 'Ms. Eden Asefa', icon: 'Palette' },
+  { name: 'Civics & Ethics', head: 'Mr. Yonas Bekele', icon: 'Scale' },
 ]
 
 // ─── SUBJECTS OFFERED ───
@@ -141,14 +141,13 @@ export const SUBJECTS = [
 
 // ─── CLUBS ───
 export const CLUBS = [
-  { name: 'Science Club', members: 45, icon: 'FlaskConical' },
-  { name: 'Reading Club', members: 60, icon: 'BookOpen' },
-  { name: 'Art Club', members: 30, icon: 'Palette' },
-  { name: 'Sports Club', members: 70, icon: 'Volleyball' },
-  { name: 'Drama Club', members: 25, icon: 'Drama' },
-  { name: 'Environment Club', members: 40, icon: 'Leaf' },
-  { name: 'Music Club', members: 35, icon: 'Music' },
-  { name: 'Civics & Ethics Club', members: 50, icon: 'Scale' },
+  { name: 'Science Club', icon: 'FlaskConical' },
+  { name: 'Reading Club', icon: 'BookOpen' },
+  { name: 'Art Club', icon: 'Palette' },
+  { name: 'Sports Club', icon: 'Volleyball' },
+  { name: 'Environment Club', icon: 'Leaf' },
+  { name: 'Music Club', icon: 'Music' },
+  { name: 'Civics & Ethics Club', icon: 'Scale' },
 ]
 
 // ─── SPORTS ───

@@ -1,0 +1,661 @@
+     1→'use client'
+     2→
+     3→import * as React from 'react'
+     4→import {
+     5→  Calendar,
+     6→  Clock,
+     7→  MapPin,
+     8→  ArrowRight,
+     9→  Pin,
+    10→  Bell,
+    11→  Tag,
+    12→  Share2,
+    13→  Facebook,
+    14→  Twitter,
+    15→  Linkedin,
+    16→  Link2,
+    17→} from 'lucide-react'
+    18→import { PageHero } from '@/components/site/page-hero'
+    19→import { SectionHeader } from '@/components/site/section-header'
+    20→import { Reveal } from '@/components/site/reveal'
+    21→import { SmartImage } from '@/components/site/smart-image'
+    22→import { DynamicIcon } from '@/components/site/dynamic-icon'
+    23→import { useNav } from '@/lib/nav-store'
+    24→import { NEWS, EVENTS, NEWS_CATEGORIES, ANNOUNCEMENTS } from '@/lib/content'
+    25→import { isDataUrl } from '@/lib/image-upload'
+    26→import { Card, CardContent } from '@/components/ui/card'
+    27→import { Button } from '@/components/ui/button'
+    28→import { Badge } from '@/components/ui/badge'
+    29→import {
+    30→  DropdownMenu,
+    31→  DropdownMenuContent,
+    32→  DropdownMenuItem,
+    33→  DropdownMenuTrigger,
+    34→} from '@/components/ui/dropdown-menu'
+    35→import {
+    36→  Pagination,
+    37→  PaginationContent,
+    38→  PaginationItem,
+    39→  PaginationLink,
+    40→  PaginationNext,
+    41→  PaginationPrevious,
+    42→} from '@/components/ui/pagination'
+    43→import { cn } from '@/lib/utils'
+    44→import { PageLoading } from '@/components/site/page-loading'
+    45→
+    46→const PAGE_SIZE = 3
+    47→
+    48→type DbNews = typeof NEWS[number]
+    49→type DbEvent = typeof EVENTS[number]
+    50→
+    51→function formatDate(iso: string) {
+    52→  return new Date(iso).toLocaleDateString('en-US', {
+    53→    month: 'short',
+    54→    day: 'numeric',
+    55→    year: 'numeric',
+    56→  })
+    57→}
+    58→
+    59→function getCategoryBadgeClass(category: string) {
+    60→  switch (category) {
+    61→    case 'Campus':
+    62→      return 'bg-emerald-100 text-emerald-700'
+    63→    case 'Achievement':
+    64→      return 'bg-amber-100 text-amber-700'
+    65→    case 'Community':
+    66→      return 'bg-teal-100 text-teal-700'
+    67→    case 'Academics':
+    68→      return 'bg-rose-100 text-rose-700'
+    69→    case 'Arts':
+    70→      return 'bg-orange-100 text-orange-700'
+    71→    default:
+    72→      return 'bg-muted text-muted-foreground'
+    73→  }
+    74→}
+    75→
+    76→// Build a March 2025 calendar grid
+    77→const CALENDAR_YEAR = 2025
+    78→const CALENDAR_MONTH = 2 // March (0-indexed)
+    79→const WEEKDAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
+    80→
+    81→function buildMarchCalendar() {
+    82→  const firstDay = new Date(CALENDAR_YEAR, CALENDAR_MONTH, 1).getDay()
+    83→  const daysInMonth = new Date(CALENDAR_YEAR, CALENDAR_MONTH + 1, 0).getDate()
+    84→  const cells: (number | null)[] = []
+    85→  for (let i = 0; i < firstDay; i++) cells.push(null)
+    86→  for (let d = 1; d <= daysInMonth; d++) cells.push(d)
+    87→  while (cells.length % 7 !== 0) cells.push(null)
+    88→  return cells
+    89→}
+    90→
+    91→export function NewsPage() {
+    92→  const [loading, setLoading] = React.useState(true)
+    93→
+    94→  const goPage = useNav((s) => s.goPage)
+    95→  const [activeCategory, setActiveCategory] = React.useState('All')
+    96→  const [page, setPage] = React.useState(1)
+    97→
+    98→  const [news, setNews] = React.useState(NEWS)
+    99→  const [events, setEvents] = React.useState(EVENTS)
+   100→
+   101→  React.useEffect(() => {
+   102→    fetch('/api/content')
+   103→      .then((r) => r.json())
+   104→      .then(
+   105→        (d: { news?: DbNews[]; events?: DbEvent[] }) => {
+   106→          if (Array.isArray(d.news) && d.news.length > 0) {
+   107→            setNews(d.news as unknown as typeof NEWS)
+   108→          }
+   109→          if (Array.isArray(d.events) && d.events.length > 0) {
+   110→            setEvents(d.events as unknown as typeof EVENTS)
+   111→          }
+   112→        }
+   113→      )
+   114→      .catch(() => { /* keep defaults on error */ })
+   115→      .finally(() => setLoading(false))
+   116→  }, [])
+   117→
+   118→  // News comes from /api/content (with content.ts fallback)
+   119→  const filtered = React.useMemo(() => {
+   120→    const list =
+   121→      activeCategory === 'All'
+   122→        ? news
+   123→        : news.filter((n) => n.category === activeCategory)
+   124→    return list
+   125→  }, [activeCategory, news])
+   126→
+   127→  React.useEffect(() => {
+   128→    setPage(1)
+   129→  }, [activeCategory])
+   130→
+   131→  const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE))
+   132→  const pageItems = filtered.slice(
+   133→    (page - 1) * PAGE_SIZE,
+   134→    page * PAGE_SIZE
+   135→  )
+   136→
+   137→  const calendarCells = React.useMemo(() => buildMarchCalendar(), [])
+   138→
+   139→  function eventsOnDay(day: number | null) {
+   140→    if (day === null) return []
+   141→    const iso = `${CALENDAR_YEAR}-${String(CALENDAR_MONTH + 1).padStart(
+   142→      2,
+   143→      '0'
+   144→    )}-${String(day).padStart(2, '0')}`
+   145→    return events.filter((e) => e.date === iso)
+   146→  }
+   147→
+   148→  if (loading) return <PageLoading />
+   149→
+   150→  return (
+   151→    <div className="flex flex-col">
+   152→      <PageHero
+   153→        eyebrow="News & Events"
+   154→        title="News & Events at Hamza"
+   155→        description="Stories from our classrooms, achievements worth celebrating, and a calendar full of moments that bring our community together."
+   156→        seed="news-hero"
+   157→        icon="Newspaper"
+   158→        breadcrumb="News & Events"
+   159→      />
+   160→
+   161→      {/* ===== NEWS ARTICLES ===== */}
+   162→      <section className="py-20 sm:py-24">
+   163→        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+   164→          <Reveal>
+   165→            <SectionHeader
+   166→              align="left"
+   167→              eyebrow="Latest Stories"
+   168→              title="School News"
+   169→              description="Discover what's happening on campus — from student wins to program launches and community initiatives."
+   170→            />
+   171→          </Reveal>
+   172→
+   173→          {/* Category filter */}
+   174→          <Reveal delay={0.05}>
+   175→            <div className="mt-8 flex flex-wrap gap-2">
+   176→              {NEWS_CATEGORIES.map((cat) => (
+   177→                <Button
+   178→                  key={cat}
+   179→                  size="sm"
+   180→                  variant={
+   181→                    activeCategory === cat ? 'default' : 'outline'
+   182→                  }
+   183→                  onClick={() => setActiveCategory(cat)}
+   184→                  className={cn(
+   185→                    'h-9 rounded-full px-4',
+   186→                    activeCategory === cat
+   187→                      ? 'bg-primary text-primary-foreground shadow-md shadow-primary/30'
+   188→                      : 'hover:border-primary hover:text-primary'
+   189→                  )}
+   190→                >
+   191→                  {cat}
+   192→                  {activeCategory === cat && (
+   193→                    <span className="ml-1.5 rounded-full bg-primary-foreground/20 px-1.5 text-xs">
+   194→                      {filtered.length}
+   195→                    </span>
+   196→                  )}
+   197→                </Button>
+   198→              ))}
+   199→            </div>
+   200→          </Reveal>
+   201→
+   202→          {/* News grid */}
+   203→          {pageItems.length === 0 ? (
+   204→            <div className="mt-10 flex min-h-[300px] items-center justify-center text-muted-foreground">
+   205→              No articles found in this category.
+   206→            </div>
+   207→          ) : (
+   208→          <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+   209→            {pageItems.map((article, i) => {
+   210→              const isPhoto = isDataUrl(article.image)
+   211→              return (
+   212→              <Reveal key={article.title} delay={i * 0.08}>
+   213→                <Card className="group flex h-full flex-col overflow-hidden border-primary/10 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-primary/5">
+   214→                  <div className="relative">
+   215→                    {isPhoto ? (
+   216→                       
+   217→                      <img
+   218→                        src={article.image}
+   219→                        alt={article.title}
+   220→                        className="aspect-[16/10] w-full object-cover"
+   221→                      />
+   222→                    ) : (
+   223→                      <SmartImage
+   224→                        seed={article.image || article.title}
+   225→                        alt={article.title}
+   226→                        label={article.category}
+   227→                        rounded="rounded-none"
+   228→                        className="aspect-[16/10] w-full"
+   229→                      />
+   230→                    )}
+   231→                    <span
+   232→                      className={cn(
+   233→                        'absolute left-3 top-3 inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-semibold shadow-sm',
+   234→                        getCategoryBadgeClass(article.category)
+   235→                      )}
+   236→                    >
+   237→                      <Tag className="size-3" />
+   238→                      {article.category}
+   239→                    </span>
+   240→                  </div>
+   241→                  <CardContent className="flex flex-1 flex-col p-6">
+   242→                    <div className="flex items-center gap-2 text-xs text-muted-foreground">
+   243→                      <Calendar className="size-3.5" />
+   244→                      {formatDate(article.date)}
+   245→                    </div>
+   246→                    <h3 className="mt-3 text-lg font-semibold leading-snug transition-colors group-hover:text-primary">
+   247→                      {article.title}
+   248→                    </h3>
+   249→                    <p className="mt-2 flex-1 text-sm text-muted-foreground">
+   250→                      {article.excerpt}
+   251→                    </p>
+   252→                    <div className="mt-5 flex items-center justify-between border-t pt-4">
+   253→                      <span className="text-xs font-medium text-muted-foreground">
+   254→                        By {article.author}
+   255→                      </span>
+   256→                      <div className="flex items-center gap-1">
+   257→                        <DropdownMenu>
+   258→                          <DropdownMenuTrigger asChild>
+   259→                            <Button
+   260→                              variant="ghost"
+   261→                              size="icon"
+   262→                              className="size-8 text-muted-foreground hover:text-primary"
+   263→                              aria-label="Share article"
+   264→                            >
+   265→                              <Share2 className="size-3.5" />
+   266→                            </Button>
+   267→                          </DropdownMenuTrigger>
+   268→                          <DropdownMenuContent align="end" className="w-44">
+   269→                            <DropdownMenuItem
+   270→                              onClick={() =>
+   271→                                window.open(
+   272→                                  `https://facebook.com/sharer/sharer.php?u=${encodeURIComponent(
+   273→                                    window.location.href
+   274→                                  )}`,
+   275→                                  '_blank',
+   276→                                  'noopener,noreferrer'
+   277→                                )
+   278→                              }
+   279→                            >
+   280→                              <Facebook className="size-4" />
+   281→                              Share on Facebook
+   282→                            </DropdownMenuItem>
+   283→                            <DropdownMenuItem
+   284→                              onClick={() =>
+   285→                                window.open(
+   286→                                  `https://twitter.com/intent/tweet?text=${encodeURIComponent(
+   287→                                    article.title
+   288→                                  )}&url=${encodeURIComponent(window.location.href)}`,
+   289→                                  '_blank',
+   290→                                  'noopener,noreferrer'
+   291→                                )
+   292→                              }
+   293→                            >
+   294→                              <Twitter className="size-4" />
+   295→                              Share on Twitter
+   296→                            </DropdownMenuItem>
+   297→                            <DropdownMenuItem
+   298→                              onClick={() =>
+   299→                                window.open(
+   300→                                  `https://linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(
+   301→                                    window.location.href
+   302→                                  )}`,
+   303→                                  '_blank',
+   304→                                  'noopener,noreferrer'
+   305→                                )
+   306→                              }
+   307→                            >
+   308→                              <Linkedin className="size-4" />
+   309→                              Share on LinkedIn
+   310→                            </DropdownMenuItem>
+   311→                            <DropdownMenuItem
+   312→                              onClick={() => {
+   313→                                if (navigator.share) {
+   314→                                  navigator.share({ title: article.title, text: article.excerpt })
+   315→                                } else if (navigator.clipboard) {
+   316→                                  navigator.clipboard.writeText(window.location.href)
+   317→                                  import('sonner').then(({ toast }) =>
+   318→                                    toast.success('Link copied to clipboard!')
+   319→                                  )
+   320→                                }
+   321→                              }}
+   322→                            >
+   323→                              <Link2 className="size-4" />
+   324→                              Copy link
+   325→                            </DropdownMenuItem>
+   326→                          </DropdownMenuContent>
+   327→                        </DropdownMenu>
+   328→                        <Button
+   329→                          variant="ghost"
+   330→                          size="sm"
+   331→                          className="h-8 gap-1 px-2 text-primary hover:bg-primary/10"
+   332→                        >
+   333→                          Read
+   334→                          <ArrowRight className="size-3.5" />
+   335→                        </Button>
+   336→                      </div>
+   337→                    </div>
+   338→                  </CardContent>
+   339→                </Card>
+   340→              </Reveal>
+   341→              )
+   342→            })}
+   343→          </div>
+   344→          )}
+   345→
+   346→          {/* Pagination */}
+   347→          {totalPages > 1 && (
+   348→            <Reveal delay={0.1}>
+   349→              <Pagination className="mt-12">
+   350→                <PaginationContent>
+   351→                  <PaginationItem>
+   352→                    <PaginationPrevious
+   353→                      onClick={() =>
+   354→                        setPage((p) => Math.max(1, p - 1))
+   355→                      }
+   356→                      className={cn(
+   357→                        page === 1 &&
+   358→                          'pointer-events-none opacity-40'
+   359→                      )}
+   360→                    />
+   361→                  </PaginationItem>
+   362→                  {Array.from({ length: totalPages }).map((_, idx) => (
+   363→                    <PaginationItem key={idx}>
+   364→                      <PaginationLink
+   365→                        isActive={page === idx + 1}
+   366→                        onClick={() => setPage(idx + 1)}
+   367→                      >
+   368→                        {idx + 1}
+   369→                      </PaginationLink>
+   370→                    </PaginationItem>
+   371→                  ))}
+   372→                  <PaginationItem>
+   373→                    <PaginationNext
+   374→                      onClick={() =>
+   375→                        setPage((p) => Math.min(totalPages, p + 1))
+   376→                      }
+   377→                      className={cn(
+   378→                        page === totalPages &&
+   379→                          'pointer-events-none opacity-40'
+   380→                      )}
+   381→                    />
+   382→                  </PaginationItem>
+   383→                </PaginationContent>
+   384→              </Pagination>
+   385→            </Reveal>
+   386→          )}
+   387→        </div>
+   388→      </section>
+   389→
+   390→      {/* ===== UPCOMING EVENTS ===== */}
+   391→      <section className="bg-muted/30 py-20 sm:py-24">
+   392→        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+   393→          <Reveal>
+   394→            <SectionHeader
+   395→              eyebrow="Mark Your Calendar"
+   396→              title="Upcoming Events"
+   397→              description="Join us at our flagship gatherings throughout the semester — from science fairs to athletic meets, there's something for every family."
+   398→            />
+   399→          </Reveal>
+   400→          <div className="mt-14 space-y-4">
+   401→            {events.map((event, i) => {
+   402→              const d = new Date(event.date)
+   403→              const month = d.toLocaleDateString('en-US', {
+   404→                month: 'short',
+   405→              })
+   406→              const day = d.getDate()
+   407→              return (
+   408→                <Reveal key={event.title} delay={i * 0.06}>
+   409→                  <Card className="group border-primary/10 transition-all duration-300 hover:shadow-lg hover:shadow-primary/5">
+   410→                    <CardContent className="flex flex-col gap-5 p-5 sm:flex-row sm:items-center sm:gap-6 sm:p-6">
+   411→                      <div className="flex shrink-0 flex-col items-center justify-center rounded-2xl bg-gradient-to-br from-primary to-teal-600 px-6 py-4 text-primary-foreground shadow-lg shadow-primary/20 sm:w-28">
+   412→                        <span className="text-xs font-semibold uppercase tracking-wider text-primary-foreground/80">
+   413→                          {month}
+   414→                        </span>
+   415→                        <span className="text-3xl font-bold leading-none">
+   416→                          {day}
+   417→                        </span>
+   418→                        <span className="mt-1 text-xs text-primary-foreground/80">
+   419→                          {d.toLocaleDateString('en-US', {
+   420→                            weekday: 'short',
+   421→                          })}
+   422→                        </span>
+   423→                      </div>
+   424→                      <div className="flex-1">
+   425→                        <div className="flex flex-wrap items-center gap-2">
+   426→                          <span
+   427→                            className={cn(
+   428→                              'inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-xs font-semibold',
+   429→                              getCategoryBadgeClass(event.category)
+   430→                            )}
+   431→                          >
+   432→                            {event.category}
+   433→                          </span>
+   434→                        </div>
+   435→                        <h3 className="mt-2 text-lg font-semibold transition-colors group-hover:text-primary sm:text-xl">
+   436→                          {event.title}
+   437→                        </h3>
+   438→                        <p className="mt-1.5 text-sm text-muted-foreground">
+   439→                          {event.description}
+   440→                        </p>
+   441→                        <div className="mt-3 flex flex-wrap gap-x-5 gap-y-1.5 text-xs text-muted-foreground">
+   442→                          <span className="inline-flex items-center gap-1.5">
+   443→                            <Clock className="size-3.5 text-primary" />
+   444→                            {event.time}
+   445→                          </span>
+   446→                          <span className="inline-flex items-center gap-1.5">
+   447→                            <MapPin className="size-3.5 text-primary" />
+   448→                            {event.location}
+   449→                          </span>
+   450→                        </div>
+   451→                      </div>
+   452→                      <Button
+   453→                        variant="outline"
+   454→                        size="sm"
+   455→                        className="shrink-0"
+   456→                        onClick={() => goPage('contact')}
+   457→                      >
+   458→                        Add to Calendar
+   459→                        <ArrowRight className="size-4" />
+   460→                      </Button>
+   461→                    </CardContent>
+   462→                  </Card>
+   463→                </Reveal>
+   464→              )
+   465→            })}
+   466→          </div>
+   467→        </div>
+   468→      </section>
+   469→
+   470→      {/* ===== SCHOOL CALENDAR ===== */}
+   471→      <section className="py-20 sm:py-24">
+   472→        <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
+   473→          <Reveal>
+   474→            <SectionHeader
+   475→              eyebrow="At a Glance"
+   476→              title="School Calendar — March 2025"
+   477→              description="A snapshot of the month ahead. Days with scheduled events are highlighted."
+   478→            />
+   479→          </Reveal>
+   480→          <Reveal delay={0.1}>
+   481→            <Card className="mt-12 border-primary/10">
+   482→              <CardContent className="p-6 sm:p-8">
+   483→                <div className="mb-5 flex items-center justify-between">
+   484→                  <div className="flex items-center gap-2">
+   485→                    <Calendar className="size-5 text-primary" />
+   486→                    <span className="text-lg font-semibold">
+   487→                      March 2025
+   488→                    </span>
+   489→                  </div>
+   490→                  <Badge className="bg-primary/10 text-primary">
+   491→                    {events.filter((e) => e.date.startsWith('2025-03'))
+   492→                      .length}{' '}
+   493→                    events
+   494→                  </Badge>
+   495→                </div>
+   496→                <div className="grid grid-cols-7 gap-1.5 sm:gap-2">
+   497→                  {WEEKDAYS.map((w) => (
+   498→                    <div
+   499→                      key={w}
+   500→                      className="py-2 text-center text-xs font-semibold uppercase tracking-wider text-muted-foreground"
+   501→                    >
+   502→                      {w}
+   503→                    </div>
+   504→                  ))}
+   505→                  {calendarCells.map((day, idx) => {
+   506→                    const evs = eventsOnDay(day)
+   507→                    const hasEvents = evs.length > 0
+   508→                    return (
+   509→                      <div
+   510→                        key={idx}
+   511→                        className={cn(
+   512→                          'relative flex aspect-square flex-col items-center justify-center rounded-xl border text-sm transition-colors sm:text-base',
+   513→                          day === null
+   514→                            ? 'border-transparent bg-transparent'
+   515→                            : hasEvents
+   516→                              ? 'border-primary bg-primary/10 font-semibold text-primary'
+   517→                              : 'border-border/60 bg-card text-foreground hover:bg-muted/50'
+   518→                        )}
+   519→                      >
+   520→                        {day !== null && (
+   521→                          <>
+   522→                            <span>{day}</span>
+   523→                            {hasEvents && (
+   524→                              <span className="absolute bottom-1.5 flex gap-0.5">
+   525→                                {evs.slice(0, 3).map((e) => (
+   526→                                  <span
+   527→                                    key={e.title}
+   528→                                    className="size-1.5 rounded-full bg-primary"
+   529→                                    title={e.title}
+   530→                                  />
+   531→                                ))}
+   532→                              </span>
+   533→                            )}
+   534→                          </>
+   535→                        )}
+   536→                      </div>
+   537→                    )
+   538→                  })}
+   539→                </div>
+   540→                {/* Event legend */}
+   541→                <div className="mt-6 space-y-2 border-t pt-5">
+   542→                  {events.filter((e) => e.date.startsWith('2025-03')).map(
+   543→                    (e) => (
+   544→                      <div
+   545→                        key={e.title}
+   546→                        className="flex items-center gap-3 text-sm"
+   547→                      >
+   548→                        <span className="flex size-8 items-center justify-center rounded-lg bg-primary/10 text-xs font-bold text-primary">
+   549→                          {new Date(e.date).getDate()}
+   550→                        </span>
+   551→                        <span className="font-medium">{e.title}</span>
+   552→                        <Badge
+   553→                          variant="secondary"
+   554→                          className="ml-auto text-xs"
+   555→                        >
+   556→                          {e.category}
+   557→                        </Badge>
+   558→                      </div>
+   559→                    )
+   560→                  )}
+   561→                </div>
+   562→              </CardContent>
+   563→            </Card>
+   564→          </Reveal>
+   565→        </div>
+   566→      </section>
+   567→
+   568→      {/* ===== ANNOUNCEMENTS ===== */}
+   569→      <section className="bg-muted/30 py-20 sm:py-24">
+   570→        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+   571→          <Reveal>
+   572→            <SectionHeader
+   573→              eyebrow="Notice Board"
+   574→              title="Announcements"
+   575→              description="Important updates for parents, students, and staff. Pin this page — notices refresh weekly."
+   576→            />
+   577→          </Reveal>
+   578→          <div className="mt-14 grid gap-6 sm:grid-cols-2">
+   579→            {ANNOUNCEMENTS.map((a, i) => (
+   580→              <Reveal key={a.title} delay={i * 0.08}>
+   581→                <Card
+   582→                  className={cn(
+   583→                    'group h-full border-l-4 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg',
+   584→                    a.tone === 'amber' &&
+   585→                      'border-l-amber-400 hover:shadow-amber-500/10',
+   586→                    a.tone === 'emerald' &&
+   587→                      'border-l-primary hover:shadow-primary/10',
+   588→                    a.tone === 'teal' &&
+   589→                      'border-l-teal-500 hover:shadow-teal-500/10',
+   590→                    a.tone === 'rose' &&
+   591→                      'border-l-rose-400 hover:shadow-rose-500/10',
+   592→                    a.tone === 'navy' &&
+   593→                      'border-l-foreground hover:shadow-foreground/10'
+   594→                  )}
+   595→                >
+   596→                  <CardContent className="flex h-full gap-4 p-6">
+   597→                    <div
+   598→                      className={cn(
+   599→                        'flex size-11 shrink-0 items-center justify-center rounded-xl',
+   600→                        a.tone === 'amber' && 'bg-amber-100 text-amber-700',
+   601→                        a.tone === 'emerald' &&
+   602→                          'bg-primary/10 text-primary',
+   603→                        a.tone === 'teal' &&
+   604→                          'bg-teal-100 text-teal-700',
+   605→                        a.tone === 'rose' &&
+   606→                          'bg-rose-100 text-rose-700',
+   607→                        a.tone === 'navy' &&
+   608→                          'bg-foreground/10 text-foreground'
+   609→                      )}
+   610→                    >
+   611→                      <DynamicIcon name={a.icon} className="size-5" />
+   612→                    </div>
+   613→                    <div className="flex-1">
+   614→                      <div className="flex items-center gap-2">
+   615→                        <Pin className="size-3.5 text-muted-foreground" />
+   616→                        <span className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
+   617→                          {a.date}
+   618→                        </span>
+   619→                      </div>
+   620→                      <h3 className="mt-1 text-base font-semibold">
+   621→                        {a.title}
+   622→                      </h3>
+   623→                      <p className="mt-2 text-sm text-muted-foreground">
+   624→                        {a.body}
+   625→                      </p>
+   626→                    </div>
+   627→                  </CardContent>
+   628→                </Card>
+   629→              </Reveal>
+   630→            ))}
+   631→          </div>
+   632→
+   633→          <Reveal delay={0.1}>
+   634→            <div className="mt-10 flex flex-col items-center justify-between gap-4 rounded-2xl border bg-card p-6 sm:flex-row">
+   635→              <div className="flex items-center gap-3">
+   636→                <div className="flex size-10 items-center justify-center rounded-xl bg-primary/10 text-primary">
+   637→                  <Bell className="size-5" />
+   638→                </div>
+   639→                <div>
+   640→                  <p className="font-semibold">Never miss an update</p>
+   641→                  <p className="text-sm text-muted-foreground">
+   642→                    Subscribe to our weekly newsletter for the latest
+   643→                    announcements.
+   644→                  </p>
+   645→                </div>
+   646→              </div>
+   647→              <Button
+   648→                onClick={() => goPage('contact')}
+   649→                className="bg-primary"
+   650→              >
+   651→                Stay Informed
+   652→                <ArrowRight className="size-4" />
+   653→              </Button>
+   654→            </div>
+   655→          </Reveal>
+   656→        </div>
+   657→      </section>
+   658→    </div>
+   659→  )
+   660→}
+   661→

@@ -588,3 +588,70 @@ Stage Summary:
 - Files modified: src/app/admin/page.tsx, src/components/pages/about.tsx.
 - Files NOT modified (correctly): src/app/api/admin/route.ts (already had add/update/delete_facility from Task 11), src/app/api/content/route.ts (already returned facilities from Task 11), src/lib/db.ts (already had facilities table + seeding from Task 11), src/components/pages/academics.tsx (doesn't use the FACILITIES array — uses LABS array + inline Reading Corner feature instead).
 - Admin password: `HamzaAdmin2025!`. Visit `/admin` → Facilities tab to add/edit/delete facilities with photo uploads.
+
+---
+Task ID: 13
+Agent: full-stack-developer
+Task: Fix 7 specific issues on the Hamza School website
+
+Work Log:
+- Read /home/z/my-project/worklog.md (Tasks 1–12) to understand the project history and existing patterns: hash-based routing via useNav(), content.ts defaults, /api/content endpoint returning school/gallery/teachers/leadership/news/events/facilities from Neon Postgres, isDataUrl() helper from src/lib/image-upload.ts, paper-texture/cream/forest/gold design system, lazy-loaded page components via next/dynamic.
+
+- Verified dev server is running (curl http://localhost:3000 → 200) and the /api/content endpoint returns the expected shape including school (name/phone/email/address/hours/social) and facilities [{id, name, description, icon, photo}] with real data URLs.
+
+Issue #1 — Contact page now fetches from DB (src/components/pages/contact.tsx)
+  - Removed hardcoded imports of CONTACT_INFO, SOCIAL_LINKS, DEPARTMENTS_CONTACT (kept SCHOOL as the default + CONTACT_SUBJECTS for the form dropdown).
+  - Added `const [school, setSchool] = React.useState(SCHOOL)` plus a useEffect that fetches /api/content and merges d.school fields (name, phone, altPhone, email, address, hours, social) over the defaults. No loading spinner — defaults render immediately and silently update when DB data arrives.
+  - Replaced the module-level CONTACT_ACTIONS const (which used SCHOOL.address/phone/email at module load time) with a `buildContactActions(school)` helper called inside the component, so the "Get Directions"/"Call Now"/"Send Email" action links honor DB-edited values.
+  - Added `buildContactInfo(school)`, `buildSocialLinks(school)`, `buildDepartmentContacts(school)` helpers and memoized their results (`contactInfo`, `socialLinks`, `departmentContacts`, `contactActions`) on the `school` state.
+  - Replaced all `CONTACT_INFO.map`, `SOCIAL_LINKS.map`, `DEPARTMENTS_CONTACT.map`, `CONTACT_ACTIONS[...]`, and `SCHOOL.address` references in JSX with the derived state-backed equivalents.
+
+Issue #2 — Languages: removed French, added Afan Oromoo (src/lib/content.ts)
+  - Removed the French entry from the LANGUAGES array.
+  - Added `{ name: 'Afan Oromoo', icon: 'Languages', level: 'Core Subject', description: 'Afan Oromoo is taught as a core subject — covering reading, writing, grammar, and Oromo culture and literature.', proficiency: 100 }`.
+  - Final LANGUAGES array now has 3 entries: English, Amharic, Afan Oromoo.
+
+Issue #3 — Clubs: removed Drama, removed member counts (src/lib/content.ts + src/components/pages/academics.tsx)
+  - In content.ts CLUBS: removed the Drama Club entry (was 8 clubs, now 7), and removed the `members` field from every remaining club. Each club is now `{ name, icon }` only.
+  - In academics.tsx Clubs tab: removed the `<Badge variant="secondary">{club.members} members</Badge>` element and the wrapping `flex items-center justify-between` div (now just the icon chip + name).
+
+Issue #4 — Loading strategy: don't block the page (src/components/pages/{home,about,news,gallery}.tsx)
+  - Removed `if (loading) return <PageLoading />` from all four pages.
+  - Removed the `import { PageLoading } from '@/components/site/page-loading'` line from all four files (now unused).
+  - Kept the `const [loading, setLoading] = React.useState(true)` state and the `.finally(() => setLoading(false))` call — per the task instructions, the loading flag is still tracked (so individual sections could opt into subtle skeleton indicators later) but is never used to gate the whole page.
+  - Added a comment on each page explaining the new strategy: content.ts defaults render immediately; DB data silently updates state when the fetch resolves.
+  - Result: every page renders instantly with the content.ts defaults; when /api/content responds, the relevant sections re-render with DB data. No more full-page spinner flash.
+
+Issue #5 — Removed the second image from the homepage mission section (src/components/pages/home.tsx)
+  - In the "ABOUT / MISSION" section, deleted the entire `<Reveal delay={0.15}>` block that contained the `<img src="/hero-desk.jpeg" ... />` with the aspect-[4/5] rounded-sm shadow-2xl wrapper.
+  - Changed the section's outer grid from `<div className="relative mx-auto grid max-w-7xl items-center gap-16 px-6 lg:grid-cols-2 lg:px-12">` to a single-column `<div className="relative mx-auto max-w-4xl px-6 lg:px-12">` so the mission text (left column) now spans the full width of a narrower, more readable container.
+  - The other two `/hero-desk.jpeg` references on the homepage (the hero photo and the principal's portrait) were intentionally left unchanged — only the mission-section image was in scope.
+
+Issue #6 — Facilities: show admin-uploaded images on the Academics page (src/components/pages/academics.tsx)
+  - Imported `isDataUrl` from '@/lib/image-upload'.
+  - Added `const [facilityPhotos, setFacilityPhotos] = React.useState<Record<string, string>>({})` and a useEffect that fetches /api/content, reads the `facilities` array, and builds a map of facility-name → photo data URL (only including entries whose `photo` is a real data URL via isDataUrl()).
+  - In the LABS section, replaced the always-`<SmartImage>` block with a conditional: for each lab, look up `facilityPhotos[lab.name]`; if it's a data URL, render `<img src={photo} alt={lab.name} className="aspect-[16/10] w-full object-cover" />`; otherwise fall back to the existing `<SmartImage seed icon label>` placeholder.
+  - Matching is by lab name (e.g. "Biology Laboratory" matches the DB facility with that name). The DB currently has 5 facilities including "Biology Laboratory" with a real uploaded photo, so the lab card now shows the admin-uploaded biology lab photo.
+  - The rest of the lab card (icon + name in CardHeader, description + equipment badges in CardContent) is preserved exactly.
+
+Issue #7 — Departments: removed subject count (src/lib/content.ts + src/components/pages/academics.tsx)
+  - In content.ts DEPARTMENTS: removed the `subjects` field from every department. Each is now `{ name, head, icon }` only.
+  - In academics.tsx Departments section: removed the `<Badge variant="secondary">{dept.subjects} subjects</Badge>` element and the wrapping `flex items-center justify-between` div (now just the icon chip + name + head).
+
+Verification:
+- `bun run lint` → 0 errors, 0 warnings in any of the modified files. The only remaining warnings are pre-existing `Unused eslint-disable directive` notes in src/lib/arcjet.ts (not in scope).
+- `bunx tsc --noEmit` → 0 errors in src/ (only pre-existing unrelated errors in skills/).
+- curl http://localhost:3000/ → 200 (home page compiles and renders).
+- curl http://localhost:3000/api/content → 200 with school.email="hamzaschool300@gmail.com", school.address="Kolfe Keranio , Addis Ababa, Ethiopia", 5 facilities including "Biology Laboratory" with a real photo data URL — confirms the contact page will now display DB-edited info and the academics page lab will display the uploaded facility photo.
+- Dev server log shows clean `✓ Compiled in ...` entries with no errors after the code changes.
+
+Stage Summary:
+- 5 files modified: src/lib/content.ts (LANGUAGES, DEPARTMENTS, CLUBS arrays), src/components/pages/contact.tsx (DB fetch + derived state), src/components/pages/home.tsx (removed PageLoading block + mission image + grid change), src/components/pages/about.tsx (removed PageLoading block + import), src/components/pages/news.tsx (removed PageLoading block + import), src/components/pages/gallery.tsx (removed PageLoading block + import), src/components/pages/academics.tsx (removed subject-count badge, removed member-count badge, added facilities fetch with real-photo rendering for labs).
+- The contact page now hydrates from /api/content and reflects admin edits to school name, phone, email, address, hours, and social links; the action links (Get Directions, Call Now, Send Email) use the live values too.
+- French is gone; Afan Oromoo is present at 100% proficiency.
+- Drama Club is gone; no club shows a member count.
+- No public page shows a full-page loading spinner anymore — defaults render instantly, DB data updates silently.
+- The homepage mission section is now a single text column (no second image).
+- The Academics page lab card shows the admin-uploaded biology lab photo when available, falling back to the SmartImage placeholder otherwise.
+- Departments no longer show subject counts.
+- Admin password (unchanged from previous tasks): `HamzaAdmin2025!`. Visit /admin to edit school info, upload facility photos (Facilities tab), etc.

@@ -15,9 +15,6 @@ import { DynamicIcon } from '@/components/site/dynamic-icon'
 import { useNav } from '@/lib/nav-store'
 import {
   SCHOOL,
-  CONTACT_INFO,
-  SOCIAL_LINKS,
-  DEPARTMENTS_CONTACT,
   CONTACT_SUBJECTS,
 } from '@/lib/content'
 import { Card, CardContent } from '@/components/ui/card'
@@ -42,22 +39,74 @@ import {
   TableRow,
 } from '@/components/ui/table'
 
-// Action/href helpers keyed by CONTACT_INFO label — keep the visual
-// action link (e.g. "Get Directions", "Call Now", "Send Email") on each card.
-const CONTACT_ACTIONS: Record<string, { action: string; href: string }> = {
-  Address: {
-    action: 'Get Directions',
-    href: `https://www.google.com/maps?q=${encodeURIComponent(SCHOOL.address)}`,
-  },
-  Phone: {
-    action: 'Call Now',
-    href: `tel:${SCHOOL.phone.replace(/[^+\d]/g, '')}`,
-  },
-  Email: {
-    action: 'Send Email',
-    href: `mailto:${SCHOOL.email}`,
-  },
-  'Office Hours': { action: '', href: '' },
+// Derived contact info / social links / department contacts are computed
+// from the live `school` state inside the component so they reflect DB edits.
+type School = typeof SCHOOL
+type ContactInfo = {
+  icon: string
+  label: string
+  value: string
+  lines: string[]
+}
+type SocialLink = {
+  name: string
+  icon: string
+  url: string
+  color: string
+}
+type DepartmentContact = {
+  name: string
+  icon: string
+  email: string
+  phone: string
+}
+
+function buildContactInfo(school: School): ContactInfo[] {
+  return [
+    { icon: 'MapPin', label: 'Address', value: school.address, lines: ['Bole Road', 'Addis Ababa, Ethiopia'] },
+    { icon: 'Phone', label: 'Phone', value: school.phone, lines: [school.phone, school.altPhone] },
+    { icon: 'Mail', label: 'Email', value: school.email, lines: [school.email, 'join@hamzaschool.et'] },
+    { icon: 'Clock', label: 'Office Hours', value: school.hours, lines: [school.hours, 'Sat–Sun: Closed'] },
+  ]
+}
+
+function buildSocialLinks(school: School): SocialLink[] {
+  return [
+    { name: 'Facebook', icon: 'Facebook', url: school.social.facebook, color: 'hover:bg-blue-600 hover:border-blue-600' },
+    { name: 'Twitter', icon: 'Twitter', url: school.social.twitter, color: 'hover:bg-sky-500 hover:border-sky-500' },
+    { name: 'Instagram', icon: 'Instagram', url: school.social.instagram, color: 'hover:bg-pink-600 hover:border-pink-600' },
+    { name: 'YouTube', icon: 'Youtube', url: school.social.youtube, color: 'hover:bg-red-600 hover:border-red-600' },
+    { name: 'Telegram', icon: 'Send', url: school.social.telegram, color: 'hover:bg-emerald-600 hover:border-emerald-600' },
+  ]
+}
+
+function buildDepartmentContacts(school: School): DepartmentContact[] {
+  return [
+    { name: 'Main Office', icon: 'Building2', email: school.email, phone: school.phone },
+    { name: 'Admissions', icon: 'GraduationCap', email: 'join@hamzaschool.et', phone: school.altPhone },
+    { name: 'Accounts', icon: 'Calculator', email: 'accounts@hamzaschool.et', phone: school.altPhone },
+    { name: 'Transport', icon: 'Bus', email: 'transport@hamzaschool.et', phone: school.altPhone },
+  ]
+}
+
+// Build the per-card action link (e.g. "Get Directions", "Call Now") from
+// the current school state so DB-edited phone/email/address are honored.
+function buildContactActions(school: School): Record<string, { action: string; href: string }> {
+  return {
+    Address: {
+      action: 'Get Directions',
+      href: `https://www.google.com/maps?q=${encodeURIComponent(school.address)}`,
+    },
+    Phone: {
+      action: 'Call Now',
+      href: `tel:${school.phone.replace(/[^+\d]/g, '')}`,
+    },
+    Email: {
+      action: 'Send Email',
+      href: `mailto:${school.email}`,
+    },
+    'Office Hours': { action: '', href: '' },
+  }
 }
 
 interface ContactForm {
@@ -76,6 +125,43 @@ export function ContactPage() {
     message: '',
   })
   const [submitting, setSubmitting] = React.useState(false)
+
+  // Local state seeded with content.ts defaults; updated from /api/content
+  // on mount. No loading spinner — the defaults render immediately and
+  // silently update when DB data arrives.
+  const [school, setSchool] = React.useState<School>(SCHOOL)
+
+  React.useEffect(() => {
+    fetch('/api/content')
+      .then((r) => r.json())
+      .then((d: { school?: Partial<School> }) => {
+        if (d.school) {
+          setSchool((prev) => ({
+            ...prev,
+            name: d.school!.name || prev.name,
+            phone: d.school!.phone || prev.phone,
+            altPhone: d.school!.altPhone || prev.altPhone,
+            email: d.school!.email || prev.email,
+            address: d.school!.address || prev.address,
+            hours: d.school!.hours || prev.hours,
+            social: { ...prev.social, ...(d.school!.social || {}) },
+          }))
+        }
+      })
+      .catch(() => {})
+  }, [])
+
+  // Derived values — always reflect the latest school state (DB or default).
+  const contactInfo = React.useMemo(() => buildContactInfo(school), [school])
+  const socialLinks = React.useMemo(() => buildSocialLinks(school), [school])
+  const departmentContacts = React.useMemo(
+    () => buildDepartmentContacts(school),
+    [school]
+  )
+  const contactActions = React.useMemo(
+    () => buildContactActions(school),
+    [school]
+  )
 
   const update =
     (key: keyof ContactForm) =>
@@ -122,8 +208,8 @@ export function ContactPage() {
             />
           </Reveal>
           <div className="mt-14 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-            {CONTACT_INFO.map((info, i) => {
-              const action = CONTACT_ACTIONS[info.label]
+            {contactInfo.map((info, i) => {
+              const action = contactActions[info.label]
               return (
               <Reveal key={info.label} delay={i * 0.08}>
                 <Card className="group h-full border-primary/10 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-primary/5">
@@ -285,7 +371,7 @@ export function ContactPage() {
                           Find Us on the Map
                         </h3>
                         <p className="text-sm text-muted-foreground">
-                          {SCHOOL.address}
+                          {school.address}
                         </p>
                       </div>
                     </div>
@@ -318,7 +404,7 @@ export function ContactPage() {
                       </Badge>
                     </div>
                     <div className="mt-5 flex flex-wrap gap-3">
-                      {SOCIAL_LINKS.map((s) => (
+                      {socialLinks.map((s) => (
                         <a
                           key={s.name}
                           href={s.url}
@@ -366,7 +452,7 @@ export function ContactPage() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {DEPARTMENTS_CONTACT.map((d) => (
+                  {departmentContacts.map((d) => (
                     <TableRow key={d.name} className="text-sm sm:text-base">
                       <TableCell className="pl-6 py-4">
                         <div className="flex items-center gap-3">

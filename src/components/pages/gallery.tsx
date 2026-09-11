@@ -19,7 +19,6 @@ import {
   DialogDescription,
 } from '@/components/ui/dialog'
 import { cn } from '@/lib/utils'
-import { PageLoading } from '@/components/site/page-loading'
 
 interface GalleryItem {
   title: string
@@ -47,6 +46,8 @@ function getCategoryBadgeClass(category: string) {
 }
 
 export function GalleryPage() {
+  // Loading state is tracked but no longer blocks rendering — content.ts
+  // defaults render immediately and silently update when DB data arrives.
   const [loading, setLoading] = React.useState(true)
 
   const goPage = useNav((s) => s.goPage)
@@ -99,8 +100,6 @@ export function GalleryPage() {
 
   const current =
     lightboxIndex !== null ? filtered[lightboxIndex] : null
-
-  if (loading) return <PageLoading />
 
   return (
     <div className="flex flex-col">

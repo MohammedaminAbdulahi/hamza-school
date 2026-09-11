@@ -36,7 +36,6 @@ import {
   PRINCIPAL,
 } from '@/lib/content'
 import { isDataUrl } from '@/lib/image-upload'
-import { PageLoading } from '@/components/site/page-loading'
 
 // DB content shape (subset of what /api/content returns)
 type DbStat = { key: string; label: string; value: number; suffix: string }
@@ -65,7 +64,10 @@ type DbEvent = {
 export function HomePage() {
   const { goPage } = useNav()
 
-  // Loading state — shows spinner until DB data arrives (prevents flash of defaults)
+  // Loading state — kept so individual sections can opt into subtle
+  // loading indicators, but we never block the whole page on it. The
+  // content.ts defaults render immediately and silently update when
+  // DB data arrives.
   const [loading, setLoading] = React.useState(true)
 
   // Local state seeded with content.ts defaults; updated from /api/content on mount.
@@ -121,8 +123,6 @@ export function HomePage() {
       .catch(() => { /* keep defaults on error */ })
       .finally(() => setLoading(false))
   }, [])
-
-  if (loading) return <PageLoading />
 
   return (
     <div className="flex flex-col">
@@ -303,7 +303,7 @@ export function HomePage() {
       {/* ===== ABOUT / MISSION ===== */}
       <section className="paper-texture relative overflow-hidden py-32">
         <div className="geo-pattern pointer-events-none absolute inset-0" />
-        <div className="relative mx-auto grid max-w-7xl items-center gap-16 px-6 lg:grid-cols-2 lg:px-12">
+        <div className="relative mx-auto max-w-4xl px-6 lg:px-12">
           <Reveal>
             <p className="section-label">Our Mission</p>
             <h2 className="mt-4 font-serif text-5xl font-medium leading-tight text-foreground lg:text-6xl">
@@ -327,18 +327,6 @@ export function HomePage() {
               Read Our Full Story
               <ArrowRight className="size-3.5" />
             </Button>
-          </Reveal>
-
-          <Reveal delay={0.15}>
-            <div className="relative">
-              <div className="aspect-[4/5] overflow-hidden rounded-sm shadow-2xl">
-                <img
-                  src="/hero-desk.jpeg"
-                  alt="Hamza School learning environment"
-                  className="h-full w-full object-cover"
-                />
-              </div>
-            </div>
           </Reveal>
         </div>
       </section>

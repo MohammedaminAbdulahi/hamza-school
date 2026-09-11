@@ -1,0 +1,600 @@
+     1→     1→'use client'
+     2→     2→
+     3→     3→import * as React from 'react'
+     4→     4→import { motion } from 'framer-motion'
+     5→     5→import {
+     6→     6→  ArrowRight,
+     7→     7→  Clock,
+     8→     8→  MapPin,
+     9→     9→  Star,
+    10→    10→  Quote,
+    11→    11→  Feather,
+    12→    12→} from 'lucide-react'
+    13→    13→import { Button } from '@/components/ui/button'
+    14→    14→import { Card, CardContent } from '@/components/ui/card'
+    15→    15→import { Badge } from '@/components/ui/badge'
+    16→    16→import { Avatar, AvatarFallback } from '@/components/ui/avatar'
+    17→    17→import {
+    18→    18→  Carousel,
+    19→    19→  CarouselContent,
+    20→    20→  CarouselItem,
+    21→    21→  CarouselNext,
+    22→    22→  CarouselPrevious,
+    23→    23→} from '@/components/ui/carousel'
+    24→    24→import { Reveal } from '@/components/site/reveal'
+    25→    25→import { AnimatedCounter } from '@/components/site/animated-counter'
+    26→    26→import { DynamicIcon } from '@/components/site/dynamic-icon'
+    27→    27→import { useNav } from '@/lib/nav-store'
+    28→    28→import {
+    29→    29→  HERO,
+    30→    30→  STATS,
+    31→    31→  WHY_CHOOSE,
+    32→    32→  MISSION,
+    33→    33→  PROGRAMS,
+    34→    34→  EVENTS,
+    35→    35→  TESTIMONIALS,
+    36→    36→  PRINCIPAL,
+    37→    37→} from '@/lib/content'
+    38→    38→import { isDataUrl } from '@/lib/image-upload'
+    39→    39→import { PageLoading } from '@/components/site/page-loading'
+    40→    40→
+    41→    41→// DB content shape (subset of what /api/content returns)
+    42→    42→type DbStat = { key: string; label: string; value: number; suffix: string }
+    43→    43→type DbSchool = {
+    44→    44→  hero?: Partial<typeof HERO>
+    45→    45→  mission?: Partial<typeof MISSION>
+    46→    46→  principal?: Partial<typeof PRINCIPAL> & { photo?: string }
+    47→    47→  vicePrincipal?: {
+    48→    48→    name?: string
+    49→    49→    title?: string
+    50→    50→    message?: string
+    51→    51→    photo?: string
+    52→    52→  }
+    53→    53→  stats?: DbStat[]
+    54→    54→}
+    55→    55→type DbEvent = {
+    56→    56→  id?: number
+    57→    57→  title: string
+    58→    58→  date: string
+    59→    59→  time: string
+    60→    60→  location: string
+    61→    61→  category: string
+    62→    62→  description?: string
+    63→    63→}
+    64→    64→
+    65→    65→export function HomePage() {
+    66→    66→  const { goPage } = useNav()
+    67→    67→
+    68→    68→  // Loading state — shows spinner until DB data arrives (prevents flash of defaults)
+    69→    69→  const [loading, setLoading] = React.useState(true)
+    70→    70→
+    71→    71→  // Local state seeded with content.ts defaults; updated from /api/content on mount.
+    72→    72→  const [hero, setHero] = React.useState(HERO)
+    73→    73→  const [mission, setMission] = React.useState(MISSION)
+    74→    74→  const [principal, setPrincipal] = React.useState<typeof PRINCIPAL & { photo?: string }>({
+    75→    75→    ...PRINCIPAL,
+    76→    76→    photo: '',
+    77→    77→  })
+    78→    78→  const [vicePrincipal, setVicePrincipal] = React.useState<{
+    79→    79→    name: string
+    80→    80→    title: string
+    81→    81→    message: string
+    82→    82→    photo: string
+    83→    83→  }>({ name: '', title: '', message: '', photo: '' })
+    84→    84→  const [events, setEvents] = React.useState<typeof EVENTS>(EVENTS)
+    85→    85→  const [stats, setStats] = React.useState<typeof STATS>(STATS)
+    86→    86→
+    87→    87→  React.useEffect(() => {
+    88→    88→    fetch('/api/content')
+    89→    89→      .then((r) => r.json())
+    90→    90→      .then((d: { school?: DbSchool; events?: DbEvent[] }) => {
+    91→    91→        if (d.school) {
+    92→    92→          if (d.school.hero) setHero({ ...HERO, ...d.school.hero })
+    93→    93→          if (d.school.mission) setMission({ ...MISSION, ...d.school.mission })
+    94→    94→          if (d.school.principal)
+    95→    95→            setPrincipal((p) => ({
+    96→    96→              ...p,
+    97→    97→              ...d.school!.principal!,
+    98→    98→              photo: (d.school!.principal as { photo?: string }).photo ?? '',
+    99→    99→            }))
+   100→   100→          if (d.school.vicePrincipal)
+   101→   101→            setVicePrincipal({
+   102→   102→              name: d.school.vicePrincipal.name ?? '',
+   103→   103→              title: d.school.vicePrincipal.title ?? '',
+   104→   104→              message: d.school.vicePrincipal.message ?? '',
+   105→   105→              photo: d.school.vicePrincipal.photo ?? '',
+   106→   106→            })
+   107→   107→          if (Array.isArray(d.school.stats) && d.school.stats.length === 4) {
+   108→   108→            setStats(
+   109→   109→              d.school.stats.map((s, i) => ({
+   110→   110→                label: s.label ?? STATS[i]?.label ?? '',
+   111→   111→                value: Number(s.value) || 0,
+   112→   112→                suffix: s.suffix ?? STATS[i]?.suffix ?? '',
+   113→   113→              })) as typeof STATS
+   114→   114→            )
+   115→   115→          }
+   116→   116→        }
+   117→   117→        if (Array.isArray(d.events) && d.events.length > 0) {
+   118→   118→          setEvents(d.events as unknown as typeof EVENTS)
+   119→   119→        }
+   120→   120→      })
+   121→   121→      .catch(() => { /* keep defaults on error */ })
+   122→   122→      .finally(() => setLoading(false))
+   123→   123→  }, [])
+   124→   124→
+   125→   125→  if (loading) return <PageLoading />
+   126→   126→
+   127→   127→  return (
+   128→   128→    <div className="flex flex-col">
+   129→   129→      {/* ===== HERO — split layout: cream text side + photo side (no dark overlay) ===== */}
+   130→   130→      <section className="relative overflow-hidden pt-28 pb-12">
+   131→   131→        <div className="mx-auto grid min-h-[88vh] w-full max-w-7xl items-center gap-12 px-6 py-12 lg:grid-cols-2 lg:px-12 lg:py-16">
+   132→   132→          {/* Left: text on cream paper */}
+   133→   133→          <motion.div
+   134→   134→            initial={{ opacity: 0, y: 24 }}
+   135→   135→            animate={{ opacity: 1, y: 0 }}
+   136→   136→            transition={{ duration: 0.7 }}
+   137→   137→            className="order-2 lg:order-1"
+   138→   138→          >
+   139→   139→            {/* Welcome label with line */}
+   140→   140→            <div className="mb-8 flex items-center gap-3">
+   141→   141→              <div className="h-px w-12 bg-gold" />
+   142→   142→              <span className="text-xs uppercase tracking-[0.4em] text-gold-deep">
+   143→   143→                {hero.eyebrow}
+   144→   144→              </span>
+   145→   145→            </div>
+   146→   146→
+   147→   147→            {/* Hero title */}
+   148→   148→            <h1 className="font-serif text-6xl font-medium leading-[0.92] tracking-tight text-forest sm:text-7xl lg:text-8xl xl:text-9xl">
+   149→   149→              Guiding
+   150→   150→              <br />
+   151→   151→              <em className="font-normal italic text-gold-deep">Hearts.</em>
+   152→   152→              <br />
+   153→   153→              Growing
+   154→   154→              <br />
+   155→   155→              <em className="font-normal italic text-gold-deep">Minds.</em>
+   156→   156→            </h1>
+   157→   157→
+   158→   158→            {/* Gold accent line */}
+   159→   159→            <div className="mt-6 h-px w-24 bg-gradient-to-r from-gold to-transparent" />
+   160→   160→
+   161→   161→            <p className="mt-6 max-w-lg text-lg font-light leading-relaxed text-foreground/80">
+   162→   162→              {hero.description}
+   163→   163→            </p>
+   164→   164→
+   165→   165→            {/* Buttons */}
+   166→   166→            <div className="mt-10 flex flex-wrap gap-4">
+   167→   167→              <Button
+   168→   168→                onClick={() => goPage('contact')}
+   169→   169→                className="h-14 gap-2.5 rounded-sm bg-forest px-9 text-xs font-medium uppercase tracking-[0.12em] text-cream transition-all hover:bg-gold-deep"
+   170→   170→              >
+   171→   171→                {hero.primaryButton}
+   172→   172→                <ArrowRight className="size-3.5" />
+   173→   173→              </Button>
+   174→   174→              <Button
+   175→   175→                variant="outline"
+   176→   176→                onClick={() => goPage('about')}
+   177→   177→                className="h-14 gap-2.5 rounded-sm border-forest bg-paper px-8 text-xs font-medium uppercase tracking-[0.12em] text-forest transition-all hover:bg-forest hover:text-cream"
+   178→   178→              >
+   179→   179→                {hero.secondaryButton}
+   180→   180→              </Button>
+   181→   181→            </div>
+   182→   182→
+   183→   183→            {/* Prophetic message badge */}
+   184→   184→            <div className="mt-12 inline-flex max-w-xl items-center gap-4 rounded-sm border border-gold/30 bg-paper px-6 py-4">
+   185→   185→              <Feather className="size-5 shrink-0 text-gold-deep" />
+   186→   186→              <span className="font-serif text-sm italic tracking-wide text-foreground/80">
+   187→   187→                &ldquo;{hero.propheticQuote}&rdquo; — {hero.propheticSource}
+   188→   188→              </span>
+   189→   189→            </div>
+   190→   190→          </motion.div>
+   191→   191→
+   192→   192→          {/* Right: the photo (clean, no dark overlay) */}
+   193→   193→          <motion.div
+   194→   194→            initial={{ opacity: 0, scale: 0.97 }}
+   195→   195→            animate={{ opacity: 1, scale: 1 }}
+   196→   196→            transition={{ duration: 0.7, delay: 0.15 }}
+   197→   197→            className="order-1 lg:order-2"
+   198→   198→          >
+   199→   199→            <div className="relative">
+   200→   200→              <div className="overflow-hidden rounded-sm border border-gold/20 shadow-2xl">
+   201→   201→                <img
+   202→   202→                  src="/hero-desk.jpeg"
+   203→   203→                  alt="A warm study desk with books labeled Knowledge, Faith, Character, Excellence"
+   204→   204→                  className="aspect-[4/5] w-full object-cover lg:aspect-[4/3]"
+   205→   205→                />
+   206→   206→              </div>
+   207→   207→              {/* Floating foundation card */}
+   208→   208→              <motion.div
+   209→   209→                animate={{ y: [0, -10, 0] }}
+   210→   210→                transition={{ repeat: Infinity, duration: 6, ease: 'easeInOut' }}
+   211→   211→                className="absolute -bottom-6 -left-4 hidden w-64 border-l-4 border-forest bg-cream p-5 shadow-xl sm:block"
+   212→   212→              >
+   213→   213→                <div className="mb-2 flex items-center gap-2">
+   214→   214→                  <DynamicIcon name="BookOpen" className="size-5 text-forest" />
+   215→   215→                  <span className="font-serif text-base font-semibold text-foreground">Our Foundation</span>
+   216→   216→                </div>
+   217→   217→                <div className="flex flex-wrap gap-1.5">
+   218→   218→                  {hero.foundationLabels.map((label, idx) => {
+   219→   219→                    const colors = ['bg-forest', 'bg-gold-deep', 'bg-navy', 'bg-crimson']
+   220→   220→                    return (
+   221→   221→                      <span key={label} className={`rounded-sm px-2.5 py-1 text-[10px] uppercase tracking-widest text-cream ${colors[idx % colors.length]}`}>
+   222→   222→                        {label}
+   223→   223→                      </span>
+   224→   224→                    )
+   225→   225→                  })}
+   226→   226→                </div>
+   227→   227→              </motion.div>
+   228→   228→            </div>
+   229→   229→          </motion.div>
+   230→   230→        </div>
+   231→   231→      </section>
+   232→   232→
+   233→   233→      {/* ===== VALUES — 4 pillars (Knowledge, Faith, Character, Excellence) ===== */}
+   234→   234→      <section className="paper-texture relative overflow-hidden py-32">
+   235→   235→        <div className="geo-pattern pointer-events-none absolute inset-0" />
+   236→   236→        <div className="relative mx-auto max-w-7xl px-6 lg:px-12">
+   237→   237→          <Reveal className="mb-16 text-center">
+   238→   238→            <div className="ornament mb-6">
+   239→   239→              <span className="text-gold">✦</span>
+   240→   240→            </div>
+   241→   241→            <p className="section-label">Our Core Values</p>
+   242→   242→            <h2 className="mt-4 font-serif text-5xl font-medium text-foreground lg:text-6xl">
+   243→   243→              The pillars of <em className="italic text-gold-deep">Hamza</em>
+   244→   244→            </h2>
+   245→   245→            <p className="mx-auto mt-6 max-w-2xl text-lg text-muted-foreground">
+   246→   246→              Every lesson, every interaction, and every day at Hamza is built on these four foundations.
+   247→   247→            </p>
+   248→   248→          </Reveal>
+   249→   249→
+   250→   250→          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+   251→   251→            {WHY_CHOOSE.map((v, i) => (
+   252→   252→              <Reveal key={v.title} delay={i * 0.1}>
+   253→   253→                <div className="value-card h-full border border-gold/18 bg-paper p-12 transition-all duration-500 hover:-translate-y-2 hover:border-gold hover:shadow-[0_24px_48px_rgba(60,35,10,0.12)]">
+   254→   254→                  <div className="mb-7 flex size-18 items-center justify-center rounded-full bg-gradient-to-br from-forest to-green-mid text-gold-light shadow-lg" style={{ width: '72px', height: '72px' }}>
+   255→   255→                    <DynamicIcon name={v.icon} className="size-7" />
+   256→   256→                  </div>
+   257→   257→                  <h3 className="font-serif text-2xl font-semibold text-foreground">{v.title}</h3>
+   258→   258→                  <p className="mt-3 text-sm leading-relaxed text-muted-foreground">{v.description}</p>
+   259→   259→                </div>
+   260→   260→              </Reveal>
+   261→   261→            ))}
+   262→   262→          </div>
+   263→   263→        </div>
+   264→   264→      </section>
+   265→   265→
+   266→   266→      {/* ===== PROPHETIC WISDOM QUOTE ===== */}
+   267→   267→      <section className="paper-texture relative overflow-hidden py-28">
+   268→   268→        <div className="geo-pattern pointer-events-none absolute inset-0" />
+   269→   269→        <div className="relative mx-auto max-w-4xl px-6 text-center lg:px-12">
+   270→   270→          <Reveal>
+   271→   271→            <div className="ornament mb-8">
+   272→   272→              <span className="text-gold text-2xl">✦</span>
+   273→   273→            </div>
+   274→   274→            <Quote className="mx-auto mb-8 size-12 text-gold/60" />
+   275→   275→            <p className="font-serif text-3xl font-light italic leading-relaxed text-forest sm:text-4xl lg:text-5xl">
+   276→   276→              &ldquo;Seeking knowledge is an obligation upon every Muslim.&rdquo;
+   277→   277→            </p>
+   278→   278→            <div className="mt-8 flex items-center justify-center gap-3">
+   279→   279→              <div className="h-px w-12 bg-gold/50" />
+   280→   280→              <p className="font-serif text-lg text-gold-deep">Prophet Muhammad ﷺ</p>
+   281→   281→              <div className="h-px w-12 bg-gold/50" />
+   282→   282→            </div>
+   283→   283→          </Reveal>
+   284→   284→        </div>
+   285→   285→      </section>
+   286→   286→
+   287→   287→      {/* ===== STATS ===== */}
+   288→   288→      <section className="bg-forest py-20 text-cream">
+   289→   289→        <div className="mx-auto max-w-6xl px-6 lg:px-12">
+   290→   290→          <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
+   291→   291→            {stats.map((stat, i) => (
+   292→   292→              <Reveal key={stat.label + i} delay={i * 0.1} className="text-center">
+   293→   293→                <div className="font-serif text-5xl font-semibold text-gold-light sm:text-6xl">
+   294→   294→                  <AnimatedCounter value={stat.value} suffix={stat.suffix} />
+   295→   295→                </div>
+   296→   296→                <div className="mt-2 text-sm uppercase tracking-wider text-cream/80">{stat.label}</div>
+   297→   297→              </Reveal>
+   298→   298→            ))}
+   299→   299→          </div>
+   300→   300→        </div>
+   301→   301→      </section>
+   302→   302→
+   303→   303→      {/* ===== ABOUT / MISSION ===== */}
+   304→   304→      <section className="paper-texture relative overflow-hidden py-32">
+   305→   305→        <div className="geo-pattern pointer-events-none absolute inset-0" />
+   306→   306→        <div className="relative mx-auto grid max-w-7xl items-center gap-16 px-6 lg:grid-cols-2 lg:px-12">
+   307→   307→          <Reveal>
+   308→   308→            <p className="section-label">Our Mission</p>
+   309→   309→            <h2 className="mt-4 font-serif text-5xl font-medium leading-tight text-foreground lg:text-6xl">
+   310→   310→              Guiding Hearts. <em className="italic text-gold-deep">Growing Minds.</em>
+   311→   311→            </h2>
+   312→   312→            <p className="mt-8 text-lg leading-relaxed text-muted-foreground">
+   313→   313→              {mission.description}
+   314→   314→            </p>
+   315→   315→            <div className="mt-8 flex items-start gap-4 rounded-sm border-l-2 border-gold bg-cream/50 p-5">
+   316→   316→              <Feather className="mt-1 size-5 shrink-0 text-gold-deep" />
+   317→   317→              <div>
+   318→   318→                <p className="font-serif text-lg italic text-foreground">&ldquo;{mission.quote}&rdquo;</p>
+   319→   319→                <p className="mt-2 text-sm font-semibold text-gold-deep">— {mission.quoteSource}</p>
+   320→   320→              </div>
+   321→   321→            </div>
+   322→   322→            <Button
+   323→   323→              onClick={() => goPage('about')}
+   324→   324→              variant="outline"
+   325→   325→              className="mt-8 h-12 gap-2 rounded-sm border-forest px-8 text-xs font-medium uppercase tracking-[0.12em] text-forest hover:bg-forest hover:text-cream"
+   326→   326→            >
+   327→   327→              Read Our Full Story
+   328→   328→              <ArrowRight className="size-3.5" />
+   329→   329→            </Button>
+   330→   330→          </Reveal>
+   331→   331→
+   332→   332→          <Reveal delay={0.15}>
+   333→   333→            <div className="relative">
+   334→   334→              <div className="aspect-[4/5] overflow-hidden rounded-sm shadow-2xl">
+   335→   335→                <img
+   336→   336→                  src="/hero-desk.jpeg"
+   337→   337→                  alt="Hamza School learning environment"
+   338→   338→                  className="h-full w-full object-cover"
+   339→   339→                />
+   340→   340→              </div>
+   341→   341→            </div>
+   342→   342→          </Reveal>
+   343→   343→        </div>
+   344→   344→      </section>
+   345→   345→
+   346→   346→      {/* ===== PROGRAMS ===== */}
+   347→   347→      <section className="bg-cream py-32">
+   348→   348→        <div className="mx-auto max-w-7xl px-6 lg:px-12">
+   349→   349→          <Reveal className="mb-16 text-center">
+   350→   350→            <div className="ornament mb-6">
+   351→   351→              <span className="text-gold">✦</span>
+   352→   352→            </div>
+   353→   353→            <p className="section-label">Academics</p>
+   354→   354→            <h2 className="mt-4 font-serif text-5xl font-medium text-foreground lg:text-6xl">
+   355→   355→              Programs for every <em className="italic text-gold-deep">stage</em>
+   356→   356→            </h2>
+   357→   357→          </Reveal>
+   358→   358→          <div className="grid gap-6 md:grid-cols-3">
+   359→   359→            {PROGRAMS.map((p, i) => (
+   360→   360→              <Reveal key={p.title} delay={i * 0.1}>
+   361→   361→                <div className="value-card h-full border border-gold/18 bg-paper p-10 transition-all duration-500 hover:-translate-y-2 hover:border-gold hover:shadow-[0_24px_48px_rgba(60,35,10,0.12)]">
+   362→   362→                  <span className="inline-block rounded-sm bg-forest px-4 py-1.5 text-[11px] uppercase tracking-widest text-cream">{p.level}</span>
+   363→   363→                  <h3 className="mt-6 font-serif text-3xl font-semibold text-foreground">{p.title}</h3>
+   364→   364→                  <p className="mt-3 text-sm leading-relaxed text-muted-foreground">{p.description}</p>
+   365→   365→                  <button
+   366→   366→                    onClick={() => goPage('academics')}
+   367→   367→                    className="mt-6 inline-flex items-center gap-2 text-xs font-medium uppercase tracking-[0.12em] text-gold-deep transition-colors hover:text-forest"
+   368→   368→                  >
+   369→   369→                    Learn More <ArrowRight className="size-3.5" />
+   370→   370→                  </button>
+   371→   371→                </div>
+   372→   372→              </Reveal>
+   373→   373→            ))}
+   374→   374→          </div>
+   375→   375→        </div>
+   376→   376→      </section>
+   377→   377→
+   378→   378→      {/* ===== EVENTS ===== */}
+   379→   379→      <section className="paper-texture relative overflow-hidden py-32">
+   380→   380→        <div className="geo-pattern pointer-events-none absolute inset-0" />
+   381→   381→        <div className="relative mx-auto max-w-7xl px-6 lg:px-12">
+   382→   382→          <div className="mb-16 flex flex-col items-start justify-between gap-6 sm:flex-row sm:items-end">
+   383→   383→            <Reveal>
+   384→   384→              <p className="section-label">What's On</p>
+   385→   385→              <h2 className="mt-4 font-serif text-5xl font-medium text-foreground lg:text-6xl">
+   386→   386→                Upcoming <em className="italic text-gold-deep">Events</em>
+   387→   387→              </h2>
+   388→   388→            </Reveal>
+   389→   389→            <Reveal delay={0.1}>
+   390→   390→              <Button
+   391→   391→                onClick={() => goPage('news')}
+   392→   392→                variant="outline"
+   393→   393→                className="h-11 gap-2 rounded-sm border-forest px-6 text-xs font-medium uppercase tracking-[0.12em] text-forest hover:bg-forest hover:text-cream"
+   394→   394→              >
+   395→   395→                View Calendar <ArrowRight className="size-3.5" />
+   396→   396→              </Button>
+   397→   397→            </Reveal>
+   398→   398→          </div>
+   399→   399→          <div className="grid gap-4 sm:grid-cols-2">
+   400→   400→            {events.slice(0, 4).map((event, i) => {
+   401→   401→              const d = new Date(event.date)
+   402→   402→              return (
+   403→   403→                <Reveal key={event.title} delay={i * 0.07}>
+   404→   404→                  <div className="flex items-center gap-5 border border-gold/18 bg-paper p-6 transition-all duration-300 hover:border-gold hover:shadow-lg">
+   405→   405→                    <div className="flex h-16 w-16 shrink-0 flex-col items-center justify-center bg-forest text-cream">
+   406→   406→                      <span className="text-[10px] font-semibold uppercase">{d.toLocaleDateString('en-US', { month: 'short' })}</span>
+   407→   407→                      <span className="font-serif text-2xl font-bold leading-none">{d.getDate()}</span>
+   408→   408→                    </div>
+   409→   409→                    <div className="min-w-0 flex-1">
+   410→   410→                      <span className="rounded-sm bg-gold/15 px-2.5 py-0.5 text-[10px] font-medium uppercase tracking-wider text-gold-deep">{event.category}</span>
+   411→   411→                      <h3 className="mt-1.5 font-serif text-xl font-semibold text-foreground">{event.title}</h3>
+   412→   412→                      <div className="mt-1 flex flex-wrap gap-x-3 gap-y-1 text-xs text-muted-foreground">
+   413→   413→                        <span className="flex items-center gap-1"><Clock className="size-3" /> {event.time}</span>
+   414→   414→                        <span className="flex items-center gap-1"><MapPin className="size-3" /> {event.location}</span>
+   415→   415→                      </div>
+   416→   416→                    </div>
+   417→   417→                  </div>
+   418→   418→                </Reveal>
+   419→   419→              )
+   420→   420→            })}
+   421→   421→          </div>
+   422→   422→        </div>
+   423→   423→      </section>
+   424→   424→
+   425→   425→      {/* ===== PRINCIPAL'S MESSAGE ===== */}
+   426→   426→      <section className="paper-texture relative overflow-hidden py-32">
+   427→   427→        <div className="geo-pattern pointer-events-none absolute inset-0" />
+   428→   428→        <div className="relative mx-auto grid max-w-7xl items-center gap-12 px-6 lg:grid-cols-12 lg:px-12">
+   429→   429→          <Reveal className="lg:col-span-5">
+   430→   430→            <div className="relative mx-auto max-w-xs">
+   431→   431→              <div className="aspect-[4/5] overflow-hidden rounded-sm border-2 border-gold/30 shadow-2xl">
+   432→   432→                {isDataUrl(principal.photo) ? (
+   433→   433→                   
+   434→   434→                  <img
+   435→   435→                    src={principal.photo}
+   436→   436→                    alt={principal.name}
+   437→   437→                    className="h-full w-full object-cover"
+   438→   438→                  />
+   439→   439→                ) : (
+   440→   440→                   
+   441→   441→                  <img
+   442→   442→                    src="/hero-desk.jpeg"
+   443→   443→                    alt={principal.name}
+   444→   444→                    className="h-full w-full object-cover"
+   445→   445→                  />
+   446→   446→                )}
+   447→   447→              </div>
+   448→   448→              <div className="absolute -bottom-5 left-1/2 w-[85%] -translate-x-1/2 border border-gold/30 bg-forest p-4 text-center shadow-xl">
+   449→   449→                <p className="font-serif text-base font-bold text-cream">{principal.name}</p>
+   450→   450→                <p className="text-xs text-gold-light">{principal.title}</p>
+   451→   451→              </div>
+   452→   452→            </div>
+   453→   453→          </Reveal>
+   454→   454→          <Reveal delay={0.15} className="lg:col-span-7">
+   455→   455→            <p className="section-label">A Word from Our Founder</p>
+   456→   456→            <Quote className="mt-6 size-12 text-gold/50" />
+   457→   457→            <p className="mt-4 font-serif text-2xl font-light italic leading-relaxed text-foreground/80 sm:text-3xl">
+   458→   458→              {principal.message}
+   459→   459→            </p>
+   460→   460→            <p className="mt-8 font-serif text-2xl font-semibold text-gold-deep">{principal.signature}</p>
+   461→   461→          </Reveal>
+   462→   462→        </div>
+   463→   463→      </section>
+   464→   464→
+   465→   465→      {/* ===== VICE DIRECTOR'S MESSAGE (only if a vice director name is set) ===== */}
+   466→   466→      {vicePrincipal.name.trim() !== '' && (
+   467→   467→        <section className="paper-texture relative overflow-hidden py-32 bg-cream/40">
+   468→   468→          <div className="geo-pattern pointer-events-none absolute inset-0" />
+   469→   469→          <div className="relative mx-auto grid max-w-7xl items-center gap-12 px-6 lg:grid-cols-12 lg:px-12">
+   470→   470→            <Reveal delay={0.15} className="order-2 lg:order-1 lg:col-span-7">
+   471→   471→              <p className="section-label">A Word from Our Vice Director</p>
+   472→   472→              <Quote className="mt-6 size-12 text-gold/50" />
+   473→   473→              <p className="mt-4 font-serif text-2xl font-light italic leading-relaxed text-foreground/80 sm:text-3xl">
+   474→   474→                {vicePrincipal.message}
+   475→   475→              </p>
+   476→   476→              <p className="mt-8 font-serif text-2xl font-semibold text-gold-deep">
+   477→   477→                {vicePrincipal.name}
+   478→   478→              </p>
+   479→   479→              <p className="mt-1 text-xs uppercase tracking-wider text-muted-foreground">
+   480→   480→                {vicePrincipal.title}
+   481→   481→              </p>
+   482→   482→            </Reveal>
+   483→   483→            <Reveal className="order-1 lg:order-2 lg:col-span-5">
+   484→   484→              <div className="relative mx-auto max-w-xs">
+   485→   485→                <div className="aspect-[4/5] overflow-hidden rounded-sm border-2 border-gold/30 shadow-2xl">
+   486→   486→                  {isDataUrl(vicePrincipal.photo) ? (
+   487→   487→                     
+   488→   488→                    <img
+   489→   489→                      src={vicePrincipal.photo}
+   490→   490→                      alt={vicePrincipal.name}
+   491→   491→                      className="h-full w-full object-cover"
+   492→   492→                    />
+   493→   493→                  ) : (
+   494→   494→                    <div className="flex h-full w-full items-center justify-center bg-forest text-gold-light">
+   495→   495→                      <span className="font-serif text-6xl font-semibold">
+   496→   496→                        {vicePrincipal.name
+   497→   497→                          .split(' ')
+   498→   498→                          .map((n) => n[0])
+   499→   499→                          .slice(0, 2)
+   500→   500→                          .join('')
+   501→   501→                          .toUpperCase()}
+   502→   502→                      </span>
+   503→   503→                    </div>
+   504→   504→                  )}
+   505→   505→                </div>
+   506→   506→                <div className="absolute -bottom-5 left-1/2 w-[85%] -translate-x-1/2 border border-gold/30 bg-forest p-4 text-center shadow-xl">
+   507→   507→                  <p className="font-serif text-base font-bold text-cream">
+   508→   508→                    {vicePrincipal.name}
+   509→   509→                  </p>
+   510→   510→                  <p className="text-xs text-gold-light">{vicePrincipal.title}</p>
+   511→   511→                </div>
+   512→   512→              </div>
+   513→   513→            </Reveal>
+   514→   514→          </div>
+   515→   515→        </section>
+   516→   516→      )}
+   517→   517→
+   518→   518→      {/* ===== TESTIMONIALS ===== */}
+   519→   519→      <section className="bg-cream py-32">
+   520→   520→        <div className="mx-auto max-w-6xl px-6 lg:px-12">
+   521→   521→          <Reveal className="mb-16 text-center">
+   522→   522→            <div className="ornament mb-6"><span className="text-gold">✦</span></div>
+   523→   523→            <p className="section-label">Voices</p>
+   524→   524→            <h2 className="mt-4 font-serif text-5xl font-medium text-foreground lg:text-6xl">
+   525→   525→              What families <em className="italic text-gold-deep">say</em>
+   526→   526→            </h2>
+   527→   527→          </Reveal>
+   528→   528→          <Reveal delay={0.1} className="mt-12">
+   529→   529→            <Carousel opts={{ align: 'start', loop: true }} className="w-full">
+   530→   530→              <CarouselContent>
+   531→   531→                {TESTIMONIALS.map((t) => (
+   532→   532→                  <CarouselItem key={t.name} className="md:basis-1/2 lg:basis-1/2">
+   533→   533→                    <div className="h-full border border-gold/18 bg-paper p-10">
+   534→   534→                      <Quote className="size-8 text-gold/50" />
+   535→   535→                      <div className="mt-3 flex gap-0.5">
+   536→   536→                        {Array.from({ length: t.rating }).map((_, i) => (
+   537→   537→                          <Star key={i} className="size-4 fill-gold text-gold" />
+   538→   538→                        ))}
+   539→   539→                      </div>
+   540→   540→                      <p className="mt-5 flex-1 font-serif text-lg italic leading-relaxed text-foreground">
+   541→   541→                        &ldquo;{t.quote}&rdquo;
+   542→   542→                      </p>
+   543→   543→                      <div className="mt-7 flex items-center gap-3">
+   544→   544→                        <Avatar className="size-12 border-2 border-gold/30">
+   545→   545→                          <AvatarFallback className="bg-forest font-serif font-semibold text-gold-light">
+   546→   546→                            {t.name.split(' ').map((n) => n[0]).slice(0, 2).join('')}
+   547→   547→                          </AvatarFallback>
+   548→   548→                        </Avatar>
+   549→   549→                        <div>
+   550→   550→                          <p className="font-serif font-semibold text-foreground">{t.name}</p>
+   551→   551→                          <p className="text-xs text-muted-foreground">{t.role}</p>
+   552→   552→                        </div>
+   553→   553→                      </div>
+   554→   554→                    </div>
+   555→   555→                  </CarouselItem>
+   556→   556→                ))}
+   557→   557→              </CarouselContent>
+   558→   558→              <CarouselPrevious className="left-2" />
+   559→   559→              <CarouselNext className="right-2" />
+   560→   560→            </Carousel>
+   561→   561→          </Reveal>
+   562→   562→        </div>
+   563→   563→      </section>
+   564→   564→
+   565→   565→
+   566→   566→      {/* ===== CTA / CONTACT ===== */}
+   567→   567→      <section className="paper-texture relative overflow-hidden py-32">
+   568→   568→        <div className="geo-pattern pointer-events-none absolute inset-0" />
+   569→   569→        <div className="relative mx-auto max-w-3xl px-6 text-center lg:px-12">
+   570→   570→          <Reveal>
+   571→   571→            <div className="ornament mb-6"><span className="text-gold text-2xl">✦</span></div>
+   572→   572→            <h2 className="font-serif text-5xl font-medium text-foreground lg:text-6xl">
+   573→   573→              Begin your <em className="italic text-gold-deep">journey</em>
+   574→   574→            </h2>
+   575→   575→            <p className="mx-auto mt-6 max-w-xl text-lg text-muted-foreground">
+   576→   576→              We'd love to meet you and your child. Book a visit, meet our teachers,
+   577→   577→              and feel the warmth of our community.
+   578→   578→            </p>
+   579→   579→            <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
+   580→   580→              <Button
+   581→   581→                onClick={() => goPage('contact')}
+   582→   582→                className="h-14 gap-2.5 rounded-sm bg-forest px-9 text-xs font-medium uppercase tracking-[0.12em] text-cream transition-all hover:bg-gold-deep"
+   583→   583→              >
+   584→   584→                Book a Visit <ArrowRight className="size-3.5" />
+   585→   585→              </Button>
+   586→   586→              <Button
+   587→   587→                onClick={() => goPage('gallery')}
+   588→   588→                variant="outline"
+   589→   589→                className="h-14 gap-2.5 rounded-sm border-forest px-8 text-xs font-medium uppercase tracking-[0.12em] text-forest transition-all hover:bg-forest hover:text-cream"
+   590→   590→              >
+   591→   591→                See Photos
+   592→   592→              </Button>
+   593→   593→            </div>
+   594→   594→          </Reveal>
+   595→   595→        </div>
+   596→   596→      </section>
+   597→   597→    </div>
+   598→   598→  )
+   599→   599→}
+   600→   600→

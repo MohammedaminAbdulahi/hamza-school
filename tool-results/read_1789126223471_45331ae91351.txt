@@ -1,0 +1,592 @@
+     1→'use client'
+     2→
+     3→import * as React from 'react'
+     4→import { Quote, ArrowRight, Target, Eye, Award, ShieldCheck, Sparkles } from 'lucide-react'
+     5→import { PageHero } from '@/components/site/page-hero'
+     6→import { SectionHeader } from '@/components/site/section-header'
+     7→import { Reveal } from '@/components/site/reveal'
+     8→import { SmartImage } from '@/components/site/smart-image'
+     9→import { DynamicIcon } from '@/components/site/dynamic-icon'
+    10→import { AnimatedCounter } from '@/components/site/animated-counter'
+    11→import { useNav } from '@/lib/nav-store'
+    12→import {
+    13→  SCHOOL,
+    14→  STATS,
+    15→  MISSION,
+    16→  CORE_VALUES,
+    17→  LEADERSHIP,
+    18→  TEACHERS,
+    19→  FACILITIES,
+    20→  ACCREDITATIONS,
+    21→  POLICIES,
+    22→  HISTORY,
+    23→  PRINCIPAL,
+    24→} from '@/lib/content'
+    25→import { isDataUrl } from '@/lib/image-upload'
+    26→import {
+    27→  Card,
+    28→  CardContent,
+    29→  CardDescription,
+    30→  CardHeader,
+    31→  CardTitle,
+    32→} from '@/components/ui/card'
+    33→import { Button } from '@/components/ui/button'
+    34→import { Badge } from '@/components/ui/badge'
+    35→import { Avatar, AvatarFallback } from '@/components/ui/avatar'
+    36→import {
+    37→  Accordion,
+    38→  AccordionContent,
+    39→  AccordionItem,
+    40→  AccordionTrigger,
+    41→} from '@/components/ui/accordion'
+    42→import { PageLoading } from '@/components/site/page-loading'
+    43→
+    44→type DbLeader = { id?: number; name: string; role: string; bio: string; initials: string; photo?: string }
+    45→type DbTeacher = { id?: number; name: string; subject: string; years: number; initials: string }
+    46→type DbStat = { key: string; label: string; value: number; suffix: string }
+    47→type DbFacility = { id?: number; name: string; description: string; icon: string; photo?: string }
+    48→type DbSchool = {
+    49→  name?: string
+    50→  established?: number
+    51→  hero?: Partial<typeof MISSION>
+    52→  mission?: Partial<typeof MISSION>
+    53→  principal?: Partial<typeof PRINCIPAL> & { photo?: string }
+    54→  stats?: DbStat[]
+    55→}
+    56→
+    57→export function AboutPage() {
+    58→  const [loading, setLoading] = React.useState(true)
+    59→
+    60→  const goPage = useNav((s) => s.goPage)
+    61→
+    62→  const [school, setSchool] = React.useState(SCHOOL)
+    63→  const [mission, setMission] = React.useState(MISSION)
+    64→  const [principal, setPrincipal] = React.useState(PRINCIPAL)
+    65→  const [leadership, setLeadership] = React.useState(LEADERSHIP)
+    66→  const [teachers, setTeachers] = React.useState(TEACHERS)
+    67→  const [stats, setStats] = React.useState<typeof STATS>(STATS)
+    68→  const [facilities, setFacilities] = React.useState<typeof FACILITIES>(FACILITIES)
+    69→
+    70→  React.useEffect(() => {
+    71→    fetch('/api/content')
+    72→      .then((r) => r.json())
+    73→      .then((d: {
+    74→        school?: DbSchool
+    75→        leadership?: DbLeader[]
+    76→        teachers?: DbTeacher[]
+    77→        facilities?: DbFacility[]
+    78→      }) => {
+    79→        if (d.school) {
+    80→          setSchool({ ...SCHOOL, ...d.school, social: SCHOOL.social })
+    81→          if (d.school.mission) setMission({ ...MISSION, ...d.school.mission })
+    82→          if (d.school.principal) setPrincipal({ ...PRINCIPAL, ...d.school.principal })
+    83→          // Merge fetched stats over the content.ts defaults so partial DB
+    84→          // responses stay safe.
+    85→          if (Array.isArray(d.school.stats) && d.school.stats.length === 4) {
+    86→            setStats(
+    87→              d.school.stats.map((s, i) => ({
+    88→                label: s.label ?? STATS[i]?.label ?? '',
+    89→                value: Number(s.value) || 0,
+    90→                suffix: s.suffix ?? STATS[i]?.suffix ?? '',
+    91→              })) as typeof STATS
+    92→            )
+    93→          }
+    94→        }
+    95→        if (Array.isArray(d.leadership) && d.leadership.length > 0) {
+    96→          setLeadership(d.leadership as unknown as typeof LEADERSHIP)
+    97→        }
+    98→        if (Array.isArray(d.teachers) && d.teachers.length > 0) {
+    99→          setTeachers(d.teachers as unknown as typeof TEACHERS)
+   100→        }
+   101→        // Hydrate facilities from the DB, falling back to content.ts defaults
+   102→        // so the section is always populated even if the DB is unreachable.
+   103→        if (Array.isArray(d.facilities) && d.facilities.length > 0) {
+   104→          setFacilities(
+   105→            d.facilities.map((f, i) => ({
+   106→              icon: f.icon || FACILITIES[i]?.icon || 'Building',
+   107→              name: f.name,
+   108→              description: f.description,
+   109→              photo: f.photo,
+   110→            })) as typeof FACILITIES
+   111→          )
+   112→        }
+   113→      })
+   114→      .catch(() => { /* keep defaults on error */ })
+   115→      .finally(() => setLoading(false))
+   116→  }, [])
+   117→
+   118→  if (loading) return <PageLoading />
+   119→
+   120→  return (
+   121→    <div className="flex flex-col">
+   122→      <PageHero
+   123→        eyebrow="About Us"
+   124→        title="A community where every child is seen, valued, and inspired"
+   125→        description={`Since ${school.established}, ${school.name} has been a family-like learning home in Addis Ababa — where children grow in confidence, character, and curiosity. Meet the people, places, and principles that make us who we are.`}
+   126→        seed="about-hero"
+   127→        icon="School"
+   128→        breadcrumb="About Us"
+   129→      />
+   130→
+   131→      {/* Quick stats strip */}
+   132→      <section className="border-b border-border/60 bg-muted/30">
+   133→        <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
+   134→          <div className="grid grid-cols-2 gap-6 md:grid-cols-4">
+   135→            {stats.map((stat, i) => (
+   136→              <Reveal key={stat.label + i} delay={i * 0.08}>
+   137→                <div className="text-center">
+   138→                  <div className="text-3xl font-bold tracking-tight text-primary sm:text-4xl">
+   139→                    <AnimatedCounter value={stat.value} suffix={stat.suffix} />
+   140→                  </div>
+   141→                  <div className="mt-1 text-sm text-muted-foreground">{stat.label}</div>
+   142→                </div>
+   143→              </Reveal>
+   144→            ))}
+   145→          </div>
+   146→        </div>
+   147→      </section>
+   148→
+   149→      {/* School History — vertical timeline */}
+   150→      <section className="py-20 sm:py-24">
+   151→        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+   152→          <Reveal>
+   153→            <SectionHeader
+   154→              eyebrow="Our Journey"
+   155→              title="A story of small beginnings, steady growth"
+   156→              description="From a single rented building on Bole Road to a warm 850-student campus, every chapter of our story reflects a commitment to children, community, and care."
+   157→            />
+   158→          </Reveal>
+   159→          <div className="mx-auto mt-14 max-w-3xl">
+   160→            <ol className="relative border-l border-primary/30 pl-8">
+   161→              {HISTORY.map((item, i) => (
+   162→                <Reveal key={item.year} delay={i * 0.06}>
+   163→                  <li className="relative mb-10 last:mb-0">
+   164→                    <span className="absolute -left-[2.55rem] flex size-7 items-center justify-center rounded-full border-2 border-primary bg-background shadow-sm">
+   165→                      <span className="size-2.5 rounded-full bg-primary" />
+   166→                    </span>
+   167→                    <Card className="gap-3 py-5">
+   168→                      <CardHeader className="gap-1">
+   169→                        <div className="flex flex-wrap items-center gap-2">
+   170→                          <Badge className="bg-primary/10 text-primary">{item.year}</Badge>
+   171→                        </div>
+   172→                        <CardTitle className="text-lg">{item.title}</CardTitle>
+   173→                      </CardHeader>
+   174→                      <CardContent>
+   175→                        <p className="text-sm text-muted-foreground">{item.description}</p>
+   176→                      </CardContent>
+   177→                    </Card>
+   178→                  </li>
+   179→                </Reveal>
+   180→              ))}
+   181→            </ol>
+   182→          </div>
+   183→        </div>
+   184→      </section>
+   185→
+   186→      {/* Mission & Vision */}
+   187→      <section className="bg-muted/30 py-20 sm:py-24">
+   188→        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+   189→          <Reveal>
+   190→            <SectionHeader
+   191→              eyebrow="Our Purpose"
+   192→              title="Mission & Vision"
+   193→              description="Two ideas guide every decision we make — what we strive to do today, and the future we are building together."
+   194→            />
+   195→          </Reveal>
+   196→          <div className="mt-12 grid gap-6 md:grid-cols-2">
+   197→            <Reveal delay={0.05}>
+   198→              <Card className="h-full overflow-hidden border-primary/20 py-0">
+   199→                <div className="relative">
+   200→                  <SmartImage
+   201→                    seed="about-mission"
+   202→                    alt="Illustration representing our mission to inspire students"
+   203→                    icon="Target"
+   204→                    label="Mission"
+   205→                    className="aspect-[16/7] w-full"
+   206→                  />
+   207→                </div>
+   208→                <CardHeader>
+   209→                  <div className="flex items-center gap-2">
+   210→                    <div className="flex size-9 items-center justify-center rounded-lg bg-primary/10 text-primary">
+   211→                      <Target className="size-5" />
+   212→                    </div>
+   213→                    <CardTitle className="text-xl">Our Mission</CardTitle>
+   214→                  </div>
+   215→                </CardHeader>
+   216→                <CardContent>
+   217→                  <p className="text-sm leading-relaxed text-muted-foreground">
+   218→                    {mission.description}
+   219→                  </p>
+   220→                </CardContent>
+   221→              </Card>
+   222→            </Reveal>
+   223→            <Reveal delay={0.12}>
+   224→              <Card className="h-full overflow-hidden border-amber-500/20 py-0">
+   225→                <div className="relative">
+   226→                  <SmartImage
+   227→                    seed="about-vision"
+   228→                    alt="Illustration representing our vision for the future"
+   229→                    icon="Eye"
+   230→                    label="Vision"
+   231→                    className="aspect-[16/7] w-full"
+   232→                  />
+   233→                </div>
+   234→                <CardHeader>
+   235→                  <div className="flex items-center gap-2">
+   236→                    <div className="flex size-9 items-center justify-center rounded-lg bg-amber-500/10 text-amber-600">
+   237→                      <Eye className="size-5" />
+   238→                    </div>
+   239→                    <CardTitle className="text-xl">Our Vision</CardTitle>
+   240→                  </div>
+   241→                </CardHeader>
+   242→                <CardContent>
+   243→                  <p className="text-sm leading-relaxed text-muted-foreground">
+   244→                    To be a school in Addis Ababa where children leave Grade 8 not
+   245→                    only ready for secondary school, but ready for life — confident
+   246→                    in who they are, kind to those around them, and curious about the
+   247→                    world. We dream of graduates who carry the Hamza spirit of
+   248→                    integrity, hard work, and care wherever they go next.
+   249→                  </p>
+   250→                </CardContent>
+   251→              </Card>
+   252→            </Reveal>
+   253→          </div>
+   254→        </div>
+   255→      </section>
+   256→
+   257→      {/* Core Values */}
+   258→      <section className="py-20 sm:py-24">
+   259→        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+   260→          <Reveal>
+   261→            <SectionHeader
+   262→              eyebrow="What We Stand For"
+   263→              title="Our Core Values"
+   264→              description="Six principles anchor our culture, inform our decisions, and shape the character of every Hamza student."
+   265→            />
+   266→          </Reveal>
+   267→          <div className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+   268→            {CORE_VALUES.map((value, i) => (
+   269→              <Reveal key={value.title} delay={i * 0.06}>
+   270→                <Card className="group h-full transition-all hover:-translate-y-1 hover:shadow-lg">
+   271→                  <CardHeader>
+   272→                    <div className="flex size-12 items-center justify-center rounded-xl bg-primary/10 text-primary transition-colors group-hover:bg-primary group-hover:text-primary-foreground">
+   273→                      <DynamicIcon name={value.icon} className="size-6" />
+   274→                    </div>
+   275→                    <CardTitle className="mt-3 text-lg">{value.title}</CardTitle>
+   276→                  </CardHeader>
+   277→                  <CardContent>
+   278→                    <p className="text-sm text-muted-foreground">{value.description}</p>
+   279→                  </CardContent>
+   280→                </Card>
+   281→              </Reveal>
+   282→            ))}
+   283→          </div>
+   284→        </div>
+   285→      </section>
+   286→
+   287→      {/* Principal's Message */}
+   288→      <section className="bg-muted/30 py-20 sm:py-24">
+   289→        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+   290→          <div className="grid items-center gap-10 lg:grid-cols-12">
+   291→            <Reveal className="lg:col-span-5" delay={0.05}>
+   292→              <div className="relative mx-auto max-w-sm">
+   293→                <div className="aspect-[4/5] w-full overflow-hidden rounded-xl border border-primary/20 shadow-sm">
+   294→                  {isDataUrl((principal as { photo?: string }).photo) ? (
+   295→                     
+   296→                    <img
+   297→                      src={(principal as { photo?: string }).photo}
+   298→                      alt={`Portrait of ${principal.name}`}
+   299→                      className="h-full w-full object-cover"
+   300→                    />
+   301→                  ) : (
+   302→                    <SmartImage
+   303→                      seed="about-principal"
+   304→                      alt={`Portrait of ${principal.name}`}
+   305→                      icon="UserRound"
+   306→                      label={principal.name}
+   307→                      rounded="rounded-none"
+   308→                      className="aspect-[4/5] w-full"
+   309→                    />
+   310→                  )}
+   311→                </div>
+   312→                <div className="absolute -bottom-4 -right-4 hidden rounded-xl border bg-background p-4 shadow-lg sm:block">
+   313→                  <div className="flex items-center gap-2">
+   314→                    <Award className="size-5 text-amber-500" />
+   315→                    <div>
+   316→                      <div className="text-xs text-muted-foreground">Leading since</div>
+   317→                      <div className="text-sm font-semibold">{school.established}</div>
+   318→                    </div>
+   319→                  </div>
+   320→                </div>
+   321→              </div>
+   322→            </Reveal>
+   323→            <Reveal className="lg:col-span-7" delay={0.12}>
+   324→              <div>
+   325→                <span className="inline-flex items-center gap-2 rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-primary">
+   326→                  <span className="size-1.5 rounded-full bg-primary" />
+   327→                  Principal's Message
+   328→                </span>
+   329→                <Quote className="mt-5 size-8 text-primary/30" />
+   330→                <blockquote className="mt-3 text-pretty text-lg font-medium leading-relaxed sm:text-xl">
+   331→                  &ldquo;{principal.message}&rdquo;
+   332→                </blockquote>
+   333→                <div className="mt-6 flex items-center gap-3">
+   334→                  <div className="h-px w-10 bg-primary" />
+   335→                  <div>
+   336→                    <div className="font-semibold">{principal.signature}</div>
+   337→                    <div className="text-sm text-muted-foreground">{principal.title}</div>
+   338→                  </div>
+   339→                </div>
+   340→              </div>
+   341→            </Reveal>
+   342→          </div>
+   343→        </div>
+   344→      </section>
+   345→
+   346→      {/* Leadership Team */}
+   347→      <section className="py-20 sm:py-24">
+   348→        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+   349→          <Reveal>
+   350→            <SectionHeader
+   351→              eyebrow="Leadership"
+   352→              title="Meet our leadership team"
+   353→              description="Experienced educators and dedicated mentors who shape the vision and daily life of our school."
+   354→            />
+   355→          </Reveal>
+   356→          <div className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+   357→            {leadership.map((member, i) => (
+   358→              <Reveal key={member.name} delay={i * 0.06}>
+   359→                <Card className="h-full transition-all hover:-translate-y-1 hover:shadow-lg">
+   360→                  <CardContent className="pt-6">
+   361→                    <div className="flex items-center gap-4">
+   362→                      {isDataUrl((member as DbLeader).photo) ? (
+   363→                         
+   364→                        <img
+   365→                          src={(member as DbLeader).photo}
+   366→                          alt={member.name}
+   367→                          className="size-14 shrink-0 rounded-full border-2 border-primary/20 object-cover"
+   368→                        />
+   369→                      ) : (
+   370→                        <Avatar className="size-14 border-2 border-primary/20">
+   371→                          <AvatarFallback className="bg-primary/10 text-base font-semibold text-primary">
+   372→                            {member.initials}
+   373→                          </AvatarFallback>
+   374→                        </Avatar>
+   375→                      )}
+   376→                      <div>
+   377→                        <CardTitle className="text-base">{member.name}</CardTitle>
+   378→                        <div className="text-sm font-medium text-primary">{member.role}</div>
+   379→                      </div>
+   380→                    </div>
+   381→                    <p className="mt-4 text-sm text-muted-foreground">{member.bio}</p>
+   382→                  </CardContent>
+   383→                </Card>
+   384→              </Reveal>
+   385→            ))}
+   386→          </div>
+   387→        </div>
+   388→      </section>
+   389→
+   390→      {/* Teachers & Staff */}
+   391→      <section className="bg-muted/30 py-20 sm:py-24">
+   392→        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+   393→          <Reveal>
+   394→            <SectionHeader
+   395→              eyebrow="Our Educators"
+   396→              title="Teachers who know every child"
+   397→              description="Passionate specialists with deep subject expertise and an unwavering commitment to student success."
+   398→            />
+   399→          </Reveal>
+   400→          <div className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+   401→            {teachers.map((teacher, i) => (
+   402→              <Reveal key={teacher.name} delay={i * 0.05}>
+   403→                <Card className="h-full text-center transition-all hover:-translate-y-1 hover:shadow-lg">
+   404→                  <CardContent className="flex flex-col items-center pt-6">
+   405→                    <Avatar className="size-16 border-2 border-amber-500/20">
+   406→                      <AvatarFallback className="bg-amber-500/10 text-lg font-semibold text-amber-600">
+   407→                        {teacher.initials}
+   408→                      </AvatarFallback>
+   409→                    </Avatar>
+   410→                    <CardTitle className="mt-4 text-base">{teacher.name}</CardTitle>
+   411→                    <div className="mt-1 text-sm font-medium text-primary">
+   412→                      {teacher.subject}
+   413→                    </div>
+   414→                    <Badge variant="secondary" className="mt-3">
+   415→                      {teacher.years} years exp.
+   416→                    </Badge>
+   417→                  </CardContent>
+   418→                </Card>
+   419→              </Reveal>
+   420→            ))}
+   421→          </div>
+   422→        </div>
+   423→      </section>
+   424→
+   425→      {/* School Facilities */}
+   426→      <section className="py-20 sm:py-24">
+   427→        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+   428→          <Reveal>
+   429→            <SectionHeader
+   430→              eyebrow="Our Campus"
+   431→              title="Small, warm spaces built for discovery"
+   432→              description="Our campus is intentionally modest — focused on the spaces that truly help children learn, play, and feel at home."
+   433→            />
+   434→          </Reveal>
+   435→          <div className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+   436→            {facilities.map((facility, i) => {
+   437→              const photo = (facility as { photo?: string }).photo
+   438→              return (
+   439→                <Reveal key={facility.name} delay={i * 0.06}>
+   440→                  <Card className="group h-full overflow-hidden py-0 transition-all hover:-translate-y-1 hover:shadow-lg">
+   441→                    <div className="relative">
+   442→                      {isDataUrl(photo) ? (
+   443→                        <img
+   444→                          src={photo}
+   445→                          alt={facility.name}
+   446→                          className="aspect-[16/9] w-full object-cover"
+   447→                        />
+   448→                      ) : (
+   449→                        <SmartImage
+   450→                          seed={`about-facility-${facility.name}`}
+   451→                          alt={facility.name}
+   452→                          icon={facility.icon}
+   453→                          label={facility.name}
+   454→                          className="aspect-[16/9] w-full"
+   455→                        />
+   456→                      )}
+   457→                    </div>
+   458→                    <CardHeader>
+   459→                      <div className="flex items-center gap-2">
+   460→                        <DynamicIcon name={facility.icon} className="size-5 text-primary" />
+   461→                        <CardTitle className="text-base">{facility.name}</CardTitle>
+   462→                      </div>
+   463→                    </CardHeader>
+   464→                    <CardContent>
+   465→                      <p className="text-sm text-muted-foreground">{facility.description}</p>
+   466→                    </CardContent>
+   467→                  </Card>
+   468→                </Reveal>
+   469→              )
+   470→            })}
+   471→          </div>
+   472→        </div>
+   473→      </section>
+   474→
+   475→      {/* Accreditations & Achievements */}
+   476→      <section className="bg-muted/30 py-20 sm:py-24">
+   477→        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+   478→          <Reveal>
+   479→            <SectionHeader
+   480→              eyebrow="Recognition"
+   481→              title="Licensed & trusted by Ethiopian authorities"
+   482→              description="Our school is fully registered with the Ethiopian Ministry of Education and recognized by the Addis Ababa Education Bureau — meeting national standards for primary and junior secondary education."
+   483→            />
+   484→          </Reveal>
+   485→          <div className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+   486→            {ACCREDITATIONS.map((item, i) => (
+   487→              <Reveal key={item} delay={i * 0.06}>
+   488→                <Card className="h-full">
+   489→                  <CardContent className="flex h-full flex-col items-start gap-4 pt-6">
+   490→                    <div className="flex size-11 items-center justify-center rounded-xl bg-emerald-500/10 text-emerald-600">
+   491→                      <ShieldCheck className="size-6" />
+   492→                    </div>
+   493→                    <div>
+   494→                      <div className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+   495→                        Accredited
+   496→                      </div>
+   497→                      <div className="mt-1 text-sm font-medium leading-snug">{item}</div>
+   498→                    </div>
+   499→                  </CardContent>
+   500→                </Card>
+   501→              </Reveal>
+   502→            ))}
+   503→          </div>
+   504→        </div>
+   505→      </section>
+   506→
+   507→      {/* School Policies */}
+   508→      <section className="py-20 sm:py-24">
+   509→        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+   510→          <div className="grid gap-10 lg:grid-cols-12">
+   511→            <Reveal className="lg:col-span-5">
+   512→              <SectionHeader
+   513→                align="left"
+   514→                eyebrow="Governance"
+   515→                title="Policies that protect our community"
+   516→                description="Clear, fair, and caring guidelines ensure every student learns in a safe, respectful, and supportive environment."
+   517→              />
+   518→              <div className="mt-6 flex items-center gap-2 rounded-lg border border-primary/20 bg-primary/5 p-4">
+   519→                <Sparkles className="size-5 shrink-0 text-primary" />
+   520→                <p className="text-sm text-muted-foreground">
+   521→                  All policies are reviewed annually with input from staff, parents, and
+   522→                  our student council.
+   523→                </p>
+   524→              </div>
+   525→            </Reveal>
+   526→            <Reveal className="lg:col-span-7" delay={0.1}>
+   527→              <Card>
+   528→                <CardContent className="pt-2">
+   529→                  <Accordion type="single" collapsible className="w-full">
+   530→                    {POLICIES.map((policy, i) => (
+   531→                      <AccordionItem key={policy.title} value={`policy-${i}`}>
+   532→                        <AccordionTrigger className="text-left text-base font-semibold">
+   533→                          {policy.title}
+   534→                        </AccordionTrigger>
+   535→                        <AccordionContent>
+   536→                          <p className="text-sm leading-relaxed text-muted-foreground">
+   537→                            {policy.description}
+   538→                          </p>
+   539→                        </AccordionContent>
+   540→                      </AccordionItem>
+   541→                    ))}
+   542→                  </Accordion>
+   543→                </CardContent>
+   544→              </Card>
+   545→            </Reveal>
+   546→          </div>
+   547→        </div>
+   548→      </section>
+   549→
+   550→      {/* CTA */}
+   551→      <section className="pb-24 pt-4">
+   552→        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+   553→          <Reveal>
+   554→            <div className="relative overflow-hidden rounded-sm border border-gold/20 bg-paper p-8 shadow-lg sm:p-12">
+   555→              <div className="geo-pattern pointer-events-none absolute inset-0 opacity-20" />
+   556→              <div className="relative flex flex-col items-start gap-6 lg:flex-row lg:items-center lg:justify-between">
+   557→                <div className="max-w-2xl">
+   558→                  <h2 className="font-serif text-3xl font-medium tracking-tight sm:text-4xl">
+   559→                    Ready to become part of our <em className="italic text-gold-deep">story?</em>
+   560→                  </h2>
+   561→                  <p className="mt-3 text-base text-foreground/80 sm:text-lg">
+   562→                    Schedule a campus visit, meet our educators, and discover why families
+   563→                    across Addis Ababa choose {school.name} for their children's education.
+   564→                  </p>
+   565→                </div>
+   566→                <div className="flex flex-col gap-3 sm:flex-row">
+   567→                  <Button
+   568→                    size="lg"
+   569→                    className="h-12 gap-2.5 rounded-sm bg-gold-deep px-8 text-xs font-medium uppercase tracking-[0.12em] text-cream hover:bg-gold"
+   570→                    onClick={() => goPage('contact')}
+   571→                  >
+   572→                    Contact Us
+   573→                    <ArrowRight className="size-3.5" />
+   574→                  </Button>
+   575→                  <Button
+   576→                    size="lg"
+   577→                    variant="outline"
+   578→                    className="h-12 gap-2.5 rounded-sm border border-forest px-8 text-xs font-medium uppercase tracking-[0.12em] text-forest hover:bg-forest hover:text-cream"
+   579→                    onClick={() => goPage('gallery')}
+   580→                  >
+   581→                    See Photos
+   582→                  </Button>
+   583→                </div>
+   584→              </div>
+   585→            </div>
+   586→          </Reveal>
+   587→        </div>
+   588→      </section>
+   589→    </div>
+   590→  )
+   591→}
+   592→

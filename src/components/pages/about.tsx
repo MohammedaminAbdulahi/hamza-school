@@ -39,7 +39,6 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from '@/components/ui/accordion'
-import { PageLoading } from '@/components/site/page-loading'
 
 type DbLeader = { id?: number; name: string; role: string; bio: string; initials: string; photo?: string }
 type DbTeacher = { id?: number; name: string; subject: string; years: number; initials: string }
@@ -55,6 +54,8 @@ type DbSchool = {
 }
 
 export function AboutPage() {
+  // Loading state is tracked but no longer blocks rendering — content.ts
+  // defaults render immediately and silently update when DB data arrives.
   const [loading, setLoading] = React.useState(true)
 
   const goPage = useNav((s) => s.goPage)
@@ -114,8 +115,6 @@ export function AboutPage() {
       .catch(() => { /* keep defaults on error */ })
       .finally(() => setLoading(false))
   }, [])
-
-  if (loading) return <PageLoading />
 
   return (
     <div className="flex flex-col">

@@ -20,6 +20,7 @@ import {
   CLUBS,
   SPORTS,
 } from '@/lib/content'
+import { isDataUrl } from '@/lib/image-upload'
 import {
   Card,
   CardContent,
@@ -41,6 +42,34 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 
 export function AcademicsPage() {
   const goPage = useNav((s) => s.goPage)
+
+  // Map of facility name -> uploaded photo data URL (real photo).
+  // Hydrated from /api/content on mount; defaults to an empty map so the
+  // SmartImage placeholder is shown until the DB responds.
+  const [facilityPhotos, setFacilityPhotos] = React.useState<
+    Record<string, string>
+  >({})
+
+  React.useEffect(() => {
+    fetch('/api/content')
+      .then((r) => r.json())
+      .then(
+        (d: {
+          facilities?: { name: string; photo?: string }[]
+        }) => {
+          if (Array.isArray(d.facilities)) {
+            const map: Record<string, string> = {}
+            for (const f of d.facilities) {
+              if (f && typeof f.name === 'string' && isDataUrl(f.photo)) {
+                map[f.name] = f.photo
+              }
+            }
+            setFacilityPhotos(map)
+          }
+        }
+      )
+      .catch(() => { /* keep defaults on error */ })
+  }, [])
 
   return (
     <div className="flex flex-col">
@@ -146,11 +175,8 @@ export function AcademicsPage() {
               <Reveal key={dept.name} delay={i * 0.06}>
                 <Card className="group h-full transition-all hover:-translate-y-1 hover:shadow-lg">
                   <CardHeader>
-                    <div className="flex items-center justify-between">
-                      <div className="flex size-12 items-center justify-center rounded-xl bg-primary/10 text-primary transition-colors group-hover:bg-primary group-hover:text-primary-foreground">
-                        <DynamicIcon name={dept.icon} className="size-6" />
-                      </div>
-                      <Badge variant="secondary">{dept.subjects} subjects</Badge>
+                    <div className="flex size-12 items-center justify-center rounded-xl bg-primary/10 text-primary transition-colors group-hover:bg-primary group-hover:text-primary-foreground">
+                      <DynamicIcon name={dept.icon} className="size-6" />
                     </div>
                     <CardTitle className="mt-3 text-lg">{dept.name}</CardTitle>
                     <CardDescription>
@@ -356,35 +382,47 @@ export function AcademicsPage() {
             />
           </Reveal>
           <div className="mt-12 grid max-w-2xl gap-6">
-            {LABS.map((lab, i) => (
-              <Reveal key={lab.name} delay={i * 0.08}>
-                <Card className="group h-full overflow-hidden py-0 transition-all hover:-translate-y-1 hover:shadow-lg">
-                  <SmartImage
-                    seed={`academics-lab-${lab.name}`}
-                    alt={lab.name}
-                    icon={lab.iconName}
-                    label={lab.name}
-                    className="aspect-[16/10] w-full rounded-none"
-                  />
-                  <CardHeader>
-                    <div className="flex items-center gap-2">
-                      <DynamicIcon name={lab.iconName} className="size-5 text-primary" />
-                      <CardTitle className="text-base">{lab.name}</CardTitle>
-                    </div>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-sm text-muted-foreground">{lab.description}</p>
-                    <div className="mt-4 flex flex-wrap gap-2">
-                      {lab.equipment.map((eq) => (
-                        <Badge key={eq} variant="secondary" className="text-xs">
-                          {eq}
-                        </Badge>
-                      ))}
-                    </div>
-                  </CardContent>
-                </Card>
-              </Reveal>
-            ))}
+            {LABS.map((lab, i) => {
+              const photo = facilityPhotos[lab.name]
+              const isPhoto = isDataUrl(photo)
+              return (
+                <Reveal key={lab.name} delay={i * 0.08}>
+                  <Card className="group h-full overflow-hidden py-0 transition-all hover:-translate-y-1 hover:shadow-lg">
+                    {isPhoto ? (
+                      <img
+                        src={photo}
+                        alt={lab.name}
+                        className="aspect-[16/10] w-full object-cover"
+                      />
+                    ) : (
+                      <SmartImage
+                        seed={`academics-lab-${lab.name}`}
+                        alt={lab.name}
+                        icon={lab.iconName}
+                        label={lab.name}
+                        className="aspect-[16/10] w-full rounded-none"
+                      />
+                    )}
+                    <CardHeader>
+                      <div className="flex items-center gap-2">
+                        <DynamicIcon name={lab.iconName} className="size-5 text-primary" />
+                        <CardTitle className="text-base">{lab.name}</CardTitle>
+                      </div>
+                    </CardHeader>
+                    <CardContent>
+                      <p className="text-sm text-muted-foreground">{lab.description}</p>
+                      <div className="mt-4 flex flex-wrap gap-2">
+                        {lab.equipment.map((eq) => (
+                          <Badge key={eq} variant="secondary" className="text-xs">
+                            {eq}
+                          </Badge>
+                        ))}
+                      </div>
+                    </CardContent>
+                  </Card>
+                </Reveal>
+              )
+            })}
           </div>
         </div>
       </section>
@@ -423,11 +461,8 @@ export function AcademicsPage() {
                     <Reveal key={club.name} delay={i * 0.04}>
                       <Card className="group h-full transition-all hover:-translate-y-1 hover:shadow-lg">
                         <CardContent className="pt-6">
-                          <div className="flex items-center justify-between">
-                            <div className="flex size-11 items-center justify-center rounded-xl bg-primary/10 text-primary transition-colors group-hover:bg-primary group-hover:text-primary-foreground">
-                              <DynamicIcon name={club.icon} className="size-5" />
-                            </div>
-                            <Badge variant="secondary">{club.members} members</Badge>
+                          <div className="flex size-11 items-center justify-center rounded-xl bg-primary/10 text-primary transition-colors group-hover:bg-primary group-hover:text-primary-foreground">
+                            <DynamicIcon name={club.icon} className="size-5" />
                           </div>
                           <div className="mt-4 font-semibold">{club.name}</div>
                         </CardContent>
