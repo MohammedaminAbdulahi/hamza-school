@@ -199,12 +199,10 @@ export function GalleryPage() {
                           className="size-full object-cover transition-transform duration-500 group-hover:scale-105"
                         />
                       ) : (
-                        <SmartImage
-                          seed={item.image || item.title}
+                        <img
+                          src="/hero-desk.jpeg"
                           alt={item.title}
-                          icon="Image"
-                          rounded="rounded-none"
-                          className="size-full transition-transform duration-500 group-hover:scale-105"
+                          className="size-full object-cover transition-transform duration-500 group-hover:scale-105"
                         />
                       )}
                       <span
@@ -308,12 +306,10 @@ export function GalleryPage() {
                     className="aspect-[16/10] w-full object-cover"
                   />
                 ) : (
-                  <SmartImage
-                    seed={current.image || current.title}
+                  <img
+                    src="/hero-desk.jpeg"
                     alt={current.title}
-                    label={current.title}
-                    rounded="rounded-none"
-                    className="aspect-[16/10] w-full"
+                    className="aspect-[16/10] w-full object-cover"
                   />
                 )}
                 <button

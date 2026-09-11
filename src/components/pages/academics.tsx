@@ -99,12 +99,10 @@ export function AcademicsPage() {
             {PROGRAMS.map((program, i) => (
               <Reveal key={program.title} delay={i * 0.06}>
                 <Card className="group h-full overflow-hidden py-0 transition-all hover:-translate-y-1 hover:shadow-lg">
-                  <SmartImage
-                    seed={`academics-program-${program.title}`}
+                  <img
+                    src="/hero-desk.jpeg"
                     alt={program.title}
-                    icon={program.icon}
-                    label={program.level}
-                    className="aspect-[16/10] w-full rounded-none"
+                    className="aspect-[16/10] w-full rounded-none object-cover"
                   />
                   <CardHeader>
                     <CardTitle className="text-base">{program.title}</CardTitle>
@@ -262,12 +260,10 @@ export function AcademicsPage() {
                 </div>
               </div>
               <div className="relative">
-                <SmartImage
-                  seed="academics-science-discovery"
+                <img
+                  src="/hero-desk.jpeg"
                   alt="Students observing plants and using microscopes in the biology lab"
-                  icon="Microscope"
-                  label="Biology Lab & Discovery"
-                  className="aspect-[4/3] w-full"
+                  className="aspect-[4/3] w-full rounded-sm object-cover"
                 />
               </div>
             </div>
@@ -332,13 +328,7 @@ export function AcademicsPage() {
             <Card className="overflow-hidden border-primary/20 py-0">
               <div className="grid lg:grid-cols-2">
                 <div className="relative">
-                  <SmartImage
-                    seed="academics-library"
-                    alt="Hamza reading corner with storybooks and quiet study tables"
-                    icon="Library"
-                    label="Reading Corner"
-                    className="h-full min-h-64 w-full rounded-none"
-                  />
+                  <img src="/hero-desk.jpeg" alt="Hamza reading corner with storybooks and quiet study tables" className="h-full min-h-64 w-full rounded-none" />
                 </div>
                 <div className="p-8 sm:p-10">
                   <span className="inline-flex items-center gap-2 rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-primary">
@@ -400,12 +390,10 @@ export function AcademicsPage() {
                         className="aspect-[16/10] w-full object-cover"
                       />
                     ) : (
-                      <SmartImage
-                        seed={`academics-lab-${lab.name}`}
+                      <img
+                        src="/hero-desk.jpeg"
                         alt={lab.name}
-                        icon={lab.iconName}
-                        label={lab.name}
-                        className="aspect-[16/10] w-full rounded-none"
+                        className="aspect-[16/10] w-full object-cover"
                       />
                     )}
                     <CardHeader>
@@ -505,13 +493,7 @@ export function AcademicsPage() {
                 <div className="grid gap-8 lg:grid-cols-12">
                   <Reveal className="lg:col-span-5">
                     <div className="relative h-full min-h-64">
-                      <SmartImage
-                        seed="academics-arts"
-                        alt="Students singing, painting, and performing short plays at Hamza School"
-                        icon="Music"
-                        label="Music, Art & Drama"
-                        className="h-full w-full"
-                      />
+                      <img src="/hero-desk.jpeg" alt="Students singing, painting, and performing short plays at Hamza School" className="h-full w-full" />
                     </div>
                   </Reveal>
                   <Reveal className="lg:col-span-7" delay={0.1}>

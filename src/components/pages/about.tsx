@@ -300,13 +300,10 @@ export function AboutPage() {
                       className="h-full w-full object-cover"
                     />
                   ) : (
-                    <SmartImage
-                      seed="about-principal"
+                    <img
+                      src="/hero-desk.jpeg"
                       alt={`Portrait of ${principal.name}`}
-                      icon="UserRound"
-                      label={principal.name}
-                      rounded="rounded-none"
-                      className="aspect-[4/5] w-full"
+                      className="h-full w-full object-cover"
                     />
                   )}
                 </div>
@@ -449,12 +446,10 @@ export function AboutPage() {
                           className="aspect-[16/9] w-full object-cover"
                         />
                       ) : (
-                        <SmartImage
-                          seed={`about-facility-${facility.name}`}
+                        <img
+                          src="/hero-desk.jpeg"
                           alt={facility.name}
-                          icon={facility.icon}
-                          label={facility.name}
-                          className="aspect-[16/9] w-full"
+                          className="aspect-[16/9] w-full object-cover"
                         />
                       )}
                     </div>

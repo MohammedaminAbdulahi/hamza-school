@@ -221,12 +221,10 @@ export function NewsPage() {
                         className="aspect-[16/10] w-full object-cover"
                       />
                     ) : (
-                      <SmartImage
-                        seed={article.image || article.title}
+                      <img
+                        src="/hero-desk.jpeg"
                         alt={article.title}
-                        label={article.category}
-                        rounded="rounded-none"
-                        className="aspect-[16/10] w-full"
+                        className="aspect-[16/10] w-full object-cover"
                       />
                     )}
                     <span
