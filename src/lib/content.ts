@@ -95,7 +95,6 @@ export const LABS = [
 ]
 
 export const ARTS_FEATURES = [
-  { icon: 'Music', title: 'Music & Singing', description: 'Our music club learns traditional Ethiopian songs alongside simple recorder and keyboard — performing at school assemblies and holiday events.' },
   { icon: 'Palette', title: 'Art & Craft', description: 'Students explore drawing, painting, and craft using local materials — building creativity and fine motor skills.' },
 ]
 
@@ -120,7 +119,6 @@ export const CLUBS = [
   { name: 'Art Club', icon: 'Palette' },
   { name: 'Sports Club', icon: 'Volleyball' },
   { name: 'Environment Club', icon: 'Leaf' },
-  { name: 'Music Club', icon: 'Music' },
   { name: 'Civics & Ethics Club', icon: 'Scale' },
 ]
 

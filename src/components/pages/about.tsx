@@ -23,6 +23,7 @@ import {
   PRINCIPAL,
 } from '@/lib/content'
 import { isDataUrl } from '@/lib/image-upload'
+import { SkeletonImage } from '@/components/site/skeleton-loader'
 import {
   Card,
   CardContent,
@@ -290,8 +291,9 @@ export function AboutPage() {
             <Reveal className="lg:col-span-5" delay={0.05}>
               <div className="relative mx-auto max-w-sm">
                 <div className="aspect-[4/5] w-full overflow-hidden rounded-xl border border-primary/20 shadow-sm">
-                  {isDataUrl((principal as { photo?: string }).photo) ? (
-                     
+                  {loading ? (
+                    <SkeletonImage aspect="h-full w-full" className="border-0" />
+                  ) : isDataUrl((principal as { photo?: string }).photo) ? (
                     <img
                       src={(principal as { photo?: string }).photo}
                       alt={`Portrait of ${principal.name}`}
@@ -438,7 +440,9 @@ export function AboutPage() {
                 <Reveal key={facility.name} delay={i * 0.06}>
                   <Card className="group h-full overflow-hidden py-0 transition-all hover:-translate-y-1 hover:shadow-lg">
                     <div className="relative">
-                      {isDataUrl(photo) ? (
+                      {loading ? (
+                        <SkeletonImage aspect="aspect-[16/9] w-full" />
+                      ) : isDataUrl(photo) ? (
                         <img
                           src={photo}
                           alt={facility.name}

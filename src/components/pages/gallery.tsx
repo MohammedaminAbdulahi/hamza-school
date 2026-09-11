@@ -9,6 +9,7 @@ import { SmartImage } from '@/components/site/smart-image'
 import { useNav } from '@/lib/nav-store'
 import { GALLERY, GALLERY_CATEGORIES } from '@/lib/content'
 import { isDataUrl } from '@/lib/image-upload'
+import { SkeletonImage } from '@/components/site/skeleton-loader'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -189,8 +190,9 @@ export function GalleryPage() {
                     aria-label={`View ${item.title} larger`}
                   >
                     <div className="relative aspect-[4/3] overflow-hidden">
-                      {isPhoto ? (
-                         
+                      {loading ? (
+                        <SkeletonImage aspect="size-full" />
+                      ) : isPhoto ? (
                         <img
                           src={item.image}
                           alt={item.title}

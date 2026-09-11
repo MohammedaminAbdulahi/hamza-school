@@ -36,6 +36,7 @@ import {
   PRINCIPAL,
 } from '@/lib/content'
 import { isDataUrl } from '@/lib/image-upload'
+import { SkeletonImage } from '@/components/site/skeleton-loader'
 
 // DB content shape (subset of what /api/content returns)
 type DbStat = { key: string; label: string; value: number; suffix: string }
@@ -417,15 +418,15 @@ export function HomePage() {
           <Reveal className="lg:col-span-5">
             <div className="relative mx-auto max-w-xs">
               <div className="aspect-[4/5] overflow-hidden rounded-sm border-2 border-gold/30 shadow-2xl">
-                {isDataUrl(principal.photo) ? (
-                   
+                {loading ? (
+                  <SkeletonImage aspect="h-full w-full" className="border-0" />
+                ) : isDataUrl(principal.photo) ? (
                   <img
                     src={principal.photo}
                     alt={principal.name}
                     className="h-full w-full object-cover"
                   />
                 ) : (
-                   
                   <img
                     src="/hero-desk.jpeg"
                     alt={principal.name}

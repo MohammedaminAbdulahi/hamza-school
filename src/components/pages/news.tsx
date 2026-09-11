@@ -23,6 +23,7 @@ import { DynamicIcon } from '@/components/site/dynamic-icon'
 import { useNav } from '@/lib/nav-store'
 import { NEWS, EVENTS, NEWS_CATEGORIES, ANNOUNCEMENTS } from '@/lib/content'
 import { isDataUrl } from '@/lib/image-upload'
+import { SkeletonImage } from '@/components/site/skeleton-loader'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -211,8 +212,9 @@ export function NewsPage() {
               <Reveal key={article.title} delay={i * 0.08}>
                 <Card className="group flex h-full flex-col overflow-hidden border-primary/10 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-primary/5">
                   <div className="relative">
-                    {isPhoto ? (
-                       
+                    {loading ? (
+                      <SkeletonImage aspect="aspect-[16/10] w-full" />
+                    ) : isPhoto ? (
                       <img
                         src={article.image}
                         alt={article.title}

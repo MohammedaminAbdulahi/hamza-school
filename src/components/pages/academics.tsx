@@ -21,6 +21,7 @@ import {
   SPORTS,
 } from '@/lib/content'
 import { isDataUrl } from '@/lib/image-upload'
+import { SkeletonImage } from '@/components/site/skeleton-loader'
 import {
   Card,
   CardContent,
@@ -49,6 +50,7 @@ export function AcademicsPage() {
   const [facilityPhotos, setFacilityPhotos] = React.useState<
     Record<string, string>
   >({})
+  const [facilitiesLoading, setFacilitiesLoading] = React.useState(true)
 
   React.useEffect(() => {
     fetch('/api/content')
@@ -69,6 +71,7 @@ export function AcademicsPage() {
         }
       )
       .catch(() => { /* keep defaults on error */ })
+      .finally(() => setFacilitiesLoading(false))
   }, [])
 
   return (
@@ -388,7 +391,9 @@ export function AcademicsPage() {
               return (
                 <Reveal key={lab.name} delay={i * 0.08}>
                   <Card className="group h-full overflow-hidden py-0 transition-all hover:-translate-y-1 hover:shadow-lg">
-                    {isPhoto ? (
+                    {facilitiesLoading ? (
+                      <SkeletonImage aspect="aspect-[16/10] w-full" />
+                    ) : isPhoto ? (
                       <img
                         src={photo}
                         alt={lab.name}
