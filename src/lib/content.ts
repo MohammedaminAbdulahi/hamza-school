@@ -257,8 +257,6 @@ export const CONTACT_INFO = [
 
 export const SOCIAL_LINKS = [
   { name: 'Facebook', icon: 'Facebook', url: SCHOOL.social.facebook, color: 'hover:bg-blue-600 hover:border-blue-600' },
-  { name: 'Twitter', icon: 'Twitter', url: SCHOOL.social.twitter, color: 'hover:bg-sky-500 hover:border-sky-500' },
-  { name: 'Instagram', icon: 'Instagram', url: SCHOOL.social.instagram, color: 'hover:bg-pink-600 hover:border-pink-600' },
   { name: 'YouTube', icon: 'Youtube', url: SCHOOL.social.youtube, color: 'hover:bg-red-600 hover:border-red-600' },
   { name: 'Telegram', icon: 'Send', url: SCHOOL.social.telegram, color: 'hover:bg-emerald-600 hover:border-emerald-600' },
 ]

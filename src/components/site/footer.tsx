@@ -3,8 +3,6 @@
 import * as React from 'react'
 import {
   Facebook,
-  Twitter,
-  Instagram,
   Youtube,
   Send,
   Mail,
@@ -110,8 +108,6 @@ export function Footer() {
           <div className="flex gap-2">
             {[
               { icon: Facebook, href: school.social?.facebook ?? SCHOOL.social.facebook, label: 'Facebook' },
-              { icon: Twitter, href: school.social?.twitter ?? SCHOOL.social.twitter, label: 'Twitter' },
-              { icon: Instagram, href: school.social?.instagram ?? SCHOOL.social.instagram, label: 'Instagram' },
               { icon: Youtube, href: school.social?.youtube ?? SCHOOL.social.youtube, label: 'YouTube' },
               { icon: Send, href: school.social?.telegram ?? SCHOOL.social.telegram, label: 'Telegram' },
             ].map((s) => (

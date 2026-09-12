@@ -64,9 +64,9 @@ type DepartmentContact = {
 
 function buildContactInfo(school: School): ContactInfo[] {
   return [
-    { icon: 'MapPin', label: 'Address', value: school.address, lines: ['Bole Road', 'Addis Ababa, Ethiopia'] },
+    { icon: 'MapPin', label: 'Address', value: school.address, lines: [school.address] },
     { icon: 'Phone', label: 'Phone', value: school.phone, lines: [school.phone, school.altPhone] },
-    { icon: 'Mail', label: 'Email', value: school.email, lines: [school.email, 'join@hamzaschool.et'] },
+    { icon: 'Mail', label: 'Email', value: school.email, lines: [school.email] },
     { icon: 'Clock', label: 'Office Hours', value: school.hours, lines: [school.hours, 'Sat–Sun: Closed'] },
   ]
 }
@@ -74,8 +74,6 @@ function buildContactInfo(school: School): ContactInfo[] {
 function buildSocialLinks(school: School): SocialLink[] {
   return [
     { name: 'Facebook', icon: 'Facebook', url: school.social.facebook, color: 'hover:bg-blue-600 hover:border-blue-600' },
-    { name: 'Twitter', icon: 'Twitter', url: school.social.twitter, color: 'hover:bg-sky-500 hover:border-sky-500' },
-    { name: 'Instagram', icon: 'Instagram', url: school.social.instagram, color: 'hover:bg-pink-600 hover:border-pink-600' },
     { name: 'YouTube', icon: 'Youtube', url: school.social.youtube, color: 'hover:bg-red-600 hover:border-red-600' },
     { name: 'Telegram', icon: 'Send', url: school.social.telegram, color: 'hover:bg-emerald-600 hover:border-emerald-600' },
   ]
