@@ -1,16 +1,14 @@
 'use client'
 
 import * as React from 'react'
-import { motion } from 'framer-motion'
 import { Images, Maximize2, X, ArrowRight, Camera } from 'lucide-react'
 import { PageHero } from '@/components/site/page-hero'
 import { SectionHeader } from '@/components/site/section-header'
 import { Reveal } from '@/components/site/reveal'
-import { SmartImage } from '@/components/site/smart-image'
 import { useNav } from '@/lib/nav-store'
-import { GALLERY, GALLERY_CATEGORIES } from '@/lib/content'
+import { GALLERY_CATEGORIES } from '@/lib/content'
 import { isDataUrl } from '@/lib/image-upload'
-import { Card, CardContent } from '@/components/ui/card'
+import { useContent } from '@/lib/content-context'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import {
@@ -53,32 +51,14 @@ export function GalleryPage() {
     null
   )
 
-  // Start with null — nothing renders until DB data arrives.
-  // This prevents the "flash of demo data → swap to real data" problem.
-  const [data, setData] = React.useState<GalleryItem[] | null>(null)
-
-  React.useEffect(() => {
-    fetch('/api/content')
-      .then((r) => r.json())
-      .then((d: { gallery?: GalleryItem[] }) => {
-        const gallery =
-          Array.isArray(d.gallery) && d.gallery.length > 0
-            ? d.gallery
-            : GALLERY
-        setData(gallery)
-      })
-      .catch(() => {
-        // DB failed — fall back to defaults so the page isn't blank forever
-        setData(GALLERY)
-      })
-  }, [])
+  const data = useContent()!
+  const gallery = data.gallery
 
   const filtered: GalleryItem[] = React.useMemo(() => {
-    const gallery = data ?? []
     return activeCategory === 'All'
       ? gallery
       : gallery.filter((g) => g.category === activeCategory)
-  }, [activeCategory, data])
+  }, [activeCategory, gallery])
 
   const openLightbox = (index: number) => setLightboxIndex(index)
   const closeLightbox = () => setLightboxIndex(null)
@@ -104,29 +84,6 @@ export function GalleryPage() {
 
   const current =
     lightboxIndex !== null ? filtered[lightboxIndex] : null
-
-  // Show a clean loading state — no demo data flash
-  if (!data) {
-    return (
-      <div className="flex min-h-screen items-center justify-center bg-background">
-        <div className="flex flex-col items-center gap-4">
-          <div className="relative size-12">
-            <div className="absolute inset-0 rounded-full border-2 border-forest/15" />
-            <motion.div
-              className="absolute inset-0 rounded-full border-2 border-transparent border-t-forest"
-              animate={{ rotate: 360 }}
-              transition={{ repeat: Infinity, duration: 0.9, ease: 'linear' }}
-            />
-          </div>
-          <p className="font-serif text-sm italic tracking-wider text-gold-deep">
-            Loading…
-          </p>
-        </div>
-      </div>
-    )
-  }
-
-  const gallery = data
 
   return (
     <div className="flex flex-col">

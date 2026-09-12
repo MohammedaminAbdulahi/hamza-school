@@ -1,12 +1,9 @@
 'use client'
 
-import * as React from 'react'
-import { motion } from 'framer-motion'
 import { ArrowRight, BookOpen } from 'lucide-react'
 import { PageHero } from '@/components/site/page-hero'
 import { SectionHeader } from '@/components/site/section-header'
 import { Reveal } from '@/components/site/reveal'
-import { SmartImage } from '@/components/site/smart-image'
 import { DynamicIcon } from '@/components/site/dynamic-icon'
 import { useNav } from '@/lib/nav-store'
 import {
@@ -22,6 +19,7 @@ import {
   SPORTS,
 } from '@/lib/content'
 import { isDataUrl } from '@/lib/image-upload'
+import { useFacilityPhoto } from '@/lib/content-context'
 import {
   Card,
   CardContent,
@@ -43,53 +41,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 
 export function AcademicsPage() {
   const goPage = useNav((s) => s.goPage)
-
-  // Start with null — nothing renders until DB data arrives.
-  // This prevents the "flash of demo data → swap to real data" problem.
-  const [facilityPhotos, setFacilityPhotos] = React.useState<
-    Record<string, string> | null
-  >(null)
-
-  React.useEffect(() => {
-    fetch('/api/content')
-      .then((r) => r.json())
-      .then((d: { facilities?: { name: string; photo?: string }[] }) => {
-        const map: Record<string, string> = {}
-        if (Array.isArray(d.facilities)) {
-          for (const f of d.facilities) {
-            if (f && typeof f.name === 'string' && isDataUrl(f.photo)) {
-              map[f.name] = f.photo
-            }
-          }
-        }
-        setFacilityPhotos(map)
-      })
-      .catch(() => {
-        // DB failed — fall back to an empty map (no facility photos)
-        setFacilityPhotos({})
-      })
-  }, [])
-
-  // Show a clean loading state — no demo data flash
-  if (!facilityPhotos) {
-    return (
-      <div className="flex min-h-screen items-center justify-center bg-background">
-        <div className="flex flex-col items-center gap-4">
-          <div className="relative size-12">
-            <div className="absolute inset-0 rounded-full border-2 border-forest/15" />
-            <motion.div
-              className="absolute inset-0 rounded-full border-2 border-transparent border-t-forest"
-              animate={{ rotate: 360 }}
-              transition={{ repeat: Infinity, duration: 0.9, ease: 'linear' }}
-            />
-          </div>
-          <p className="font-serif text-sm italic tracking-wider text-gold-deep">
-            Loading…
-          </p>
-        </div>
-      </div>
-    )
-  }
+  const biologyLabPhoto = useFacilityPhoto('Biology Laboratory')
+  const readingCornerPhoto = useFacilityPhoto('Reading Corner')
 
   return (
     <div className="flex flex-col">
@@ -345,7 +298,7 @@ export function AcademicsPage() {
             <Card className="overflow-hidden border-primary/20 py-0">
               <div className="grid lg:grid-cols-2">
                 <div className="relative">
-                  <img src="/hero-desk.jpeg" alt="Hamza reading corner with storybooks and quiet study tables" className="h-full min-h-64 w-full rounded-none" />
+                  <img src={isDataUrl(readingCornerPhoto) ? readingCornerPhoto : "/hero-desk.jpeg"} alt="Hamza reading corner with storybooks and quiet study tables" className="h-full min-h-64 w-full rounded-none" />
                 </div>
                 <div className="p-8 sm:p-10">
                   <span className="inline-flex items-center gap-2 rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-primary">
@@ -393,7 +346,7 @@ export function AcademicsPage() {
           </Reveal>
           <div className="mt-12 grid max-w-2xl gap-6">
             {LABS.map((lab, i) => {
-              const photo = facilityPhotos[lab.name]
+              const photo = biologyLabPhoto
               const isPhoto = isDataUrl(photo)
               return (
                 <Reveal key={lab.name} delay={i * 0.08}>

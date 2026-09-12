@@ -17,6 +17,7 @@ import {
   SCHOOL,
   CONTACT_SUBJECTS,
 } from '@/lib/content'
+import { useContent } from '@/lib/content-context'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -126,30 +127,8 @@ export function ContactPage() {
   })
   const [submitting, setSubmitting] = React.useState(false)
 
-  // Local state seeded with content.ts defaults; updated from /api/content
-  // on mount. No loading spinner — the defaults render immediately and
-  // silently update when DB data arrives.
-  const [school, setSchool] = React.useState<School>(SCHOOL)
-
-  React.useEffect(() => {
-    fetch('/api/content')
-      .then((r) => r.json())
-      .then((d: { school?: Partial<School> }) => {
-        if (d.school) {
-          setSchool((prev) => ({
-            ...prev,
-            name: d.school!.name || prev.name,
-            phone: d.school!.phone || prev.phone,
-            altPhone: d.school!.altPhone || prev.altPhone,
-            email: d.school!.email || prev.email,
-            address: d.school!.address || prev.address,
-            hours: d.school!.hours || prev.hours,
-            social: { ...prev.social, ...(d.school!.social || {}) },
-          }))
-        }
-      })
-      .catch(() => {})
-  }, [])
+  const data = useContent()!
+  const school = data.school
 
   // Derived values — always reflect the latest school state (DB or default).
   const contactInfo = React.useMemo(() => buildContactInfo(school), [school])

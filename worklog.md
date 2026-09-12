@@ -655,3 +655,64 @@ Stage Summary:
 - The Academics page lab card shows the admin-uploaded biology lab photo when available, falling back to the SmartImage placeholder otherwise.
 - Departments no longer show subject counts.
 - Admin password (unchanged from previous tasks): `HamzaAdmin2025!`. Visit /admin to edit school info, upload facility photos (Facilities tab), etc.
+
+---
+Task ID: 15
+Agent: fullstack-developer
+Task: Migrate 6 page components to shared ContentProvider (remove individual /api/content fetches)
+
+Work Log:
+- Read worklog.md (Tasks 1–13) and src/lib/content-context.tsx (created by Task 14) to understand the new shared-context pattern: ContentProvider fetches /api/content ONCE, caches in window.__contentCache (survives hash-based page navigation), provides ContentData via useContent() hook, shows a global loading spinner until data arrives. All pages now render inside <ContentProvider> (see src/app/page.tsx).
+
+- Updated src/components/pages/home.tsx:
+  * Removed the useEffect fetch + useState for {hero, mission, principal, vicePrincipal, events, stats}, the full-page loading spinner, the `if (!data)` guard, and local DB-shape types (DbStat, DbSchool, DbEvent).
+  * Replaced with: `const data = useContent()!` → `const { school, events } = data` → `const { hero, mission, principal, vicePrincipal, stats } = school`.
+  * Removed now-unused imports: React, Card, CardContent, Badge, HERO, STATS, MISSION, EVENTS, PRINCIPAL. Kept motion (hero animations), WHY_CHOOSE, PROGRAMS, TESTIMONIALS, isDataUrl.
+  * All JSX preserved exactly.
+
+- Updated src/components/pages/about.tsx:
+  * Removed useEffect fetch + useState + loading spinner + `if (!data)` guard + unused types (DbTeacher, DbStat, DbFacility, DbSchool).
+  * Replaced with: `const data = useContent()!` → `const { school, leadership, teachers, facilities } = data` → `const { mission, principal, stats } = school`.
+  * Removed unused imports: React, motion, SCHOOL, STATS, MISSION, LEADERSHIP, TEACHERS, FACILITIES, PRINCIPAL. Kept DbLeader type (still used by `(member as DbLeader).photo` cast in leadership JSX), SmartImage, isDataUrl, CORE_VALUES, ACCREDITATIONS, POLICIES, HISTORY.
+
+- Updated src/components/pages/academics.tsx:
+  * Removed useEffect fetch + facilityPhotos state + loading spinner + `if (!facilityPhotos)` guard.
+  * Replaced with two hook calls: `const biologyLabPhoto = useFacilityPhoto('Biology Laboratory')` and `const readingCornerPhoto = useFacilityPhoto('Reading Corner')`.
+  * Lab card: `const photo = biologyLabPhoto` (was `facilityPhotos[lab.name]`); the existing isDataUrl-conditional `<img>` block is unchanged.
+  * Reading Corner: changed the hardcoded `<img src="/hero-desk.jpeg">` to `<img src={isDataUrl(readingCornerPhoto) ? readingCornerPhoto : "/hero-desk.jpeg"} ...>` so admin-uploaded facility photos show when available.
+  * Removed unused imports: React, motion, SmartImage. Kept isDataUrl, all content.ts arrays (PROGRAMS, LABS, etc.).
+
+- Updated src/components/pages/news.tsx:
+  * Removed useEffect fetch + data state + loading spinner + `if (!data)` guard + DbNews/DbEvent types.
+  * Replaced with: `const data = useContent()!` → `const { news, events } = data`. The `filtered`/`pageItems`/`eventsOnDay` logic now uses `data.news`/`data.events` directly (no state variable).
+  * Removed unused imports: motion, NEWS, EVENTS, SmartImage. Kept React (still uses useState for activeCategory/page, useEffect for page-reset, useMemo for calendar), NEWS_CATEGORIES, ANNOUNCEMENTS, isDataUrl.
+
+- Updated src/components/pages/gallery.tsx:
+  * Removed useEffect fetch + data state + loading spinner + `if (!data)` guard + trailing `const gallery = data` line.
+  * Replaced with: `const data = useContent()!` → `const gallery = data.gallery`. The `filtered` useMemo deps changed from `[activeCategory, data]` → `[activeCategory, gallery]`.
+  * Removed unused imports: motion, SmartImage, Card, CardContent, GALLERY. Kept React (useState/useEffect/useMemo still in use), GALLERY_CATEGORIES, isDataUrl, GalleryItem interface.
+
+- Updated src/components/pages/contact.tsx:
+  * Removed the `school` useState and the useEffect fetch.
+  * Replaced with: `const data = useContent()!` → `const school = data.school`.
+  * The buildContactInfo/buildSocialLinks/buildDepartmentContacts/buildContactActions helpers + useMemo calls are unchanged — they accept `School = typeof SCHOOL` and `ContentData['school']` is a structural supertype (has all SCHOOL fields plus hero/mission/principal/vicePrincipal/stats), so the assignment type-checks cleanly.
+  * Kept SCHOOL import (used by `type School = typeof SCHOOL`), CONTACT_SUBJECTS, React.
+
+- Fixed src/lib/content-context.tsx (pre-existing tsc errors blocking the quality bar):
+  * 4 occurrences of `(window as Record<string, unknown>)` → `(window as unknown as Record<string, unknown>)` (lines 75, 76, 128, 152). TypeScript rejects the direct cast from `Window` to `Record<string, unknown>` because the types don't sufficiently overlap; routing through `unknown` first is the standard fix.
+
+Verification:
+- `bun run lint` → 0 errors, 2 warnings (both pre-existing in src/lib/arcjet.ts — unused eslint-disable directives, not in scope).
+- `bunx tsc --noEmit` → 0 errors in src/ (only pre-existing unrelated errors in skills/image-edit and skills/stock-analysis-skill).
+- `curl http://localhost:3000/` → 200; `curl http://localhost:3000/api/content` → 200.
+- Dev log (.next/dev/logs/next-development.log) shows clean `✓ Compiled` entries with no errors.
+- Grep confirms no page component in src/components/pages/ calls `fetch('/api/content')` anymore; all 6 use `useContent()!` (home, about, news, gallery, contact) or `useFacilityPhoto()` (academics).
+
+Stage Summary:
+- All 6 public pages now read from the shared ContentProvider instead of fetching /api/content individually. The provider fetches ONCE on first app load, caches the result in window.__contentCache, and shows a single global loading spinner until data arrives.
+- Navigation between pages is now instant: on subsequent page loads the provider hydrates from the window cache (no refetch, no per-page spinner). This eliminates the "loading flash" that each page previously had.
+- All visual design is preserved — every page's JSX is identical except where data sources changed (home/about/news/gallery/contact: only the data-derivation lines; academics: lab photo source + reading corner img src).
+- Used the non-null assertion `useContent()!` in each page because the provider guarantees data is non-null before children render (it returns a loading spinner otherwise), and the task explicitly forbade re-adding `if (!data)` guards. This satisfies TypeScript without runtime checks.
+- academics.tsx uses useFacilityPhoto() (which internally calls useContent()) rather than calling useContent() directly, avoiding an unused variable while still connecting to the shared context.
+- Cleaned up unused imports across all 6 files (motion, SmartImage, Card/CardContent/Badge, content.ts defaults that were only used as fetch fallbacks, local DB-shape types).
+- Files modified: src/components/pages/home.tsx, src/components/pages/about.tsx, src/components/pages/academics.tsx, src/components/pages/news.tsx, src/components/pages/gallery.tsx, src/components/pages/contact.tsx, src/lib/content-context.tsx (tsc fix only).

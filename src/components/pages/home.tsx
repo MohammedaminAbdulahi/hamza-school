@@ -1,6 +1,5 @@
 'use client'
 
-import * as React from 'react'
 import { motion } from 'framer-motion'
 import {
   ArrowRight,
@@ -11,8 +10,6 @@ import {
   Feather,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { Card, CardContent } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import {
   Carousel,
@@ -25,127 +22,15 @@ import { Reveal } from '@/components/site/reveal'
 import { AnimatedCounter } from '@/components/site/animated-counter'
 import { DynamicIcon } from '@/components/site/dynamic-icon'
 import { useNav } from '@/lib/nav-store'
-import {
-  HERO,
-  STATS,
-  WHY_CHOOSE,
-  MISSION,
-  PROGRAMS,
-  EVENTS,
-  TESTIMONIALS,
-  PRINCIPAL,
-} from '@/lib/content'
+import { WHY_CHOOSE, PROGRAMS, TESTIMONIALS } from '@/lib/content'
 import { isDataUrl } from '@/lib/image-upload'
-
-// DB content shape (subset of what /api/content returns)
-type DbStat = { key: string; label: string; value: number; suffix: string }
-type DbSchool = {
-  hero?: Partial<typeof HERO>
-  mission?: Partial<typeof MISSION>
-  principal?: Partial<typeof PRINCIPAL> & { photo?: string }
-  vicePrincipal?: {
-    name?: string
-    title?: string
-    message?: string
-    photo?: string
-  }
-  stats?: DbStat[]
-}
-type DbEvent = {
-  id?: number
-  title: string
-  date: string
-  time: string
-  location: string
-  category: string
-  description?: string
-}
+import { useContent } from '@/lib/content-context'
 
 export function HomePage() {
   const { goPage } = useNav()
-
-  // Start with null — nothing renders until DB data arrives.
-  // This prevents the "flash of demo data → swap to real data" problem.
-  const [data, setData] = React.useState<{
-    hero: typeof HERO
-    mission: typeof MISSION
-    principal: typeof PRINCIPAL & { photo?: string }
-    vicePrincipal: { name: string; title: string; message: string; photo: string }
-    events: typeof EVENTS
-    stats: typeof STATS
-  } | null>(null)
-
-  React.useEffect(() => {
-    fetch('/api/content')
-      .then((r) => r.json())
-      .then((d: { school?: DbSchool; events?: DbEvent[] }) => {
-        const hero = d.school?.hero ? { ...HERO, ...d.school.hero } : HERO
-        const mission = d.school?.mission ? { ...MISSION, ...d.school.mission } : MISSION
-        const principal = d.school?.principal
-          ? {
-              ...PRINCIPAL,
-              ...d.school.principal,
-              photo: (d.school.principal as { photo?: string }).photo ?? '',
-            }
-          : { ...PRINCIPAL, photo: '' }
-        const vicePrincipal = d.school?.vicePrincipal
-          ? {
-              name: d.school.vicePrincipal.name ?? '',
-              title: d.school.vicePrincipal.title ?? '',
-              message: d.school.vicePrincipal.message ?? '',
-              photo: d.school.vicePrincipal.photo ?? '',
-            }
-          : { name: '', title: '', message: '', photo: '' }
-        const stats =
-          Array.isArray(d.school?.stats) && d.school!.stats!.length === 4
-            ? (d.school!.stats!.map((s, i) => ({
-                label: s.label ?? STATS[i]?.label ?? '',
-                value: Number(s.value) || 0,
-                suffix: s.suffix ?? STATS[i]?.suffix ?? '',
-              })) as typeof STATS)
-            : STATS
-        const events =
-          Array.isArray(d.events) && d.events.length > 0
-            ? (d.events as unknown as typeof EVENTS)
-            : EVENTS
-
-        setData({ hero, mission, principal, vicePrincipal, events, stats })
-      })
-      .catch(() => {
-        // DB failed — fall back to defaults so the page isn't blank forever
-        setData({
-          hero: HERO,
-          mission: MISSION,
-          principal: { ...PRINCIPAL, photo: '' },
-          vicePrincipal: { name: '', title: '', message: '', photo: '' },
-          events: EVENTS,
-          stats: STATS,
-        })
-      })
-  }, [])
-
-  // Show a clean loading state — no demo data flash
-  if (!data) {
-    return (
-      <div className="flex min-h-screen items-center justify-center bg-background">
-        <div className="flex flex-col items-center gap-4">
-          <div className="relative size-12">
-            <div className="absolute inset-0 rounded-full border-2 border-forest/15" />
-            <motion.div
-              className="absolute inset-0 rounded-full border-2 border-transparent border-t-forest"
-              animate={{ rotate: 360 }}
-              transition={{ repeat: Infinity, duration: 0.9, ease: 'linear' }}
-            />
-          </div>
-          <p className="font-serif text-sm italic tracking-wider text-gold-deep">
-            Loading…
-          </p>
-        </div>
-      </div>
-    )
-  }
-
-  const { hero, mission, principal, vicePrincipal, events, stats } = data
+  const data = useContent()!
+  const { school, events } = data
+  const { hero, mission, principal, vicePrincipal, stats } = school
 
   return (
     <div className="flex flex-col">

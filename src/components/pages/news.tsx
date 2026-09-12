@@ -1,7 +1,6 @@
 'use client'
 
 import * as React from 'react'
-import { motion } from 'framer-motion'
 import {
   Calendar,
   Clock,
@@ -19,11 +18,11 @@ import {
 import { PageHero } from '@/components/site/page-hero'
 import { SectionHeader } from '@/components/site/section-header'
 import { Reveal } from '@/components/site/reveal'
-import { SmartImage } from '@/components/site/smart-image'
 import { DynamicIcon } from '@/components/site/dynamic-icon'
 import { useNav } from '@/lib/nav-store'
-import { NEWS, EVENTS, NEWS_CATEGORIES, ANNOUNCEMENTS } from '@/lib/content'
+import { NEWS_CATEGORIES, ANNOUNCEMENTS } from '@/lib/content'
 import { isDataUrl } from '@/lib/image-upload'
+import { useContent } from '@/lib/content-context'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -44,9 +43,6 @@ import {
 import { cn } from '@/lib/utils'
 
 const PAGE_SIZE = 3
-
-type DbNews = typeof NEWS[number]
-type DbEvent = typeof EVENTS[number]
 
 function formatDate(iso: string) {
   return new Date(iso).toLocaleDateString('en-US', {
@@ -93,32 +89,8 @@ export function NewsPage() {
   const [activeCategory, setActiveCategory] = React.useState('All')
   const [page, setPage] = React.useState(1)
 
-  // Start with null — nothing renders until DB data arrives.
-  // This prevents the "flash of demo data → swap to real data" problem.
-  const [data, setData] = React.useState<{
-    news: typeof NEWS
-    events: typeof EVENTS
-  } | null>(null)
-
-  React.useEffect(() => {
-    fetch('/api/content')
-      .then((r) => r.json())
-      .then((d: { news?: DbNews[]; events?: DbEvent[] }) => {
-        const news =
-          Array.isArray(d.news) && d.news.length > 0
-            ? (d.news as unknown as typeof NEWS)
-            : NEWS
-        const events =
-          Array.isArray(d.events) && d.events.length > 0
-            ? (d.events as unknown as typeof EVENTS)
-            : EVENTS
-        setData({ news, events })
-      })
-      .catch(() => {
-        // DB failed — fall back to defaults so the page isn't blank forever
-        setData({ news: NEWS, events: EVENTS })
-      })
-  }, [])
+  const data = useContent()!
+  const { news, events } = data
 
   // Reset to page 1 when the category changes
   React.useEffect(() => {
@@ -128,30 +100,6 @@ export function NewsPage() {
   // Static March 2025 calendar grid — independent of DB data
   const calendarCells = React.useMemo(() => buildMarchCalendar(), [])
 
-  // Show a clean loading state — no demo data flash
-  if (!data) {
-    return (
-      <div className="flex min-h-screen items-center justify-center bg-background">
-        <div className="flex flex-col items-center gap-4">
-          <div className="relative size-12">
-            <div className="absolute inset-0 rounded-full border-2 border-forest/15" />
-            <motion.div
-              className="absolute inset-0 rounded-full border-2 border-transparent border-t-forest"
-              animate={{ rotate: 360 }}
-              transition={{ repeat: Infinity, duration: 0.9, ease: 'linear' }}
-            />
-          </div>
-          <p className="font-serif text-sm italic tracking-wider text-gold-deep">
-            Loading…
-          </p>
-        </div>
-      </div>
-    )
-  }
-
-  const { news, events } = data
-
-  // News comes from /api/content (with content.ts fallback)
   const filtered =
     activeCategory === 'All'
       ? news

@@ -1,7 +1,5 @@
 'use client'
 
-import * as React from 'react'
-import { motion } from 'framer-motion'
 import { Quote, ArrowRight, Target, Eye, Award, ShieldCheck, Sparkles } from 'lucide-react'
 import { PageHero } from '@/components/site/page-hero'
 import { SectionHeader } from '@/components/site/section-header'
@@ -10,20 +8,9 @@ import { SmartImage } from '@/components/site/smart-image'
 import { DynamicIcon } from '@/components/site/dynamic-icon'
 import { AnimatedCounter } from '@/components/site/animated-counter'
 import { useNav } from '@/lib/nav-store'
-import {
-  SCHOOL,
-  STATS,
-  MISSION,
-  CORE_VALUES,
-  LEADERSHIP,
-  TEACHERS,
-  FACILITIES,
-  ACCREDITATIONS,
-  POLICIES,
-  HISTORY,
-  PRINCIPAL,
-} from '@/lib/content'
+import { CORE_VALUES, ACCREDITATIONS, POLICIES, HISTORY } from '@/lib/content'
 import { isDataUrl } from '@/lib/image-upload'
+import { useContent } from '@/lib/content-context'
 import {
   Card,
   CardContent,
@@ -42,115 +29,12 @@ import {
 } from '@/components/ui/accordion'
 
 type DbLeader = { id?: number; name: string; role: string; bio: string; initials: string; photo?: string }
-type DbTeacher = { id?: number; name: string; subject: string; years: number; initials: string }
-type DbStat = { key: string; label: string; value: number; suffix: string }
-type DbFacility = { id?: number; name: string; description: string; icon: string; photo?: string }
-type DbSchool = {
-  name?: string
-  established?: number
-  hero?: Partial<typeof MISSION>
-  mission?: Partial<typeof MISSION>
-  principal?: Partial<typeof PRINCIPAL> & { photo?: string }
-  stats?: DbStat[]
-}
 
 export function AboutPage() {
   const goPage = useNav((s) => s.goPage)
-
-  // Start with null — nothing renders until DB data arrives.
-  // This prevents the "flash of demo data → swap to real data" problem.
-  const [data, setData] = React.useState<{
-    school: typeof SCHOOL
-    mission: typeof MISSION
-    principal: typeof PRINCIPAL & { photo?: string }
-    leadership: typeof LEADERSHIP
-    teachers: typeof TEACHERS
-    stats: typeof STATS
-    facilities: typeof FACILITIES
-  } | null>(null)
-
-  React.useEffect(() => {
-    fetch('/api/content')
-      .then((r) => r.json())
-      .then((d: {
-        school?: DbSchool
-        leadership?: DbLeader[]
-        teachers?: DbTeacher[]
-        facilities?: DbFacility[]
-      }) => {
-        const school = d.school
-          ? { ...SCHOOL, ...d.school, social: SCHOOL.social }
-          : SCHOOL
-        const mission = d.school?.mission
-          ? { ...MISSION, ...d.school.mission }
-          : MISSION
-        const principal = d.school?.principal
-          ? { ...PRINCIPAL, ...d.school.principal }
-          : { ...PRINCIPAL }
-        const leadership =
-          Array.isArray(d.leadership) && d.leadership.length > 0
-            ? (d.leadership as unknown as typeof LEADERSHIP)
-            : LEADERSHIP
-        const teachers =
-          Array.isArray(d.teachers) && d.teachers.length > 0
-            ? (d.teachers as unknown as typeof TEACHERS)
-            : TEACHERS
-        const stats =
-          Array.isArray(d.school?.stats) && d.school!.stats!.length === 4
-            ? (d.school!.stats!.map((s, i) => ({
-                label: s.label ?? STATS[i]?.label ?? '',
-                value: Number(s.value) || 0,
-                suffix: s.suffix ?? STATS[i]?.suffix ?? '',
-              })) as typeof STATS)
-            : STATS
-        const facilities =
-          Array.isArray(d.facilities) && d.facilities.length > 0
-            ? (d.facilities.map((f, i) => ({
-                icon: f.icon || FACILITIES[i]?.icon || 'Building',
-                name: f.name,
-                description: f.description,
-                photo: f.photo,
-              })) as typeof FACILITIES)
-            : FACILITIES
-
-        setData({ school, mission, principal, leadership, teachers, stats, facilities })
-      })
-      .catch(() => {
-        // DB failed — fall back to defaults so the page isn't blank forever
-        setData({
-          school: SCHOOL,
-          mission: MISSION,
-          principal: { ...PRINCIPAL },
-          leadership: LEADERSHIP,
-          teachers: TEACHERS,
-          stats: STATS,
-          facilities: FACILITIES,
-        })
-      })
-  }, [])
-
-  // Show a clean loading state — no demo data flash
-  if (!data) {
-    return (
-      <div className="flex min-h-screen items-center justify-center bg-background">
-        <div className="flex flex-col items-center gap-4">
-          <div className="relative size-12">
-            <div className="absolute inset-0 rounded-full border-2 border-forest/15" />
-            <motion.div
-              className="absolute inset-0 rounded-full border-2 border-transparent border-t-forest"
-              animate={{ rotate: 360 }}
-              transition={{ repeat: Infinity, duration: 0.9, ease: 'linear' }}
-            />
-          </div>
-          <p className="font-serif text-sm italic tracking-wider text-gold-deep">
-            Loading…
-          </p>
-        </div>
-      </div>
-    )
-  }
-
-  const { school, mission, principal, leadership, teachers, stats, facilities } = data
+  const data = useContent()!
+  const { school, leadership, teachers, facilities } = data
+  const { mission, principal, stats } = school
 
   return (
     <div className="flex flex-col">
