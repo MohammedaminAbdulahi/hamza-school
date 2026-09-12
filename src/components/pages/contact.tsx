@@ -329,7 +329,7 @@ export function ContactPage() {
                     <div className="aspect-[4/3] w-full sm:aspect-[16/12]">
                       <iframe
                         title="Hamza School location map"
-                        src="https://www.google.com/maps?q=Hamza+School+Addis+Ababa&output=embed"
+                        src="https://maps.google.com/maps?q=Hamza%20School%20Bole%20Road%20Addis%20Ababa%20Ethiopia&t=&z=15&ie=UTF8&iwloc=&output=embed"
                         className="size-full border-0"
                         loading="lazy"
                         referrerPolicy="no-referrer-when-downgrade"

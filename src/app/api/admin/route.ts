@@ -24,8 +24,8 @@ function authOk(password: unknown): boolean {
 }
 
 // ─── Rate limiting (in-memory, per-IP) ───
-// Blocks IP after 5 failed attempts for 15 minutes
-const MAX_ATTEMPTS = 5
+// Blocks IP after 3 failed attempts for 15 minutes
+const MAX_ATTEMPTS = 3
 const BLOCK_MS = 15 * 60 * 1000
 const attempts = new Map<string, { count: number; firstAt: number }>()
 
@@ -382,8 +382,16 @@ export async function POST(req: NextRequest) {
 
   if (!authOk(body.password)) {
     recordFailedAttempt(ip)
+    const entry = attempts.get(ip)
+    const remaining = MAX_ATTEMPTS - (entry?.count || 0)
+    if (remaining <= 0) {
+      return NextResponse.json(
+        { error: 'Too many failed attempts. Try again in 15 minutes.' },
+        { status: 429 }
+      )
+    }
     return NextResponse.json(
-      { error: 'Invalid password' },
+      { error: `Invalid password. ${remaining} attempt${remaining === 1 ? '' : 's'} remaining before lockout.` },
       { status: 401 }
     )
   }

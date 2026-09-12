@@ -132,11 +132,11 @@ export const SPORTS = [
 ]
 
 export const HISTORY = [
-  { year: '2015', title: 'Hamza School Founded', description: 'Opened on Bole Road with 60 students and 6 teachers in a single building.' },
-  { year: '2018', title: 'First Grade 8 Graduates', description: 'Our inaugural Grade 8 class sat for the national exam — 92% passed.' },
-  { year: '2020', title: 'Biology Lab Opened', description: 'A dedicated science lab with microscopes and specimens was added for Grades 7–8.' },
-  { year: '2023', title: 'Grew to 850 Students', description: 'Expanded to serve over 850 students across Grades 1–8 with 48 educators.' },
-  { year: '2025', title: 'Digital Learning Tools', description: 'Introduced tablets and educational software to enhance classroom learning.' },
+  { year: '2000', title: 'Hamza School Founded', description: 'Opened on Bole Road with 60 students and 6 teachers in a single building.' },
+  { year: '2000', title: 'First Grade 8 Graduates', description: 'Our inaugural Grade 8 class sat for the national exam — 92% passed.' },
+  { year: '2010', title: 'Biology Lab Opened', description: 'A dedicated science lab with microscopes and specimens was added for Grades 7–8.' },
+  { year: '2010', title: 'Grew to 850 Students', description: 'Expanded to serve over 850 students across Grades 1–8 with 48 educators.' },
+  { year: '2015', title: 'Digital Learning Tools', description: 'Introduced tablets and educational software to enhance classroom learning.' },
 ]
 
 export const ACHIEVEMENTS = [
