@@ -32,13 +32,7 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table'
+            } from '@/components/ui/table'
 
 // Derived contact info / social links / department contacts are computed
 // from the live `school` state inside the component so they reflect DB edits.
@@ -55,13 +49,6 @@ type SocialLink = {
   url: string
   color: string
 }
-type DepartmentContact = {
-  name: string
-  icon: string
-  email: string
-  phone: string
-}
-
 function buildContactInfo(school: School): ContactInfo[] {
   return [
     { icon: 'MapPin', label: 'Address', value: school.address, lines: [school.address] },
@@ -76,15 +63,6 @@ function buildSocialLinks(school: School): SocialLink[] {
     { name: 'Facebook', icon: 'Facebook', url: school.social.facebook, color: 'hover:bg-blue-600 hover:border-blue-600' },
     { name: 'YouTube', icon: 'Youtube', url: school.social.youtube, color: 'hover:bg-red-600 hover:border-red-600' },
     { name: 'Telegram', icon: 'Send', url: school.social.telegram, color: 'hover:bg-emerald-600 hover:border-emerald-600' },
-  ]
-}
-
-function buildDepartmentContacts(school: School): DepartmentContact[] {
-  return [
-    { name: 'Main Office', icon: 'Building2', email: school.email, phone: school.phone },
-    { name: 'Admissions', icon: 'GraduationCap', email: 'join@hamzaschool.et', phone: school.altPhone },
-    { name: 'Accounts', icon: 'Calculator', email: 'accounts@hamzaschool.et', phone: school.altPhone },
-    { name: 'Transport', icon: 'Bus', email: 'transport@hamzaschool.et', phone: school.altPhone },
   ]
 }
 
@@ -131,10 +109,6 @@ export function ContactPage() {
   // Derived values — always reflect the latest school state (DB or default).
   const contactInfo = React.useMemo(() => buildContactInfo(school), [school])
   const socialLinks = React.useMemo(() => buildSocialLinks(school), [school])
-  const departmentContacts = React.useMemo(
-    () => buildDepartmentContacts(school),
-    [school]
-  )
   const contactActions = React.useMemo(
     () => buildContactActions(school),
     [school]
@@ -355,7 +329,7 @@ export function ContactPage() {
                     <div className="aspect-[4/3] w-full sm:aspect-[16/12]">
                       <iframe
                         title="Hamza School location map"
-                        src="https://www.google.com/maps?q=Riverside%20CA&output=embed"
+                        src="https://www.google.com/maps?q=Hamza+School+Addis+Ababa&output=embed"
                         className="size-full border-0"
                         loading="lazy"
                         referrerPolicy="no-referrer-when-downgrade"
@@ -399,68 +373,6 @@ export function ContactPage() {
               </div>
             </Reveal>
           </div>
-        </div>
-      </section>
-
-      {/* ===== DEPARTMENT CONTACTS ===== */}
-      <section className="py-20 sm:py-24">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <Reveal>
-            <SectionHeader
-              eyebrow="Direct Lines"
-              title="Department Contacts"
-              description="Need to reach a specific team? Use these direct lines for faster, more tailored help."
-            />
-          </Reveal>
-          <Reveal delay={0.1}>
-            <Card className="mt-12 overflow-hidden border-primary/10">
-              <Table>
-                <TableHeader>
-                  <TableRow className="bg-primary/5 hover:bg-primary/5">
-                    <TableHead className="pl-6 text-sm font-semibold uppercase tracking-wider text-primary">
-                      Department
-                    </TableHead>
-                    <TableHead className="text-sm font-semibold uppercase tracking-wider text-primary">
-                      Email
-                    </TableHead>
-                    <TableHead className="pr-6 text-sm font-semibold uppercase tracking-wider text-primary">
-                      Phone
-                    </TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {departmentContacts.map((d) => (
-                    <TableRow key={d.name} className="text-sm sm:text-base">
-                      <TableCell className="pl-6 py-4">
-                        <div className="flex items-center gap-3">
-                          <div className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
-                            <DynamicIcon name={d.icon} className="size-4.5" />
-                          </div>
-                          <span className="font-medium">{d.name}</span>
-                        </div>
-                      </TableCell>
-                      <TableCell className="py-4">
-                        <a
-                          href={`mailto:${d.email}`}
-                          className="text-primary hover:underline"
-                        >
-                          {d.email}
-                        </a>
-                      </TableCell>
-                      <TableCell className="pr-6 py-4 text-muted-foreground">
-                        <a
-                          href={`tel:${d.phone.replace(/[^+\d]/g, '')}`}
-                          className="hover:text-primary hover:underline"
-                        >
-                          {d.phone}
-                        </a>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </Card>
-          </Reveal>
         </div>
       </section>
 
