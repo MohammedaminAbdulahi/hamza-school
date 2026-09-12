@@ -1,6 +1,7 @@
 'use client'
 
 import * as React from 'react'
+import { motion } from 'framer-motion'
 import {
   Calendar,
   Clock,
@@ -23,7 +24,6 @@ import { DynamicIcon } from '@/components/site/dynamic-icon'
 import { useNav } from '@/lib/nav-store'
 import { NEWS, EVENTS, NEWS_CATEGORIES, ANNOUNCEMENTS } from '@/lib/content'
 import { isDataUrl } from '@/lib/image-upload'
-import { SkeletonImage } from '@/components/site/skeleton-loader'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -89,54 +89,79 @@ function buildMarchCalendar() {
 }
 
 export function NewsPage() {
-  // Loading state is tracked but no longer blocks rendering — content.ts
-  // defaults render immediately and silently update when DB data arrives.
-  const [loading, setLoading] = React.useState(true)
-
   const goPage = useNav((s) => s.goPage)
   const [activeCategory, setActiveCategory] = React.useState('All')
   const [page, setPage] = React.useState(1)
 
-  const [news, setNews] = React.useState(NEWS)
-  const [events, setEvents] = React.useState(EVENTS)
+  // Start with null — nothing renders until DB data arrives.
+  // This prevents the "flash of demo data → swap to real data" problem.
+  const [data, setData] = React.useState<{
+    news: typeof NEWS
+    events: typeof EVENTS
+  } | null>(null)
 
   React.useEffect(() => {
     fetch('/api/content')
       .then((r) => r.json())
-      .then(
-        (d: { news?: DbNews[]; events?: DbEvent[] }) => {
-          if (Array.isArray(d.news) && d.news.length > 0) {
-            setNews(d.news as unknown as typeof NEWS)
-          }
-          if (Array.isArray(d.events) && d.events.length > 0) {
-            setEvents(d.events as unknown as typeof EVENTS)
-          }
-        }
-      )
-      .catch(() => { /* keep defaults on error */ })
-      .finally(() => setLoading(false))
+      .then((d: { news?: DbNews[]; events?: DbEvent[] }) => {
+        const news =
+          Array.isArray(d.news) && d.news.length > 0
+            ? (d.news as unknown as typeof NEWS)
+            : NEWS
+        const events =
+          Array.isArray(d.events) && d.events.length > 0
+            ? (d.events as unknown as typeof EVENTS)
+            : EVENTS
+        setData({ news, events })
+      })
+      .catch(() => {
+        // DB failed — fall back to defaults so the page isn't blank forever
+        setData({ news: NEWS, events: EVENTS })
+      })
   }, [])
 
-  // News comes from /api/content (with content.ts fallback)
-  const filtered = React.useMemo(() => {
-    const list =
-      activeCategory === 'All'
-        ? news
-        : news.filter((n) => n.category === activeCategory)
-    return list
-  }, [activeCategory, news])
-
+  // Reset to page 1 when the category changes
   React.useEffect(() => {
     setPage(1)
   }, [activeCategory])
+
+  // Static March 2025 calendar grid — independent of DB data
+  const calendarCells = React.useMemo(() => buildMarchCalendar(), [])
+
+  // Show a clean loading state — no demo data flash
+  if (!data) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-background">
+        <div className="flex flex-col items-center gap-4">
+          <div className="relative size-12">
+            <div className="absolute inset-0 rounded-full border-2 border-forest/15" />
+            <motion.div
+              className="absolute inset-0 rounded-full border-2 border-transparent border-t-forest"
+              animate={{ rotate: 360 }}
+              transition={{ repeat: Infinity, duration: 0.9, ease: 'linear' }}
+            />
+          </div>
+          <p className="font-serif text-sm italic tracking-wider text-gold-deep">
+            Loading…
+          </p>
+        </div>
+      </div>
+    )
+  }
+
+  const { news, events } = data
+
+  // News comes from /api/content (with content.ts fallback)
+  const filtered =
+    activeCategory === 'All'
+      ? news
+      : news.filter((n) => n.category === activeCategory)
 
   const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE))
   const pageItems = filtered.slice(
     (page - 1) * PAGE_SIZE,
     page * PAGE_SIZE
   )
-
-  const calendarCells = React.useMemo(() => buildMarchCalendar(), [])
 
   function eventsOnDay(day: number | null) {
     if (day === null) return []
@@ -212,9 +237,7 @@ export function NewsPage() {
               <Reveal key={article.title} delay={i * 0.08}>
                 <Card className="group flex h-full flex-col overflow-hidden border-primary/10 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-primary/5">
                   <div className="relative">
-                    {loading ? (
-                      <SkeletonImage aspect="aspect-[16/10] w-full" />
-                    ) : isPhoto ? (
+                    {isPhoto ? (
                       <img
                         src={article.image}
                         alt={article.title}

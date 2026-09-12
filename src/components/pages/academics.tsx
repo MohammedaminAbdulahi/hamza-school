@@ -1,6 +1,7 @@
 'use client'
 
 import * as React from 'react'
+import { motion } from 'framer-motion'
 import { ArrowRight, BookOpen } from 'lucide-react'
 import { PageHero } from '@/components/site/page-hero'
 import { SectionHeader } from '@/components/site/section-header'
@@ -21,7 +22,6 @@ import {
   SPORTS,
 } from '@/lib/content'
 import { isDataUrl } from '@/lib/image-upload'
-import { SkeletonImage } from '@/components/site/skeleton-loader'
 import {
   Card,
   CardContent,
@@ -44,35 +44,52 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 export function AcademicsPage() {
   const goPage = useNav((s) => s.goPage)
 
-  // Map of facility name -> uploaded photo data URL (real photo).
-  // Hydrated from /api/content on mount; defaults to an empty map so the
-  // SmartImage placeholder is shown until the DB responds.
+  // Start with null — nothing renders until DB data arrives.
+  // This prevents the "flash of demo data → swap to real data" problem.
   const [facilityPhotos, setFacilityPhotos] = React.useState<
-    Record<string, string>
-  >({})
-  const [facilitiesLoading, setFacilitiesLoading] = React.useState(true)
+    Record<string, string> | null
+  >(null)
 
   React.useEffect(() => {
     fetch('/api/content')
       .then((r) => r.json())
-      .then(
-        (d: {
-          facilities?: { name: string; photo?: string }[]
-        }) => {
-          if (Array.isArray(d.facilities)) {
-            const map: Record<string, string> = {}
-            for (const f of d.facilities) {
-              if (f && typeof f.name === 'string' && isDataUrl(f.photo)) {
-                map[f.name] = f.photo
-              }
+      .then((d: { facilities?: { name: string; photo?: string }[] }) => {
+        const map: Record<string, string> = {}
+        if (Array.isArray(d.facilities)) {
+          for (const f of d.facilities) {
+            if (f && typeof f.name === 'string' && isDataUrl(f.photo)) {
+              map[f.name] = f.photo
             }
-            setFacilityPhotos(map)
           }
         }
-      )
-      .catch(() => { /* keep defaults on error */ })
-      .finally(() => setFacilitiesLoading(false))
+        setFacilityPhotos(map)
+      })
+      .catch(() => {
+        // DB failed — fall back to an empty map (no facility photos)
+        setFacilityPhotos({})
+      })
   }, [])
+
+  // Show a clean loading state — no demo data flash
+  if (!facilityPhotos) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-background">
+        <div className="flex flex-col items-center gap-4">
+          <div className="relative size-12">
+            <div className="absolute inset-0 rounded-full border-2 border-forest/15" />
+            <motion.div
+              className="absolute inset-0 rounded-full border-2 border-transparent border-t-forest"
+              animate={{ rotate: 360 }}
+              transition={{ repeat: Infinity, duration: 0.9, ease: 'linear' }}
+            />
+          </div>
+          <p className="font-serif text-sm italic tracking-wider text-gold-deep">
+            Loading…
+          </p>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className="flex flex-col">
@@ -381,9 +398,7 @@ export function AcademicsPage() {
               return (
                 <Reveal key={lab.name} delay={i * 0.08}>
                   <Card className="group h-full overflow-hidden py-0 transition-all hover:-translate-y-1 hover:shadow-lg">
-                    {facilitiesLoading ? (
-                      <SkeletonImage aspect="aspect-[16/10] w-full" />
-                    ) : isPhoto ? (
+                    {isPhoto ? (
                       <img
                         src={photo}
                         alt={lab.name}

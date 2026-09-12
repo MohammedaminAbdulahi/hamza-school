@@ -1,22 +1,37 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import { cn } from '@/lib/utils'
 
 /**
- * Skeleton placeholder with a blur-pulse animation.
- * Used for images and content that's being fetched from the database.
- * Shows a shimmering blur effect until the real data arrives.
+ * Inline skeleton — shows a subtle shimmer pulse inside an element.
+ * Use this for text/images that are loading from the database.
  */
-export function Skeleton({ className }: { className?: string }) {
+export function InlineSkeleton({ className }: { className?: string }) {
+  return (
+    <span
+      className={`inline-block animate-pulse rounded-sm bg-forest/10 ${className || ''}`}
+      style={{ minHeight: '1em' }}
+    />
+  )
+}
+
+/**
+ * Section skeleton — shows a pulsing block while a section loads.
+ */
+export function SectionSkeleton({ className }: { className?: string }) {
+  return (
+    <div className={`animate-pulse rounded-sm bg-forest/5 ${className || ''}`} />
+  )
+}
+
+/**
+ * Image skeleton — shimmer box for images.
+ */
+export function ImageSkeleton({ className }: { className?: string }) {
   return (
     <div
-      className={cn(
-        'relative overflow-hidden bg-forest/10',
-        className
-      )}
+      className={`relative overflow-hidden bg-forest/10 ${className || ''}`}
     >
-      {/* Shimmer effect */}
       <motion.div
         className="absolute inset-0"
         style={{
@@ -30,28 +45,26 @@ export function Skeleton({ className }: { className?: string }) {
 }
 
 /**
- * Skeleton for image placeholders — shows a blurred shimmer box
- * until the real image loads.
+ * Text skeleton — shimmer bar for text lines.
  */
-export function SkeletonImage({
+export function TextSkeleton({
   className,
-  aspect = 'aspect-[4/3]',
+  lines = 1,
 }: {
   className?: string
-  aspect?: string
+  lines?: number
 }) {
-  return <Skeleton className={cn(aspect, 'w-full rounded-sm', className)} />
-}
-
-/**
- * Skeleton for text lines — shows a blurred shimmer bar.
- */
-export function SkeletonText({
-  className,
-  width = 'w-full',
-}: {
-  className?: string
-  width?: string
-}) {
-  return <Skeleton className={cn('h-4 rounded-sm', width, className)} />
+  if (lines === 1) {
+    return <InlineSkeleton className={className} />
+  }
+  return (
+    <div className="flex flex-col gap-2">
+      {Array.from({ length: lines }).map((_, i) => (
+        <InlineSkeleton
+          key={i}
+          className={i === lines - 1 ? `w-2/3 ${className || ''}` : `w-full ${className || ''}`}
+        />
+      ))}
+    </div>
+  )
 }

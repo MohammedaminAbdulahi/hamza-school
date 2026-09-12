@@ -1,6 +1,7 @@
 'use client'
 
 import * as React from 'react'
+import { motion } from 'framer-motion'
 import { Images, Maximize2, X, ArrowRight, Camera } from 'lucide-react'
 import { PageHero } from '@/components/site/page-hero'
 import { SectionHeader } from '@/components/site/section-header'
@@ -9,7 +10,6 @@ import { SmartImage } from '@/components/site/smart-image'
 import { useNav } from '@/lib/nav-store'
 import { GALLERY, GALLERY_CATEGORIES } from '@/lib/content'
 import { isDataUrl } from '@/lib/image-upload'
-import { SkeletonImage } from '@/components/site/skeleton-loader'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -47,35 +47,38 @@ function getCategoryBadgeClass(category: string) {
 }
 
 export function GalleryPage() {
-  // Loading state is tracked but no longer blocks rendering — content.ts
-  // defaults render immediately and silently update when DB data arrives.
-  const [loading, setLoading] = React.useState(true)
-
   const goPage = useNav((s) => s.goPage)
   const [activeCategory, setActiveCategory] = React.useState('All')
   const [lightboxIndex, setLightboxIndex] = React.useState<number | null>(
     null
   )
 
-  const [gallery, setGallery] = React.useState<GalleryItem[]>(GALLERY)
+  // Start with null — nothing renders until DB data arrives.
+  // This prevents the "flash of demo data → swap to real data" problem.
+  const [data, setData] = React.useState<GalleryItem[] | null>(null)
 
   React.useEffect(() => {
     fetch('/api/content')
       .then((r) => r.json())
       .then((d: { gallery?: GalleryItem[] }) => {
-        if (Array.isArray(d.gallery) && d.gallery.length > 0) {
-          setGallery(d.gallery)
-        }
+        const gallery =
+          Array.isArray(d.gallery) && d.gallery.length > 0
+            ? d.gallery
+            : GALLERY
+        setData(gallery)
       })
-      .catch(() => { /* keep defaults on error */ })
-      .finally(() => setLoading(false))
+      .catch(() => {
+        // DB failed — fall back to defaults so the page isn't blank forever
+        setData(GALLERY)
+      })
   }, [])
 
   const filtered: GalleryItem[] = React.useMemo(() => {
+    const gallery = data ?? []
     return activeCategory === 'All'
       ? gallery
       : gallery.filter((g) => g.category === activeCategory)
-  }, [activeCategory, gallery])
+  }, [activeCategory, data])
 
   const openLightbox = (index: number) => setLightboxIndex(index)
   const closeLightbox = () => setLightboxIndex(null)
@@ -101,6 +104,29 @@ export function GalleryPage() {
 
   const current =
     lightboxIndex !== null ? filtered[lightboxIndex] : null
+
+  // Show a clean loading state — no demo data flash
+  if (!data) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-background">
+        <div className="flex flex-col items-center gap-4">
+          <div className="relative size-12">
+            <div className="absolute inset-0 rounded-full border-2 border-forest/15" />
+            <motion.div
+              className="absolute inset-0 rounded-full border-2 border-transparent border-t-forest"
+              animate={{ rotate: 360 }}
+              transition={{ repeat: Infinity, duration: 0.9, ease: 'linear' }}
+            />
+          </div>
+          <p className="font-serif text-sm italic tracking-wider text-gold-deep">
+            Loading…
+          </p>
+        </div>
+      </div>
+    )
+  }
+
+  const gallery = data
 
   return (
     <div className="flex flex-col">
@@ -190,9 +216,7 @@ export function GalleryPage() {
                     aria-label={`View ${item.title} larger`}
                   >
                     <div className="relative aspect-[4/3] overflow-hidden">
-                      {loading ? (
-                        <SkeletonImage aspect="size-full" />
-                      ) : isPhoto ? (
+                      {isPhoto ? (
                         <img
                           src={item.image}
                           alt={item.title}

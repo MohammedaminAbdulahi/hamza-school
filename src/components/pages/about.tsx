@@ -1,6 +1,7 @@
 'use client'
 
 import * as React from 'react'
+import { motion } from 'framer-motion'
 import { Quote, ArrowRight, Target, Eye, Award, ShieldCheck, Sparkles } from 'lucide-react'
 import { PageHero } from '@/components/site/page-hero'
 import { SectionHeader } from '@/components/site/section-header'
@@ -23,7 +24,6 @@ import {
   PRINCIPAL,
 } from '@/lib/content'
 import { isDataUrl } from '@/lib/image-upload'
-import { SkeletonImage } from '@/components/site/skeleton-loader'
 import {
   Card,
   CardContent,
@@ -55,19 +55,19 @@ type DbSchool = {
 }
 
 export function AboutPage() {
-  // Loading state is tracked but no longer blocks rendering — content.ts
-  // defaults render immediately and silently update when DB data arrives.
-  const [loading, setLoading] = React.useState(true)
-
   const goPage = useNav((s) => s.goPage)
 
-  const [school, setSchool] = React.useState(SCHOOL)
-  const [mission, setMission] = React.useState(MISSION)
-  const [principal, setPrincipal] = React.useState(PRINCIPAL)
-  const [leadership, setLeadership] = React.useState(LEADERSHIP)
-  const [teachers, setTeachers] = React.useState(TEACHERS)
-  const [stats, setStats] = React.useState<typeof STATS>(STATS)
-  const [facilities, setFacilities] = React.useState<typeof FACILITIES>(FACILITIES)
+  // Start with null — nothing renders until DB data arrives.
+  // This prevents the "flash of demo data → swap to real data" problem.
+  const [data, setData] = React.useState<{
+    school: typeof SCHOOL
+    mission: typeof MISSION
+    principal: typeof PRINCIPAL & { photo?: string }
+    leadership: typeof LEADERSHIP
+    teachers: typeof TEACHERS
+    stats: typeof STATS
+    facilities: typeof FACILITIES
+  } | null>(null)
 
   React.useEffect(() => {
     fetch('/api/content')
@@ -78,44 +78,79 @@ export function AboutPage() {
         teachers?: DbTeacher[]
         facilities?: DbFacility[]
       }) => {
-        if (d.school) {
-          setSchool({ ...SCHOOL, ...d.school, social: SCHOOL.social })
-          if (d.school.mission) setMission({ ...MISSION, ...d.school.mission })
-          if (d.school.principal) setPrincipal({ ...PRINCIPAL, ...d.school.principal })
-          // Merge fetched stats over the content.ts defaults so partial DB
-          // responses stay safe.
-          if (Array.isArray(d.school.stats) && d.school.stats.length === 4) {
-            setStats(
-              d.school.stats.map((s, i) => ({
+        const school = d.school
+          ? { ...SCHOOL, ...d.school, social: SCHOOL.social }
+          : SCHOOL
+        const mission = d.school?.mission
+          ? { ...MISSION, ...d.school.mission }
+          : MISSION
+        const principal = d.school?.principal
+          ? { ...PRINCIPAL, ...d.school.principal }
+          : { ...PRINCIPAL }
+        const leadership =
+          Array.isArray(d.leadership) && d.leadership.length > 0
+            ? (d.leadership as unknown as typeof LEADERSHIP)
+            : LEADERSHIP
+        const teachers =
+          Array.isArray(d.teachers) && d.teachers.length > 0
+            ? (d.teachers as unknown as typeof TEACHERS)
+            : TEACHERS
+        const stats =
+          Array.isArray(d.school?.stats) && d.school!.stats!.length === 4
+            ? (d.school!.stats!.map((s, i) => ({
                 label: s.label ?? STATS[i]?.label ?? '',
                 value: Number(s.value) || 0,
                 suffix: s.suffix ?? STATS[i]?.suffix ?? '',
-              })) as typeof STATS
-            )
-          }
-        }
-        if (Array.isArray(d.leadership) && d.leadership.length > 0) {
-          setLeadership(d.leadership as unknown as typeof LEADERSHIP)
-        }
-        if (Array.isArray(d.teachers) && d.teachers.length > 0) {
-          setTeachers(d.teachers as unknown as typeof TEACHERS)
-        }
-        // Hydrate facilities from the DB, falling back to content.ts defaults
-        // so the section is always populated even if the DB is unreachable.
-        if (Array.isArray(d.facilities) && d.facilities.length > 0) {
-          setFacilities(
-            d.facilities.map((f, i) => ({
-              icon: f.icon || FACILITIES[i]?.icon || 'Building',
-              name: f.name,
-              description: f.description,
-              photo: f.photo,
-            })) as typeof FACILITIES
-          )
-        }
+              })) as typeof STATS)
+            : STATS
+        const facilities =
+          Array.isArray(d.facilities) && d.facilities.length > 0
+            ? (d.facilities.map((f, i) => ({
+                icon: f.icon || FACILITIES[i]?.icon || 'Building',
+                name: f.name,
+                description: f.description,
+                photo: f.photo,
+              })) as typeof FACILITIES)
+            : FACILITIES
+
+        setData({ school, mission, principal, leadership, teachers, stats, facilities })
       })
-      .catch(() => { /* keep defaults on error */ })
-      .finally(() => setLoading(false))
+      .catch(() => {
+        // DB failed — fall back to defaults so the page isn't blank forever
+        setData({
+          school: SCHOOL,
+          mission: MISSION,
+          principal: { ...PRINCIPAL },
+          leadership: LEADERSHIP,
+          teachers: TEACHERS,
+          stats: STATS,
+          facilities: FACILITIES,
+        })
+      })
   }, [])
+
+  // Show a clean loading state — no demo data flash
+  if (!data) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-background">
+        <div className="flex flex-col items-center gap-4">
+          <div className="relative size-12">
+            <div className="absolute inset-0 rounded-full border-2 border-forest/15" />
+            <motion.div
+              className="absolute inset-0 rounded-full border-2 border-transparent border-t-forest"
+              animate={{ rotate: 360 }}
+              transition={{ repeat: Infinity, duration: 0.9, ease: 'linear' }}
+            />
+          </div>
+          <p className="font-serif text-sm italic tracking-wider text-gold-deep">
+            Loading…
+          </p>
+        </div>
+      </div>
+    )
+  }
+
+  const { school, mission, principal, leadership, teachers, stats, facilities } = data
 
   return (
     <div className="flex flex-col">
@@ -291,11 +326,9 @@ export function AboutPage() {
             <Reveal className="lg:col-span-5" delay={0.05}>
               <div className="relative mx-auto max-w-sm">
                 <div className="aspect-[4/5] w-full overflow-hidden rounded-xl border border-primary/20 shadow-sm">
-                  {loading ? (
-                    <SkeletonImage aspect="h-full w-full" className="border-0" />
-                  ) : isDataUrl((principal as { photo?: string }).photo) ? (
+                  {isDataUrl(principal.photo) ? (
                     <img
-                      src={(principal as { photo?: string }).photo}
+                      src={principal.photo}
                       alt={`Portrait of ${principal.name}`}
                       className="h-full w-full object-cover"
                     />
@@ -437,9 +470,7 @@ export function AboutPage() {
                 <Reveal key={facility.name} delay={i * 0.06}>
                   <Card className="group h-full overflow-hidden py-0 transition-all hover:-translate-y-1 hover:shadow-lg">
                     <div className="relative">
-                      {loading ? (
-                        <SkeletonImage aspect="aspect-[16/9] w-full" />
-                      ) : isDataUrl(photo) ? (
+                      {isDataUrl(photo) ? (
                         <img
                           src={photo}
                           alt={facility.name}

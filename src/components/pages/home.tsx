@@ -36,7 +36,6 @@ import {
   PRINCIPAL,
 } from '@/lib/content'
 import { isDataUrl } from '@/lib/image-upload'
-import { SkeletonImage } from '@/components/site/skeleton-loader'
 
 // DB content shape (subset of what /api/content returns)
 type DbStat = { key: string; label: string; value: number; suffix: string }
@@ -65,65 +64,88 @@ type DbEvent = {
 export function HomePage() {
   const { goPage } = useNav()
 
-  // Loading state — kept so individual sections can opt into subtle
-  // loading indicators, but we never block the whole page on it. The
-  // content.ts defaults render immediately and silently update when
-  // DB data arrives.
-  const [loading, setLoading] = React.useState(true)
-
-  // Local state seeded with content.ts defaults; updated from /api/content on mount.
-  const [hero, setHero] = React.useState(HERO)
-  const [mission, setMission] = React.useState(MISSION)
-  const [principal, setPrincipal] = React.useState<typeof PRINCIPAL & { photo?: string }>({
-    ...PRINCIPAL,
-    photo: '',
-  })
-  const [vicePrincipal, setVicePrincipal] = React.useState<{
-    name: string
-    title: string
-    message: string
-    photo: string
-  }>({ name: '', title: '', message: '', photo: '' })
-  const [events, setEvents] = React.useState<typeof EVENTS>(EVENTS)
-  const [stats, setStats] = React.useState<typeof STATS>(STATS)
+  // Start with null — nothing renders until DB data arrives.
+  // This prevents the "flash of demo data → swap to real data" problem.
+  const [data, setData] = React.useState<{
+    hero: typeof HERO
+    mission: typeof MISSION
+    principal: typeof PRINCIPAL & { photo?: string }
+    vicePrincipal: { name: string; title: string; message: string; photo: string }
+    events: typeof EVENTS
+    stats: typeof STATS
+  } | null>(null)
 
   React.useEffect(() => {
     fetch('/api/content')
       .then((r) => r.json())
       .then((d: { school?: DbSchool; events?: DbEvent[] }) => {
-        if (d.school) {
-          if (d.school.hero) setHero({ ...HERO, ...d.school.hero })
-          if (d.school.mission) setMission({ ...MISSION, ...d.school.mission })
-          if (d.school.principal)
-            setPrincipal((p) => ({
-              ...p,
-              ...d.school!.principal!,
-              photo: (d.school!.principal as { photo?: string }).photo ?? '',
-            }))
-          if (d.school.vicePrincipal)
-            setVicePrincipal({
+        const hero = d.school?.hero ? { ...HERO, ...d.school.hero } : HERO
+        const mission = d.school?.mission ? { ...MISSION, ...d.school.mission } : MISSION
+        const principal = d.school?.principal
+          ? {
+              ...PRINCIPAL,
+              ...d.school.principal,
+              photo: (d.school.principal as { photo?: string }).photo ?? '',
+            }
+          : { ...PRINCIPAL, photo: '' }
+        const vicePrincipal = d.school?.vicePrincipal
+          ? {
               name: d.school.vicePrincipal.name ?? '',
               title: d.school.vicePrincipal.title ?? '',
               message: d.school.vicePrincipal.message ?? '',
               photo: d.school.vicePrincipal.photo ?? '',
-            })
-          if (Array.isArray(d.school.stats) && d.school.stats.length === 4) {
-            setStats(
-              d.school.stats.map((s, i) => ({
+            }
+          : { name: '', title: '', message: '', photo: '' }
+        const stats =
+          Array.isArray(d.school?.stats) && d.school!.stats!.length === 4
+            ? (d.school!.stats!.map((s, i) => ({
                 label: s.label ?? STATS[i]?.label ?? '',
                 value: Number(s.value) || 0,
                 suffix: s.suffix ?? STATS[i]?.suffix ?? '',
-              })) as typeof STATS
-            )
-          }
-        }
-        if (Array.isArray(d.events) && d.events.length > 0) {
-          setEvents(d.events as unknown as typeof EVENTS)
-        }
+              })) as typeof STATS)
+            : STATS
+        const events =
+          Array.isArray(d.events) && d.events.length > 0
+            ? (d.events as unknown as typeof EVENTS)
+            : EVENTS
+
+        setData({ hero, mission, principal, vicePrincipal, events, stats })
       })
-      .catch(() => { /* keep defaults on error */ })
-      .finally(() => setLoading(false))
+      .catch(() => {
+        // DB failed — fall back to defaults so the page isn't blank forever
+        setData({
+          hero: HERO,
+          mission: MISSION,
+          principal: { ...PRINCIPAL, photo: '' },
+          vicePrincipal: { name: '', title: '', message: '', photo: '' },
+          events: EVENTS,
+          stats: STATS,
+        })
+      })
   }, [])
+
+  // Show a clean loading state — no demo data flash
+  if (!data) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-background">
+        <div className="flex flex-col items-center gap-4">
+          <div className="relative size-12">
+            <div className="absolute inset-0 rounded-full border-2 border-forest/15" />
+            <motion.div
+              className="absolute inset-0 rounded-full border-2 border-transparent border-t-forest"
+              animate={{ rotate: 360 }}
+              transition={{ repeat: Infinity, duration: 0.9, ease: 'linear' }}
+            />
+          </div>
+          <p className="font-serif text-sm italic tracking-wider text-gold-deep">
+            Loading…
+          </p>
+        </div>
+      </div>
+    )
+  }
+
+  const { hero, mission, principal, vicePrincipal, events, stats } = data
 
   return (
     <div className="flex flex-col">
@@ -418,9 +440,7 @@ export function HomePage() {
           <Reveal className="lg:col-span-5">
             <div className="relative mx-auto max-w-xs">
               <div className="aspect-[4/5] overflow-hidden rounded-sm border-2 border-gold/30 shadow-2xl">
-                {loading ? (
-                  <SkeletonImage aspect="h-full w-full" className="border-0" />
-                ) : isDataUrl(principal.photo) ? (
+                {isDataUrl(principal.photo) ? (
                   <img
                     src={principal.photo}
                     alt={principal.name}
